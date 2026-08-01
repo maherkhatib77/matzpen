@@ -5314,7 +5314,6 @@ function _saveCompleteData(solutionId) {
                             </div>
                             <div style="margin-top:16px;text-align:center;">
                                 <button class="btn btn-primary" onclick="App._saveHomepageContent()">💾 שמור תוכן</button>
-                                <button class="btn btn-outline" onclick="App._initHpTinyMCE()" style="margin-right:8px;">🔄 אתחל עורך</button>
                             </div>
                         </div>
                     </div>
@@ -5347,8 +5346,41 @@ function _saveCompleteData(solutionId) {
             </style>
         `;
 
-        // Initialize TinyMCE after rendering
-        setTimeout(function() { _initHpTinyMCE(); }, 50);
+        // Initialize TinyMCE after rendering - using full-featured config from official demo
+        setTimeout(function() { 
+            if (typeof tinymce !== 'undefined') {
+                tinymce.remove(); // Remove any existing editors
+                tinymce.init({
+                    selector: '#hpMainRich',
+                    height: 600,
+                    directionality: 'rtl',
+                    language: 'he_IL',
+                    language_url: 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5/langs/he_IL.min.js',
+                    menubar: 'file edit view insert format tools table help',
+                    plugins: [
+                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 
+                        'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 
+                        'table', 'paste', 'wordcount', 'help', 'directionality', 'textcolor', 'emoticons', 
+                        'pagebreak', 'nonbreaking', 'toc', 'hr', 'codesample', 'autosave', 'save'
+                    ],
+                    toolbar: "undo redo | styles fontsize | bold italic forecolor backcolor | alignleft aligncenter alignright justify | rtl ltr | bullist numlist outdent indent | table | link image media | emoticons charmap hr codesample | removeformat | code preview | save | help",
+                    content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 15px; line-height: 1.8; padding: 16px; direction: rtl; } img { max-width: 100%; height: auto; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; } h1 { font-size: 26px; } h2 { font-size: 22px; } h3 { font-size: 18px; }',
+                    branding: false,
+                    promotion: false,
+                    resize: true,
+                    statusbar: true,
+                    paste_data_images: true,
+                    autosave_ask_before_unload: true,
+                    autosave_interval: '30s',
+                    autosave_prefix: '{path}{query}-{id}-',
+                    autosave_restore_when_empty: false,
+                    autosave_retention: '2m'
+                });
+                console.log('[Homepage] TinyMCE initialized successfully');
+            } else {
+                console.warn('[Homepage] TinyMCE not loaded yet');
+            }
+        }, 100);
     }
 
 
@@ -5397,60 +5429,7 @@ function _saveCompleteData(solutionId) {
         DataStore.updateHomepage(updates);
         showToast('הכותרת נשמרה', 'success');
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
-    }
-
-    var _hpTinyMCEInit = false;
-
-    function _initHpTinyMCE() {
-        if (typeof tinymce === 'undefined') {
-            console.warn('[Homepage] TinyMCE not loaded yet');
-            return;
-        }
-        // Destroy existing editor if any
-        if (_hpTinyMCEInit) {
-            try {
-                var existingEditor = tinymce.get('hpMainRich');
-                if (existingEditor) {
-                    existingEditor.save();
-                    existingEditor.destroy();
-                }
-            } catch(e) { console.error('[Homepage] Error destroying editor:', e); }
-            _hpTinyMCEInit = false;
-        }
-        // Check if textarea exists
-        var textarea = document.getElementById('hpMainRich');
-        if (!textarea) {
-            console.warn('[Homepage] Textarea #hpMainRich not found');
-            return;
-        }
-        // Initialize new editor
-        try {
-            tinymce.init({
-                selector: '#hpMainRich',
-                height: 500,
-                directionality: 'rtl',
-                language: 'he_IL',
-                language_url: 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5/langs/he_IL.min.js',
-                menubar: 'file edit view insert format table tools',
-                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste wordcount help directionality textcolor emoticons pagebreak nonbreaking toc hr codesample',
-                toolbar: 'undo redo | styles fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright justify | rtl ltr | bullist numlist outdent indent | table | link image media | emoticons charmap | hr codesample | removeformat | code | help',
-                content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 15px; line-height: 1.8; padding: 16px; direction: rtl; } img { max-width: 100%; height: auto; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; } h1 { font-size: 26px; } h2 { font-size: 22px; } h3 { font-size: 18px; }',
-                branding: false,
-                promotion: false,
-                resize: true,
-                statusbar: true,
-                paste_data_images: true,
-                setup: function(editor) {
-                    editor.on('init', function() {
-                        _hpTinyMCEInit = true;
-                        console.log('[Homepage] TinyMCE initialized successfully');
-                    });
-                }
-            });
-        } catch(e) {
-            console.error('[Homepage] Error initializing TinyMCE:', e);
-        }
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function _saveHomepageContent() {
@@ -5468,7 +5447,7 @@ function _saveCompleteData(solutionId) {
         });
         showToast('התוכן נשמר', 'success');
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function _saveHomepageFooter() {
@@ -5477,7 +5456,7 @@ function _saveCompleteData(solutionId) {
         DataStore.updateHomepage({ footerText: { he: footerHe, ar: footerAr } });
         showToast('ה-Footer נשמר', 'success');
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function openHomepageNavModal(id) {
@@ -5534,7 +5513,7 @@ function _saveCompleteData(solutionId) {
         closeModal();
         DataStore.updateHomepage({ navItems: items });
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function deleteHomepageNavItem(id) {
@@ -5544,7 +5523,7 @@ function _saveCompleteData(solutionId) {
             DataStore.updateHomepage({ navItems: items });
             showToast('פריט הניווט נמחק', 'success');
             // Re-render and re-initialize TinyMCE after a short delay
-            setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+            setTimeout(function() { renderHomepage(); }, 100);
         });
     }
 
@@ -5569,7 +5548,7 @@ function _saveCompleteData(solutionId) {
         items[targetIdx].order = tempOrder;
         DataStore.updateHomepage({ navItems: items });
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     // ── Sidebar Items CRUD (same pattern as Nav Items) ──
@@ -5662,7 +5641,7 @@ function _saveCompleteData(solutionId) {
         closeModal();
         DataStore.updateHomepage({ sidebarItems: items });
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function deleteHomepageSidebarItem(id) {
@@ -5672,7 +5651,7 @@ function _saveCompleteData(solutionId) {
             DataStore.updateHomepage({ sidebarItems: items });
             showToast('פריט התוכן הצדדי נמחק', 'success');
             // Re-render and re-initialize TinyMCE after a short delay
-            setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+            setTimeout(function() { renderHomepage(); }, 100);
         });
     }
 
@@ -5696,7 +5675,7 @@ function _saveCompleteData(solutionId) {
         items[targetIdx].order = tempOrder;
         DataStore.updateHomepage({ sidebarItems: items });
         // Re-render and re-initialize TinyMCE after a short delay
-        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+        setTimeout(function() { renderHomepage(); }, 100);
     }
 
     function _previewHomepageLogo(input) {
@@ -10295,7 +10274,7 @@ function _saveCompleteData(solutionId) {
         // Guides Repo
         openGuideRepoModal, saveGuideRepo, deleteGuideRepo, clearAllGuidesRepo, filterGuidesRepo, _previewGuideImage, moveGuideRepo,
         // Homepage
-        renderHomepage, _saveHomepageHeader, _saveHomepageContent, _saveHomepageFooter, _initHpTinyMCE,
+        renderHomepage, _saveHomepageHeader, _saveHomepageContent, _saveHomepageFooter,
         openHomepageNavModal, saveHomepageNavItem, deleteHomepageNavItem, moveHomepageNavItem,
         openHomepageSidebarModal, saveHomepageSidebarItem, deleteHomepageSidebarItem, moveHomepageSidebarItem,
         _previewHomepageLogo,
