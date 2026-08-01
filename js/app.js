@@ -5230,6 +5230,18 @@ function _saveCompleteData(solutionId) {
         const container = document.getElementById('section-homepage');
         if (!container) return;
 
+        // Destroy any existing TinyMCE editor before re-rendering
+        if (typeof tinymce !== 'undefined' && _hpTinyMCEInit) {
+            try {
+                var existingEditor = tinymce.get('hpMainRich');
+                if (existingEditor) {
+                    existingEditor.save();
+                    existingEditor.destroy();
+                }
+            } catch(e) { console.error('[Homepage] Error destroying editor on re-render:', e); }
+            _hpTinyMCEInit = false;
+        }
+
         container.innerHTML = `
             ${_lookupTableHeader('ניהול דף שער', 1)}
             <div style="display:flex;flex-direction:column;gap:24px;">
@@ -5290,10 +5302,13 @@ function _saveCompleteData(solutionId) {
                         <div style="display:flex;flex-direction:column;gap:12px;">
                             <div>
                                 <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block;">תוכן עשיר (עברית + ערבית)</label>
-                                <textarea id="hpMainRich" class="form-input" rows="10" placeholder="הזן תוכן בעברית ובערבית...">${escAttr(hp.mainContent?.combined || hp.mainContent?.he || '')}</textarea>
+                                <div class="hp-editor-wrapper" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                                    <textarea id="hpMainRich">${escHtml(hp.mainContent?.combined || hp.mainContent?.he || '')}</textarea>
+                                </div>
                             </div>
                             <div style="margin-top:16px;text-align:center;">
                                 <button class="btn btn-primary" onclick="App._saveHomepageContent()">💾 שמור תוכן</button>
+                                <button class="btn btn-outline" onclick="App._initHpTinyMCE()" style="margin-right:8px;">🔄 אתחל עורך</button>
                             </div>
                         </div>
                     </div>
@@ -5372,9 +5387,63 @@ function _saveCompleteData(solutionId) {
         if (newLogo) updates.logo = newLogo;
         DataStore.updateHomepage(updates);
         showToast('הכותרת נשמרה', 'success');
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
+    }
+
+    var _hpTinyMCEInit = false;
+    function _initHpTinyMCE() {
+        if (typeof tinymce === 'undefined') {
+            console.warn('[Homepage] TinyMCE not loaded yet');
+            return;
+        }
+        // Destroy existing editor if any
+        if (_hpTinyMCEInit) {
+            try {
+                var existingEditor = tinymce.get('hpMainRich');
+                if (existingEditor) {
+                    existingEditor.save();
+                    existingEditor.destroy();
+                }
+            } catch(e) { console.error('[Homepage] Error destroying editor:', e); }
+            _hpTinyMCEInit = false;
+        }
+        // Initialize new editor
+        try {
+            tinymce.init({
+                selector: '#hpMainRich',
+                height: 450,
+                directionality: 'rtl',
+                language: 'he_IL',
+                menubar: 'file edit view insert format table tools',
+                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste wordcount help directionality textcolor',
+                toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize | forecolor backcolor | alignleft aligncenter alignright justify | ltr rtl | bullist numlist | outdent indent | table | link image | hr | removeformat | code | help',
+                content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 15px; line-height: 1.8; padding: 16px; direction: rtl; } img { max-width: 100%; height: auto; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; } h1 { font-size: 26px; } h2 { font-size: 22px; } h3 { font-size: 18px; }',
+                branding: false,
+                promotion: false,
+                resize: true,
+                statusbar: true,
+                paste_data_images: true,
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        _hpTinyMCEInit = true;
+                        console.log('[Homepage] TinyMCE initialized successfully');
+                    });
+                }
+            });
+        } catch(e) {
+            console.error('[Homepage] Error initializing TinyMCE:', e);
+        }
     }
 
     function _saveHomepageContent() {
+        // Save editor content before saving
+        if (typeof tinymce !== 'undefined') {
+            var editor = tinymce.get('hpMainRich');
+            if (editor) {
+                editor.save();
+            }
+        }
         var mainRich = document.getElementById('hpMainRich');
         var content = mainRich ? mainRich.value : '';
         DataStore.updateHomepage({
@@ -5388,6 +5457,8 @@ function _saveCompleteData(solutionId) {
         const footerAr = document.getElementById('hpFooterAr').value;
         DataStore.updateHomepage({ footerText: { he: footerHe, ar: footerAr } });
         showToast('ה-Footer נשמר', 'success');
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     function openHomepageNavModal(id) {
@@ -5443,7 +5514,8 @@ function _saveCompleteData(solutionId) {
         editingItem = null;
         closeModal();
         DataStore.updateHomepage({ navItems: items });
-        renderHomepage();
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     function deleteHomepageNavItem(id) {
@@ -5452,7 +5524,8 @@ function _saveCompleteData(solutionId) {
             const items = (hp.navItems || []).filter(i => i.id !== id);
             DataStore.updateHomepage({ navItems: items });
             showToast('פריט הניווט נמחק', 'success');
-            renderHomepage();
+            // Re-render and re-initialize TinyMCE after a short delay
+            setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
         });
     }
 
@@ -5476,7 +5549,8 @@ function _saveCompleteData(solutionId) {
         items[idx].order = itemB.order || 0;
         items[targetIdx].order = tempOrder;
         DataStore.updateHomepage({ navItems: items });
-        renderHomepage();
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     // ── Sidebar Items CRUD (same pattern as Nav Items) ──
@@ -5568,7 +5642,8 @@ function _saveCompleteData(solutionId) {
         editingItem = null;
         closeModal();
         DataStore.updateHomepage({ sidebarItems: items });
-        renderHomepage();
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     function deleteHomepageSidebarItem(id) {
@@ -5577,7 +5652,8 @@ function _saveCompleteData(solutionId) {
             const items = (hp.sidebarItems || []).filter(i => i.id !== id);
             DataStore.updateHomepage({ sidebarItems: items });
             showToast('פריט התוכן הצדדי נמחק', 'success');
-            renderHomepage();
+            // Re-render and re-initialize TinyMCE after a short delay
+            setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
         });
     }
 
@@ -5600,7 +5676,8 @@ function _saveCompleteData(solutionId) {
         items[idx].order = itemB.order || 0;
         items[targetIdx].order = tempOrder;
         DataStore.updateHomepage({ sidebarItems: items });
-        renderHomepage();
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     function _previewHomepageLogo(input) {
