@@ -1,0 +1,72 @@
+[
+  {
+    "value": "א",
+    "label": "א",
+    "labelAr": "الاحد",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yr1y0bddmgpeg8",
+    "createdAt": "2026-07-28T18:02:29.400Z",
+    "updatedAt": "2026-07-29T15:31:19.234Z"
+  },
+  {
+    "value": "ב",
+    "label": "ב",
+    "labelAr": "الاثنين",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yr1y2l5si7g27z",
+    "createdAt": "2026-07-28T18:02:29.402Z",
+    "updatedAt": "2026-07-28T18:02:29.402Z"
+  },
+  {
+    "value": "ג",
+    "label": "ג",
+    "labelAr": "الثلاثاء",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yr1y2nopccz98p",
+    "createdAt": "2026-07-28T18:02:29.402Z",
+    "updatedAt": "2026-07-28T18:02:29.402Z"
+  },
+  {
+    "value": "ד",
+    "label": "ד",
+    "labelAr": "الاربعاء",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yr1y3gakusbzsm",
+    "createdAt": "2026-07-28T18:02:29.403Z",
+    "updatedAt": "2026-07-29T15:31:33.461Z"
+  },
+  {
+    "value": "ה",
+    "label": "ה",
+    "labelAr": "الخميس",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4yr1y4zmoq2l7nr",
+    "createdAt": "2026-07-28T18:02:29.404Z",
+    "updatedAt": "2026-07-28T18:02:29.404Z"
+  },
+  {
+    "value": "ו",
+    "label": "ו",
+    "labelAr": "الجمعة",
+    "order": 6,
+    "isActive": true,
+    "id": "ms4yr1y4o5ab5vpwd",
+    "createdAt": "2026-07-28T18:02:29.404Z",
+    "updatedAt": "2026-07-28T18:02:29.404Z"
+  },
+  {
+    "value": "שבת",
+    "label": "שבת",
+    "labelAr": "السبت",
+    "order": 7,
+    "isActive": true,
+    "id": "ms4yr1y55aikvvyk9",
+    "createdAt": "2026-07-28T18:02:29.405Z",
+    "updatedAt": "2026-07-28T18:02:29.405Z"
+  }
+]

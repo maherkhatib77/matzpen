@@ -1,0 +1,62 @@
+[
+  {
+    "value": "תחום דעת",
+    "label": "תחום דעת",
+    "labelAr": "مجالات التخصص",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yq4z2lqytro5so",
+    "createdAt": "2026-07-28T18:01:46.670Z",
+    "updatedAt": "2026-07-28T18:01:46.670Z"
+  },
+  {
+    "value": "בעלי תפקידים",
+    "label": "בעלי תפקידים",
+    "labelAr": "أصحاب الوظائف",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yq4z3ty7hii1vn",
+    "createdAt": "2026-07-28T18:01:46.671Z",
+    "updatedAt": "2026-07-29T16:09:33.016Z"
+  },
+  {
+    "value": "נושא רוחב",
+    "label": "נושא רוחב",
+    "labelAr": "مواضيع عامة",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yq4z4rv30mitpv",
+    "createdAt": "2026-07-28T18:01:46.672Z",
+    "updatedAt": "2026-07-28T18:01:46.672Z"
+  },
+  {
+    "value": "תוכניות ייעודיות",
+    "label": "תוכניות ייעודיות",
+    "labelAr": "برامج متميزة",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yq4z41356h8gm3",
+    "createdAt": "2026-07-28T18:01:46.672Z",
+    "updatedAt": "2026-07-28T18:01:46.672Z"
+  },
+  {
+    "value": "בית ספרי",
+    "label": "בית ספרי",
+    "labelAr": "استكمالات المدارس",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4yq4z5fs1k5o8oz",
+    "createdAt": "2026-07-28T18:01:46.673Z",
+    "updatedAt": "2026-07-29T15:22:01.610Z"
+  },
+  {
+    "value": "גזרת פיקוח",
+    "label": "גזרת פיקוח",
+    "labelAr": "مناطق التفتيش",
+    "isActive": true,
+    "order": 6,
+    "id": "ms68hivhr5858y54h",
+    "createdAt": "2026-07-29T15:22:47.117Z",
+    "updatedAt": "2026-07-29T15:22:47.117Z"
+  }
+]

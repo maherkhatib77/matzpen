@@ -1,0 +1,322 @@
+[
+  {
+    "value": "מנהל",
+    "label": "מנהל",
+    "labelAr": "مدير",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4ythes5jhl9df7k",
+    "createdAt": "2026-07-28T18:04:22.756Z",
+    "updatedAt": "2026-07-29T14:49:42.703Z"
+  },
+  {
+    "value": "סגן מנהל",
+    "label": "סגן מנהל",
+    "labelAr": "نائب",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4ytheuk70ksxn7m",
+    "createdAt": "2026-07-28T18:04:22.758Z",
+    "updatedAt": "2026-07-29T14:49:46.953Z"
+  },
+  {
+    "value": "מחנך",
+    "label": "מחנך",
+    "labelAr": "مربي صف",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4ythevpv14lwfag",
+    "createdAt": "2026-07-28T18:04:22.759Z",
+    "updatedAt": "2026-07-28T18:04:22.759Z"
+  },
+  {
+    "value": "יועץ",
+    "label": "יועץ",
+    "labelAr": "المستشار التربوي",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4ythevmxkkfawoo",
+    "createdAt": "2026-07-28T18:04:22.759Z",
+    "updatedAt": "2026-07-29T14:50:04.133Z"
+  },
+  {
+    "value": "רכז מקצוע",
+    "label": "רכז מקצוע",
+    "labelAr": "مركز موضوع",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4ytheweas8cbb44",
+    "createdAt": "2026-07-28T18:04:22.760Z",
+    "updatedAt": "2026-07-29T14:50:18.856Z"
+  },
+  {
+    "value": "רכז שכבה",
+    "label": "רכז שכבה",
+    "labelAr": "مركز طبقة",
+    "order": 6,
+    "isActive": true,
+    "id": "ms4ythex2wf0c27au",
+    "createdAt": "2026-07-28T18:04:22.761Z",
+    "updatedAt": "2026-07-29T14:55:48.477Z"
+  },
+  {
+    "value": "רכז מעבדה",
+    "label": "רכז מעבדה",
+    "labelAr": "مركز المختبر",
+    "order": 7,
+    "isActive": true,
+    "id": "ms4ythexivi0et2ie",
+    "createdAt": "2026-07-28T18:04:22.761Z",
+    "updatedAt": "2026-07-29T14:50:39.194Z"
+  },
+  {
+    "value": "רכז חינוך חברתי",
+    "label": "רכז חינוך חברתי",
+    "labelAr": "مركز التربية الاجتماعية",
+    "order": 8,
+    "isActive": true,
+    "id": "ms4ytheyz0t4gdj34",
+    "createdAt": "2026-07-28T18:04:22.762Z",
+    "updatedAt": "2026-07-29T14:50:52.895Z"
+  },
+  {
+    "value": "רכז בחינות בגרות",
+    "label": "רכז בחינות בגרות",
+    "labelAr": "مركز بجروت",
+    "order": 9,
+    "isActive": true,
+    "id": "ms4ythezj3nkp4yup",
+    "createdAt": "2026-07-28T18:04:22.763Z",
+    "updatedAt": "2026-07-29T14:59:01.982Z"
+  },
+  {
+    "value": "רכז ביטחון",
+    "label": "רכז ביטחון",
+    "labelAr": "مركز الأمن والأمان",
+    "order": 10,
+    "isActive": true,
+    "id": "ms4ythf00t0c9srxr",
+    "createdAt": "2026-07-28T18:04:22.764Z",
+    "updatedAt": "2026-07-29T14:51:02.065Z"
+  },
+  {
+    "value": "רכז זהירות בדרכים",
+    "label": "רכז זהירות בדרכים",
+    "labelAr": "مركز الحذر على الطرق",
+    "order": 11,
+    "isActive": true,
+    "id": "ms4ythf1wglueq46c",
+    "createdAt": "2026-07-28T18:04:22.765Z",
+    "updatedAt": "2026-07-29T14:58:00.946Z"
+  },
+  {
+    "value": "רכז מניעת סמים",
+    "label": "רכז מניעת סמים",
+    "labelAr": "مركز الوقاية من المخدرات والإدمان",
+    "order": 12,
+    "isActive": true,
+    "id": "ms4ythf2qf8sevopk",
+    "createdAt": "2026-07-28T18:04:22.766Z",
+    "updatedAt": "2026-07-29T14:51:17.397Z"
+  },
+  {
+    "value": "רכז טיולים",
+    "label": "רכז טיולים",
+    "labelAr": "مركز رحلات",
+    "order": 13,
+    "isActive": true,
+    "id": "ms4ythf3prs6toahr",
+    "createdAt": "2026-07-28T18:04:22.767Z",
+    "updatedAt": "2026-07-29T14:59:33.161Z"
+  },
+  {
+    "value": "רכז מערכת שעות",
+    "label": "רכז מערכת שעות",
+    "labelAr": "مركز برنامج الساعات المدرسي",
+    "order": 14,
+    "isActive": true,
+    "id": "ms4ythf3qz5rxsh6m",
+    "createdAt": "2026-07-28T18:04:22.767Z",
+    "updatedAt": "2026-07-29T14:51:34.378Z"
+  },
+  {
+    "value": "רכז הערכה ומדידה",
+    "label": "רכז הערכה ומדידה",
+    "labelAr": "مركز التقييم والقياس",
+    "order": 15,
+    "isActive": true,
+    "id": "ms4ythf4kk1brr5t6",
+    "createdAt": "2026-07-28T18:04:22.768Z",
+    "updatedAt": "2026-07-29T14:56:35.130Z"
+  },
+  {
+    "value": "מורה חונך",
+    "label": "מורה חונך",
+    "labelAr": "معلم موجّه",
+    "order": 16,
+    "isActive": true,
+    "id": "ms4ythf5r9saq06p0",
+    "createdAt": "2026-07-28T18:04:22.769Z",
+    "updatedAt": "2026-07-28T18:04:22.769Z"
+  },
+  {
+    "value": "רכז פדגוגי",
+    "label": "רכז פדגוגי",
+    "labelAr": "مركز تربوي",
+    "order": 17,
+    "isActive": true,
+    "id": "ms4ythf6ifdbv1uet",
+    "createdAt": "2026-07-28T18:04:22.770Z",
+    "updatedAt": "2026-07-29T14:51:39.492Z"
+  },
+  {
+    "value": "רכז מחוננים ומצטיינים",
+    "label": "רכז מחוננים ומצטיינים",
+    "labelAr": "مركز الموهوبين والمتفوقين",
+    "order": 18,
+    "isActive": true,
+    "id": "ms4ythf7nnzxolz4v",
+    "createdAt": "2026-07-28T18:04:22.771Z",
+    "updatedAt": "2026-07-29T14:51:49.497Z"
+  },
+  {
+    "value": "רכז התאמות ללמידה",
+    "label": "רכז התאמות ללמידה",
+    "labelAr": "مركز الملاءمات",
+    "order": 19,
+    "isActive": true,
+    "id": "ms4ythf862v6ssaen",
+    "createdAt": "2026-07-28T18:04:22.772Z",
+    "updatedAt": "2026-07-29T14:58:28.773Z"
+  },
+  {
+    "value": "רכז מועצת תלמידים",
+    "label": "רכז מועצת תלמידים",
+    "labelAr": "مركز مجلس الطلاب",
+    "order": 20,
+    "isActive": true,
+    "id": "ms4ythf9znpyl5c5t",
+    "createdAt": "2026-07-28T18:04:22.773Z",
+    "updatedAt": "2026-07-29T14:52:00.894Z"
+  },
+  {
+    "value": "מורה מאמן",
+    "label": "מורה מאמן",
+    "labelAr": "معلم مرافق",
+    "order": 21,
+    "isActive": true,
+    "id": "ms4ythf9g2c4e961c",
+    "createdAt": "2026-07-28T18:04:22.773Z",
+    "updatedAt": "2026-07-28T18:04:22.773Z"
+  },
+  {
+    "value": "רכז תקשוב",
+    "label": "רכז תקשוב",
+    "labelAr": "مركز الحوسبة",
+    "order": 22,
+    "isActive": true,
+    "id": "ms4ythfanj6ma7gq6",
+    "createdAt": "2026-07-28T18:04:22.774Z",
+    "updatedAt": "2026-07-29T14:52:08.089Z"
+  },
+  {
+    "value": "רכז מעורבות חברתית",
+    "label": "רכז מעורבות חברתית",
+    "labelAr": "مركز تداخل اجتماعي",
+    "order": 23,
+    "isActive": true,
+    "id": "ms4ythfbcchprh6qz",
+    "createdAt": "2026-07-28T18:04:22.775Z",
+    "updatedAt": "2026-07-29T15:00:12.681Z"
+  },
+  {
+    "value": "רכז עבודות גמר",
+    "label": "רכז עבודות גמר",
+    "labelAr": "مركز الوظائف النهائية",
+    "order": 24,
+    "isActive": true,
+    "id": "ms4ythfcunv4k07y7",
+    "createdAt": "2026-07-28T18:04:22.776Z",
+    "updatedAt": "2026-07-29T14:52:12.750Z"
+  },
+  {
+    "value": "רכז מיומנויות",
+    "label": "רכז מיומנויות",
+    "labelAr": "مركز مهارات",
+    "order": 25,
+    "isActive": true,
+    "id": "ms4ythfd6oja8pf58",
+    "createdAt": "2026-07-28T18:04:22.777Z",
+    "updatedAt": "2026-07-29T14:59:51.314Z"
+  },
+  {
+    "value": "רכז השתלבות ואוכלוסיות מיוחדות",
+    "label": "רכז השתלבות ואוכלוסיות מיוחדות",
+    "labelAr": "مركز الاندماج والاحتواء",
+    "order": 26,
+    "isActive": true,
+    "id": "ms4ythfe6tkvx5b7x",
+    "createdAt": "2026-07-28T18:04:22.778Z",
+    "updatedAt": "2026-07-29T14:52:29.029Z"
+  },
+  {
+    "value": "רכז ערבית",
+    "label": "רכז ערבית",
+    "labelAr": "مركز اللغة العربية",
+    "isActive": true,
+    "order": 27,
+    "id": "ms67h5t5j8r7lp1vj",
+    "createdAt": "2026-07-29T14:54:30.569Z",
+    "updatedAt": "2026-07-29T14:54:30.569Z"
+  },
+  {
+    "value": "רכז עברית",
+    "label": "רכז עברית",
+    "labelAr": "مركز اللغة العبرية",
+    "isActive": true,
+    "order": 28,
+    "id": "ms67hvj1xi3vyt7qp",
+    "createdAt": "2026-07-29T14:55:03.901Z",
+    "updatedAt": "2026-07-29T14:55:03.901Z"
+  },
+  {
+    "value": "רכז אנגלית",
+    "label": "רכז אנגלית",
+    "labelAr": "مركز اللغة الانجليزية",
+    "isActive": true,
+    "order": 29,
+    "id": "ms67ib2hmofdigb3v",
+    "createdAt": "2026-07-29T14:55:24.041Z",
+    "updatedAt": "2026-07-29T14:55:24.041Z"
+  },
+  {
+    "value": "רכז הכלה",
+    "label": "רכז הכלה",
+    "labelAr": "مركز احتواء",
+    "isActive": true,
+    "order": 30,
+    "id": "ms67l656vbzefyryg",
+    "createdAt": "2026-07-29T14:57:37.626Z",
+    "updatedAt": "2026-07-29T14:57:37.626Z"
+  },
+  {
+    "value": "מורה מוביל",
+    "label": "מורה מוביל",
+    "labelAr": "معلم ريادي",
+    "isActive": true,
+    "order": 31,
+    "id": "ms67pvumndipqlyt6",
+    "createdAt": "2026-07-29T15:01:17.566Z",
+    "updatedAt": "2026-07-29T15:01:17.566Z"
+  },
+  {
+    "value": "מדריך מחוזי",
+    "label": "מדריך מחוזי",
+    "labelAr": "مرشد لوائي",
+    "isActive": true,
+    "order": 32,
+    "id": "ms67rml39gnsqj6nw",
+    "createdAt": "2026-07-29T15:02:38.871Z",
+    "updatedAt": "2026-07-29T15:02:38.871Z"
+  }
+]

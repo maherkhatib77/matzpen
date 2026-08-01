@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوصلة نت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans Arabic', 'Tajawal', 'Open Sans', sans-serif;
+            min-height: 100vh;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            direction: rtl;
+        }
+        body[dir="rtl"] { direction: rtl; }
+        body[dir="ltr"] { direction: ltr; }
+
+        /* ── Header ── */
+        .hp-header {
+            background: #0f1820;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+        }
+        .hp-header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .hp-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+        .hp-logo-img {
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,.4);
+            background: rgba(255,255,255,.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .hp-logo-img img { width: 100%; height: 100%; object-fit: cover; }
+        .hp-site-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,.15);
+            line-height: 1.3;
+        }
+        /* ── Navigation ── */
+        .hp-nav {
+            background: #f8fafb;
+            border-bottom: 1px solid #ececec;
+        }
+        .hp-nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .hp-nav-inner::-webkit-scrollbar { height: 0; }
+        .hp-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Noto Sans Arabic', 'Tajawal', sans-serif;
+            color: #4c6373;
+            text-decoration: none;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all .2s;
+        }
+        .hp-nav-link:hover {
+            color: #0ca7aa;
+            border-bottom-color: #0ca7aa;
+            background: rgba(12,167,170,.04);
+        }
+
+        /* ── Content Area ── */
+        .hp-content-area {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px;
+            display: grid;
+            grid-template-columns: 1fr 4fr;
+            gap: 28px;
+        }
+
+        /* Sidebar */
+        .hp-sidebar {
+            background: #f8fafb;
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666666;
+            word-break: break-word;
+            align-self: start;
+            position: sticky;
+            top: 90px;
+        }
+        .hp-sidebar a { color: #0ca7aa; text-decoration: none; }
+        .hp-sidebar a:hover { text-decoration: underline; }
+
+        /* Main */
+        .hp-main {
+            font-size: 16px;
+            line-height: 1.9;
+            color: #24343f;
+            word-break: break-word;
+        }
+
+        /* ── Rich Text Styles (for Quill WYSIWYG content) ── */
+        .hp-main h1 { font-size: 28px; font-weight: 800; margin: 24px 0 12px; color: #0f1820; line-height: 1.3; }
+        .hp-main h2 { font-size: 22px; font-weight: 700; margin: 20px 0 10px; color: #24343f; line-height: 1.4; }
+        .hp-main h3 { font-size: 18px; font-weight: 700; margin: 16px 0 8px; color: #4c6373; line-height: 1.4; }
+        .hp-main p { margin: 10px 0; }
+        .hp-main ul, .hp-main ol { padding-right: 24px; margin: 10px 0; }
+        .hp-main ul { list-style-type: disc; }
+        .hp-main ol { list-style-type: decimal; }
+        .hp-main li { margin: 4px 0; }
+        .hp-main blockquote { border-right: 4px solid #0ca7aa; padding: 12px 20px; margin: 16px 0; background: #e9f6fb; border-radius: 0 8px 8px 0; color: #4c6373; }
+        .hp-main a { color: #0ca7aa; text-decoration: none; }
+        .hp-main a:hover { text-decoration: underline; }
+        .hp-main img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; }
+        .hp-main strong { font-weight: 700; }
+        .hp-main em { font-style: italic; }
+
+        /* ── Footer ── */
+        .hp-footer {
+            text-align: center;
+            padding: 20px 24px;
+            border-top: 1px solid #ececec;
+            background: #f8fafb;
+            font-size: 13px;
+            color: #999999;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+        .hp-footer a { color: #0ca7aa; text-decoration: none; }
+        .hp-footer a:hover { text-decoration: underline; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hp-header-inner { flex-wrap: wrap; padding: 14px 16px; }
+            .hp-site-name { font-size: 17px; }
+            .hp-logo-img { width: 44px; height: 44px; font-size: 24px; }
+            .hp-content-area { grid-template-columns: 1fr; padding: 20px 16px; gap: 20px; }
+            .hp-sidebar { position: static; }
+            .hp-nav-link { padding: 12px 14px; font-size: 14px; }
+            .hp-main h1 { font-size: 22px; }
+            .hp-main h2 { font-size: 19px; }
+            .hp-main h3 { font-size: 16px; }
+        }
+        @media (max-width: 480px) {
+            .hp-site-name { font-size: 18px; }
+            .hp-logo-area { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 1. Header Section -->
+    <header class="hp-header">
+        <div class="hp-header-inner">
+            <div class="hp-logo-area" id="hpLogoArea">
+                <div class="hp-logo-img" id="globalHeaderLogo">🧭</div>
+                <div class="hp-site-name" id="hpSiteName">بوصلة نت</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. Navigation Bar -->
+    <nav class="hp-nav" id="hpNavBar">
+        <div class="hp-nav-inner" id="hpNavInner"></div>
+    </nav>
+
+    <!-- 3 & 4. Content Area (Sidebar 20% + Main 80%) -->
+    <div class="hp-content-area">
+        <aside class="hp-sidebar" id="hpSidebar"></aside>
+        <main class="hp-main" id="hpMain"></main>
+    </div>
+
+    <!-- 5. Footer Section -->
+    <footer class="hp-footer" id="globalFooterText"></footer>
+
+    <script src="./js/data.js?v=4.5.0"></script>
+    <script src="./js/global-ui.js?v=1.0.0"></script>
+    <script>
+        var currentLang = 'ar';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function renderPage() {
+            var hp = DataStore.getHomepage();
+            var lang = currentLang;
+
+            // Logo
+            var logoEl = document.getElementById('globalHeaderLogo');
+            if (hp.logo) {
+                logoEl.innerHTML = '<img src="' + escapeHtml(hp.logo) + '" alt="logo">';
+            } else {
+                logoEl.innerHTML = '🧭';
+            }
+
+            // Site name
+            var siteName = hp.siteName[lang] || hp.siteName.he || 'מצפן נט';
+            document.getElementById('hpSiteName').textContent = siteName;
+            document.title = siteName;
+
+            // Nav items — each opens in a new tab
+            var navItems = (hp.navItems || []).filter(function(n) { return n.isActive !== false; })
+                .slice().sort(function(a,b) { return (a.order||0) - (b.order||0); });
+            var navHtml = navItems.map(function(n) {
+                var label = lang === 'ar' ? (n.labelAr || n.labelHe) : n.labelHe;
+                return '<a class="hp-nav-link" href="' + escapeHtml(n.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(label) + '</a>';
+            }).join('');
+            document.getElementById('hpNavInner').innerHTML = navHtml;
+
+            // Show/hide nav bar
+            document.getElementById('hpNavBar').style.display = navItems.length ? '' : 'none';
+
+            // Sidebar items — each opens in a new tab (same as nav)
+            var sidebarItems = (hp.sidebarItems || []).filter(function(n) { return n.isActive !== false; })
+                .slice().sort(function(a,b) { return (a.order||0) - (b.order||0); });
+            var sidebarHtml = '';
+            if (sidebarItems.length) {
+                sidebarHtml = '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">';
+                sidebarItems.forEach(function(n) {
+                    var label = lang === 'ar' ? (n.labelAr || n.labelHe) : n.labelHe;
+                    sidebarHtml += '<li><a class="hp-nav-link" href="' + escapeHtml(n.url) + '" target="_blank" rel="noopener noreferrer" style="display:block;padding:10px 14px;border-radius:8px;border:1px solid #ececec;">' + escapeHtml(label) + '</a></li>';
+                });
+                sidebarHtml += '</ul>';
+            }
+            document.getElementById('hpSidebar').innerHTML = sidebarHtml;
+
+            // Main content (rich text from Quill WYSIWYG — must use innerHTML)
+            document.getElementById('hpMain').innerHTML = hp.mainContent[lang] || '';
+
+            // Footer (supports HTML — links, copyright text, etc.)
+            document.getElementById('globalFooterText').innerHTML = hp.footerText[lang] || '';
+            if (typeof GlobalUI !== 'undefined') GlobalUI.apply(currentLang);
+        }
+
+        // Initialize
+        if (DataStore.init && typeof DataStore.init === 'function') {
+            var _t = setTimeout(function() { renderPage(); }, 5000);
+            DataStore.init().then(function() { clearTimeout(_t); renderPage(); }).catch(function() { clearTimeout(_t); renderPage(); });
+        } else {
+            renderPage();
+        }
+    </script>
+</body>
+</html>

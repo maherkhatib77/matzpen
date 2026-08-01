@@ -1,0 +1,32 @@
+[
+  {
+    "value": "שיוך מלא",
+    "label": "שיוך מלא",
+    "labelAr": "إسناد كامل",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4ys0twwh503zqed",
+    "createdAt": "2026-07-28T18:03:14.612Z",
+    "updatedAt": "2026-07-28T18:03:14.612Z"
+  },
+  {
+    "value": "שיוך חלקי",
+    "label": "שיוך חלקי",
+    "labelAr": "إسناد جزئي",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4ys0ty0zfybimne",
+    "createdAt": "2026-07-28T18:03:14.614Z",
+    "updatedAt": "2026-07-28T18:03:14.614Z"
+  },
+  {
+    "value": "לא שויך",
+    "label": "לא שויך",
+    "labelAr": "غير مسند",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4ys0tzw006pe1ik",
+    "createdAt": "2026-07-28T18:03:14.615Z",
+    "updatedAt": "2026-07-28T18:03:14.615Z"
+  }
+]

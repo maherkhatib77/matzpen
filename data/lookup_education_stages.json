@@ -1,0 +1,72 @@
+[
+  {
+    "value": "קדם-יסודי",
+    "label": "קדם-יסודי",
+    "labelAr": "رياض الاطفال",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yqgc188r1xew5n",
+    "createdAt": "2026-07-28T18:02:01.393Z",
+    "updatedAt": "2026-07-28T18:02:01.393Z"
+  },
+  {
+    "value": "יסודי",
+    "label": "יסודי",
+    "labelAr": "ابتدائي",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yqgc2zfylhioym",
+    "createdAt": "2026-07-28T18:02:01.394Z",
+    "updatedAt": "2026-07-29T14:46:47.382Z"
+  },
+  {
+    "value": "חטיבת ביניים",
+    "label": "חטיבת ביניים",
+    "labelAr": "اعدادي",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yqgc227je8ens4",
+    "createdAt": "2026-07-28T18:02:01.394Z",
+    "updatedAt": "2026-07-29T14:46:59.028Z"
+  },
+  {
+    "value": "חטיבה עליונה",
+    "label": "חטיבה עליונה",
+    "labelAr": "ثانوي",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yqgc3b71y7h86i",
+    "createdAt": "2026-07-28T18:02:01.395Z",
+    "updatedAt": "2026-07-29T14:47:09.751Z"
+  },
+  {
+    "value": "בתי ספר לחינוך מיוחד",
+    "label": "בתי ספר לחינוך מיוחד",
+    "labelAr": "مدارس تربية خاصة",
+    "isActive": true,
+    "order": 5,
+    "id": "ms69z19pna9139rnl",
+    "createdAt": "2026-07-29T16:04:23.725Z",
+    "updatedAt": "2026-07-29T16:06:41.749Z"
+  },
+  {
+    "value": "גני ילדים בחינוך המיוחד",
+    "label": "גני ילדים בחינוך המיוחד",
+    "labelAr": "روضات تربية خاصة",
+    "isActive": true,
+    "order": 6,
+    "id": "ms6a1l7lc69c6a0tj",
+    "createdAt": "2026-07-29T16:06:22.881Z",
+    "updatedAt": "2026-07-29T16:06:22.881Z"
+  },
+  {
+    "value": "כל שלבי החינוך",
+    "label": "כל שלבי החינוך",
+    "labelAr": "كل الفئات",
+    "isActive": true,
+    "order": 7,
+    "id": "ms6a38akpnam24ezh",
+    "createdAt": "2026-07-29T16:07:39.452Z",
+    "updatedAt": "2026-07-29T16:07:39.452Z"
+  }
+]

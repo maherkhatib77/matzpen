@@ -1,0 +1,52 @@
+[
+  {
+    "value": "פעיל",
+    "label": "פעיל",
+    "labelAr": "نشط",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4ysb3a9rvleabre",
+    "createdAt": "2026-07-28T18:03:27.910Z",
+    "updatedAt": "2026-07-28T18:03:27.910Z"
+  },
+  {
+    "value": "ממתין לאישור",
+    "label": "ממתין לאישור",
+    "labelAr": "بانتظار الموافقة",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4ysb3byqvklgq3p",
+    "createdAt": "2026-07-28T18:03:27.911Z",
+    "updatedAt": "2026-07-28T18:03:27.911Z"
+  },
+  {
+    "value": "בתכנון",
+    "label": "בתכנון",
+    "labelAr": "في التخطيط",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4ysb3bghb0eejxx",
+    "createdAt": "2026-07-28T18:03:27.911Z",
+    "updatedAt": "2026-07-28T18:03:27.911Z"
+  },
+  {
+    "value": "הושלם",
+    "label": "הושלם",
+    "labelAr": "مكتمل",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4ysb3ckht5i40my",
+    "createdAt": "2026-07-28T18:03:27.912Z",
+    "updatedAt": "2026-07-28T18:03:27.912Z"
+  },
+  {
+    "value": "בוטל",
+    "label": "בוטל",
+    "labelAr": "ملغى",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4ysb3ddhy8iya9e",
+    "createdAt": "2026-07-28T18:03:27.913Z",
+    "updatedAt": "2026-07-28T18:03:27.913Z"
+  }
+]

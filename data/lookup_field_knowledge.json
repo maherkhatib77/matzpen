@@ -1,0 +1,332 @@
+[
+  {
+    "value": "עברית",
+    "label": "עברית",
+    "labelAr": "اللغة العبرية",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yt7mdzb31x6cdx",
+    "createdAt": "2026-07-28T18:04:10.069Z",
+    "updatedAt": "2026-07-28T18:04:10.069Z"
+  },
+  {
+    "value": "אנגלית",
+    "label": "אנגלית",
+    "labelAr": "اللغة الإنجليزية",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yt7menuafcts6u",
+    "createdAt": "2026-07-28T18:04:10.070Z",
+    "updatedAt": "2026-07-28T18:04:10.070Z"
+  },
+  {
+    "value": "ערבית",
+    "label": "ערבית",
+    "labelAr": "اللغة العربية",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yt7mfy6smj6l7f",
+    "createdAt": "2026-07-28T18:04:10.071Z",
+    "updatedAt": "2026-07-28T18:04:10.071Z"
+  },
+  {
+    "value": "היסטוריה",
+    "label": "היסטוריה",
+    "labelAr": "تاريخ",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yt7mf4tbs9fx7o",
+    "createdAt": "2026-07-28T18:04:10.071Z",
+    "updatedAt": "2026-07-28T18:04:10.071Z"
+  },
+  {
+    "value": "אזרחות",
+    "label": "אזרחות",
+    "labelAr": "مدنيات",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4yt7mgyl7fdehvy",
+    "createdAt": "2026-07-28T18:04:10.072Z",
+    "updatedAt": "2026-07-28T18:04:10.072Z"
+  },
+  {
+    "value": "מתמטיקה",
+    "label": "מתמטיקה",
+    "labelAr": "رياضيات",
+    "order": 6,
+    "isActive": true,
+    "id": "ms4yt7mheuhlqjozd",
+    "createdAt": "2026-07-28T18:04:10.073Z",
+    "updatedAt": "2026-07-28T18:04:10.073Z"
+  },
+  {
+    "value": "פיזיקה",
+    "label": "פיזיקה",
+    "labelAr": "فيزياء",
+    "order": 7,
+    "isActive": true,
+    "id": "ms4yt7mhjoaxbpsnt",
+    "createdAt": "2026-07-28T18:04:10.073Z",
+    "updatedAt": "2026-07-28T18:04:10.073Z"
+  },
+  {
+    "value": "כימיה",
+    "label": "כימיה",
+    "labelAr": "كيمياء",
+    "order": 8,
+    "isActive": true,
+    "id": "ms4yt7miqoapzn9lm",
+    "createdAt": "2026-07-28T18:04:10.074Z",
+    "updatedAt": "2026-07-28T18:04:10.074Z"
+  },
+  {
+    "value": "חינוך גופני",
+    "label": "חינוך גופני",
+    "labelAr": "تربية بدنية",
+    "order": 9,
+    "isActive": true,
+    "id": "ms4yt7mjsxpav9h57",
+    "createdAt": "2026-07-28T18:04:10.075Z",
+    "updatedAt": "2026-07-28T18:04:10.075Z"
+  },
+  {
+    "value": "ביולוגיה",
+    "label": "ביולוגיה",
+    "labelAr": "علم الأحياء",
+    "order": 10,
+    "isActive": true,
+    "id": "ms4yt7mjy2l4xb0ln",
+    "createdAt": "2026-07-28T18:04:10.075Z",
+    "updatedAt": "2026-07-28T18:04:10.075Z"
+  },
+  {
+    "value": "מוסיקה",
+    "label": "מוסיקה",
+    "labelAr": "موسيقى",
+    "order": 11,
+    "isActive": true,
+    "id": "ms4yt7mkaqjn212n3",
+    "createdAt": "2026-07-28T18:04:10.076Z",
+    "updatedAt": "2026-07-28T18:04:10.076Z"
+  },
+  {
+    "value": "אומנות",
+    "label": "אומנות",
+    "labelAr": "فنون",
+    "order": 12,
+    "isActive": true,
+    "id": "ms4yt7mlacj4sbegn",
+    "createdAt": "2026-07-28T18:04:10.077Z",
+    "updatedAt": "2026-07-28T18:04:10.077Z"
+  },
+  {
+    "value": "גאוגרפיה",
+    "label": "גאוגרפיה",
+    "labelAr": "جغرافيا",
+    "order": 13,
+    "isActive": true,
+    "id": "ms4yt7mm9sgrilvqp",
+    "createdAt": "2026-07-28T18:04:10.078Z",
+    "updatedAt": "2026-07-28T18:04:10.078Z"
+  },
+  {
+    "value": "מוט\"ב - מדע וטכנולוגיה בחברה",
+    "label": "מוט\"ב - מדע וטכנולוגיה בחברה",
+    "labelAr": "علوم وتكنولوجيا في المجتمع",
+    "order": 14,
+    "isActive": true,
+    "id": "ms4yt7mn80beo3a74",
+    "createdAt": "2026-07-28T18:04:10.079Z",
+    "updatedAt": "2026-07-28T18:04:10.079Z"
+  },
+  {
+    "value": "מוט\"ל - מדע וטכנולוגיה לכולם",
+    "label": "מוט\"ל - מדע וטכנולוגיה לכולם",
+    "labelAr": "علوم وتكنولوجيا للجميع",
+    "order": 15,
+    "isActive": true,
+    "id": "ms4yt7moet65i5csz",
+    "createdAt": "2026-07-28T18:04:10.080Z",
+    "updatedAt": "2026-07-28T18:04:10.080Z"
+  },
+  {
+    "value": "מדע וטכנולוגיה",
+    "label": "מדע וטכנולוגיה",
+    "labelAr": "علوم وتكنولوجيا",
+    "order": 16,
+    "isActive": true,
+    "id": "ms4yt7mp3v17ecu3f",
+    "createdAt": "2026-07-28T18:04:10.081Z",
+    "updatedAt": "2026-07-28T18:04:10.081Z"
+  },
+  {
+    "value": "דת נוצרית",
+    "label": "דת נוצרית",
+    "labelAr": "الدين المسيحي",
+    "order": 17,
+    "isActive": true,
+    "id": "ms4yt7mqc4jmbirto",
+    "createdAt": "2026-07-28T18:04:10.082Z",
+    "updatedAt": "2026-07-28T18:04:10.082Z"
+  },
+  {
+    "value": "דת האסלם",
+    "label": "דת האסלם",
+    "labelAr": "الدين الإسلامي",
+    "order": 18,
+    "isActive": true,
+    "id": "ms4yt7mr2tozfe5ln",
+    "createdAt": "2026-07-28T18:04:10.083Z",
+    "updatedAt": "2026-07-28T18:04:10.083Z"
+  },
+  {
+    "value": "חינוך תעבורתי",
+    "label": "חינוך תעבורתי",
+    "labelAr": "تثقيف مروري",
+    "order": 19,
+    "isActive": true,
+    "id": "ms4yt7mswrqbn4rm6",
+    "createdAt": "2026-07-28T18:04:10.084Z",
+    "updatedAt": "2026-07-28T18:04:10.084Z"
+  },
+  {
+    "value": "גרפיקה ממוחשבת",
+    "label": "גרפיקה ממוחשבת",
+    "labelAr": "تصميم جرافيك حاسوبي",
+    "order": 20,
+    "isActive": true,
+    "id": "ms4yt7muosdoq3kvt",
+    "createdAt": "2026-07-28T18:04:10.086Z",
+    "updatedAt": "2026-07-28T18:04:10.086Z"
+  },
+  {
+    "value": "מדעי המחשב",
+    "label": "מדעי המחשב",
+    "labelAr": "علوم الحاسوب",
+    "order": 21,
+    "isActive": true,
+    "id": "ms4yt7mvoiip36n53",
+    "createdAt": "2026-07-28T18:04:10.087Z",
+    "updatedAt": "2026-07-28T18:04:10.087Z"
+  },
+  {
+    "value": "סוציולוגיה",
+    "label": "סוציולוגיה",
+    "labelAr": "علم الاجتماع",
+    "order": 22,
+    "isActive": true,
+    "id": "ms4yt7mwgu8200074",
+    "createdAt": "2026-07-28T18:04:10.088Z",
+    "updatedAt": "2026-07-28T18:04:10.088Z"
+  },
+  {
+    "value": "מערכות חשמל רכב",
+    "label": "מערכות חשמל רכב",
+    "labelAr": "أنظمة كهرباء المركبات",
+    "order": 23,
+    "isActive": true,
+    "id": "ms4yt7mxf8cr0lz00",
+    "createdAt": "2026-07-28T18:04:10.089Z",
+    "updatedAt": "2026-07-28T18:04:10.089Z"
+  },
+  {
+    "value": "מערכות מכונאות רכב",
+    "label": "מערכות מכונאות רכב",
+    "labelAr": "أنظمة ميكانيكا المركبات",
+    "order": 24,
+    "isActive": true,
+    "id": "ms4yt7mxs7iuqqegt",
+    "createdAt": "2026-07-28T18:04:10.089Z",
+    "updatedAt": "2026-07-28T18:04:10.090Z"
+  },
+  {
+    "value": "מדעים",
+    "label": "מדעים",
+    "labelAr": "علوم",
+    "order": 25,
+    "isActive": true,
+    "id": "ms4yt7myxr529byph",
+    "createdAt": "2026-07-28T18:04:10.090Z",
+    "updatedAt": "2026-07-28T18:04:10.090Z"
+  },
+  {
+    "value": "זה\"ב - זהירות בדרכים",
+    "label": "זה\"ב - זהירות בדרכים",
+    "labelAr": "التوعية المرورية والسلامة على الطرق",
+    "order": 26,
+    "isActive": true,
+    "id": "ms4yt7mzshbk3q427",
+    "createdAt": "2026-07-28T18:04:10.091Z",
+    "updatedAt": "2026-07-28T18:04:10.091Z"
+  },
+  {
+    "value": "ביוטכנולוגיה",
+    "label": "ביוטכנולוגיה",
+    "labelAr": "بيوتكنولوجيا",
+    "order": 27,
+    "isActive": true,
+    "id": "ms4yt7n14gf7giy0k",
+    "createdAt": "2026-07-28T18:04:10.093Z",
+    "updatedAt": "2026-07-28T18:04:10.093Z"
+  },
+  {
+    "value": "ביוכימיה",
+    "label": "ביוכימיה",
+    "labelAr": "كيمياء حيوية",
+    "order": 28,
+    "isActive": true,
+    "id": "ms4yt7n29hgo84zqi",
+    "createdAt": "2026-07-28T18:04:10.094Z",
+    "updatedAt": "2026-07-28T18:04:10.094Z"
+  },
+  {
+    "value": "חינוך טכנולוגי",
+    "label": "חינוך טכנולוגי",
+    "labelAr": "تربية تكنولوجية",
+    "order": 29,
+    "isActive": true,
+    "id": "ms4yt7n3s1t9mwu3g",
+    "createdAt": "2026-07-28T18:04:10.095Z",
+    "updatedAt": "2026-07-28T18:04:10.095Z"
+  },
+  {
+    "value": "כישורי חיים וחינוך חברתי",
+    "label": "כישורי חיים וחינוך חברתי",
+    "labelAr": "مهارات حياتية وتربية اجتماعية",
+    "order": 30,
+    "isActive": true,
+    "id": "ms4yt7n40h61bcf2v",
+    "createdAt": "2026-07-28T18:04:10.096Z",
+    "updatedAt": "2026-07-28T18:04:10.096Z"
+  },
+  {
+    "value": "כישורי חיים",
+    "label": "כישורי חיים",
+    "labelAr": "مهارات حياتية",
+    "order": 31,
+    "isActive": true,
+    "id": "ms4yt7n5ewmb6vykb",
+    "createdAt": "2026-07-28T18:04:10.097Z",
+    "updatedAt": "2026-07-28T18:04:10.097Z"
+  },
+  {
+    "value": "תקשוב",
+    "label": "תקשוב",
+    "labelAr": "حاسوب",
+    "isActive": true,
+    "order": 32,
+    "id": "ms8vikz8mgnuqtere",
+    "createdAt": "2026-07-31T11:43:00.020Z",
+    "updatedAt": "2026-07-31T11:43:00.020Z"
+  },
+  {
+    "value": "תקשורת",
+    "label": "תקשורת",
+    "labelAr": "اتصالات",
+    "isActive": true,
+    "order": 33,
+    "id": "ms8vixhuq8p4sjcc7",
+    "createdAt": "2026-07-31T11:43:16.242Z",
+    "updatedAt": "2026-07-31T11:43:16.242Z"
+  }
+]
