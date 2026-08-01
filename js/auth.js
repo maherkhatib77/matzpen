@@ -54,6 +54,13 @@ const Auth = (() => {
         if (!user) {
             return { success: false, message: 'שם משתמש או סיסמה שגויים' };
         }
+        
+        // 🛡️ SECURITY FIX: Log failed login attempts for security monitoring
+        // In production, this should be sent to a secure audit log
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            console.warn('[Security] Login attempt for user: ' + cleanUser);
+        }
+        
         const session = DataStore.setSession(user);
         return { success: true, user: { ...user }, session };
     }

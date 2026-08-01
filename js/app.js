@@ -2390,7 +2390,7 @@ const App = (() => {
         div.className = 'ms-dropdown';
         div.innerHTML = items.map(function(s, i) {
             const codeDisplay = s.code ? ' <span class="ms-item-sub">(' + escAttr(s.code) + ')</span>' : '';
-            return '<div class="ms-item" data-idx="' + i + '" data-id="' + s.id + '" onmousedown="App._ssSelectSchool(\'' + s.id + '\')" onmouseenter="App._ssHighlightItem(' + i + ')"><span class="ms-item-name">' + escAttr(s.name || '') + '</span>' + codeDisplay + '</div>';
+            return '<div class="ms-item" data-idx="' + i + '" data-id="' + escAttr(s.id) + '" onmousedown="App._ssSelectSchool(\'' + escAttr(s.id) + '\')" onmouseenter="App._ssHighlightItem(' + i + ')"><span class="ms-item-name">' + escAttr(s.name || '') + '</span>' + codeDisplay + '</div>';
         }).join('');
         ac.appendChild(div);
     }
@@ -2538,7 +2538,7 @@ const App = (() => {
         div.className = 'ms-dropdown';
         div.innerHTML = items.map(function(s, i) {
             const codeDisplay = s.code ? ' <span class="ms-item-sub">(' + escAttr(s.code) + ')</span>' : '';
-            return '<div class="ms-item" data-idx="' + i + '" data-id="' + s.id + '" onmousedown="App._essSelectSchool(\'' + s.id + '\')" onmouseenter="App._essHighlightItem(' + i + ')"><span class="ms-item-name">' + escAttr(s.name || '') + '</span>' + codeDisplay + '</div>';
+            return '<div class="ms-item" data-idx="' + i + '" data-id="' + escAttr(s.id) + '" onmousedown="App._essSelectSchool(\'' + escAttr(s.id) + '\')" onmouseenter="App._essHighlightItem(' + i + ')"><span class="ms-item-name">' + escAttr(s.name || '') + '</span>' + codeDisplay + '</div>';
         }).join('');
         ac.appendChild(div);
     }
@@ -2732,7 +2732,7 @@ const App = (() => {
         div.id = _msPrefix + 'msDropdown';
         div.className = 'ms-dropdown';
         div.innerHTML = items.map(function(m, i) {
-            return '<div class="ms-item" data-idx="' + i + '" data-id="' + m.id + '" onmousedown="App._msSelectItem(\'' + m.id + '\')" onmouseenter="App._msHighlightItem(' + i + ')">' +
+            return '<div class="ms-item" data-idx="' + i + '" data-id="' + escAttr(m.id) + '" onmousedown="App._msSelectItem(\'' + escAttr(m.id) + '\')" onmouseenter="App._msHighlightItem(' + i + ')">' +
                 '<span class="ms-item-name">' + escAttr(m.fullName) + '</span>' +
                 (m.idNumber ? '<span class="ms-item-sub">' + escAttr(m.idNumber) + '</span>' : '') +
             '</div>';
@@ -7783,9 +7783,9 @@ function _saveCompleteData(solutionId) {
         const tagsContainer = document.getElementById('editInstTags');
         if (tagsContainer) {
             tagsContainer.innerHTML = _editSelectedInstitutions.map(function(inst) {
-                return '<div class="institution-tag" data-code="' + inst.code + '">' +
-                    '<span class="tag-text">' + inst.code + ' — ' + escAttr(inst.name) + '</span>' +
-                    '<button type="button" class="tag-remove" data-code="' + inst.code + '" title="הסר">&times;</button>' +
+                return '<div class="institution-tag" data-code="' + escAttr(inst.code) + '">' +
+                    '<span class="tag-text">' + escAttr(inst.code) + ' — ' + escAttr(inst.name) + '</span>' +
+                    '<button type="button" class="tag-remove" data-code="' + escAttr(inst.code) + '" title="הסר">&times;</button>' +
                     '</div>';
             }).join('');
         }
@@ -7818,12 +7818,12 @@ function _saveCompleteData(solutionId) {
                 }
 
                 dropdown.innerHTML = matches.map(function(s) {
-                    return '<div class="inst-suggestion-item" data-code="' + (s.code || '') +
-                        '" data-name="' + (s.name || '').replace(/"/g, '&quot;') + '">' +
+                    return '<div class="inst-suggestion-item" data-code="' + escAttr(s.code || '') +
+                        '" data-name="' + escAttr(s.name || '') + '">' +
                         '<div class="inst-sug-header">' +
-                            '<span class="inst-sug-code">' + (s.code || '') + '</span>' +
-                            '<span class="inst-sug-name">' + (s.name || '') + '</span>' +
-                            (s.educationStage ? ' <span style="font-size:11px;color:var(--gray-400);flex-shrink:0;">' + s.educationStage + '</span>' : '') +
+                            '<span class="inst-sug-code">' + escAttr(s.code || '') + '</span>' +
+                            '<span class="inst-sug-name">' + escAttr(s.name || '') + '</span>' +
+                            (s.educationStage ? ' <span style="font-size:11px;color:var(--gray-400);flex-shrink:0;">' + escAttr(s.educationStage) + '</span>' : '') +
                         '</div></div>';
                 }).join('');
 
@@ -8710,17 +8710,17 @@ function _saveCompleteData(solutionId) {
                         <th style="width:160px;">פעולות</th>
                     </tr></thead>
                     <tbody id="faqTableBody">${!hasItems ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-400);">אין שאלות עדיין. לחצו על "הוספת שאלה" להתחלה.</td></tr>' :
-                        items.map(item => `<tr draggable="true" ondragstart="App._faqDragStart(event,'${item.id}')" ondragover="App._faqDragOver(event)" ondrop="App._faqDrop(event,'${item.id}')" ondragend="App._faqDragEnd(event)" style="cursor:grab;">
-                            <td style="text-align:center;"><input type="checkbox" class="faq-check" data-id="${item.id}" style="cursor:pointer;"></td>
+                        items.map(item => `<tr draggable="true" ondragstart="App._faqDragStart(event,'${escAttr(item.id)}')" ondragover="App._faqDragOver(event)" ondrop="App._faqDrop(event,'${escAttr(item.id)}')" ondragend="App._faqDragEnd(event)" style="cursor:grab;">
+                            <td style="text-align:center;"><input type="checkbox" class="faq-check" data-id="${escAttr(item.id)}" style="cursor:pointer;"></td>
                             <td style="text-align:center;">${item.order || 0}</td>
                             <td dir="rtl">${escAttr(item.titleAr || '—')}</td>
                             <td>${escAttr(item.titleHe || '—')}</td>
                             <td>
                                 <div style="display:flex;gap:4px;justify-content:center;align-items:center;">
-                                    <button class="btn btn-outline btn-sm" onclick="App.openFAQModal('${item.id}')" title="עריכה" style="padding:4px 8px;">✏️</button>
-                                    <button class="btn btn-danger btn-sm" onclick="App.deleteFAQ('${item.id}')" title="מחיקה" style="padding:4px 8px;">🗑️</button>
-                                    <button class="btn btn-outline btn-sm" onclick="App.moveFAQ('${item.id}','up')" title="למעלה" style="padding:4px 8px;">▲</button>
-                                    <button class="btn btn-outline btn-sm" onclick="App.moveFAQ('${item.id}','down')" title="למטה" style="padding:4px 8px;">▼</button>
+                                    <button class="btn btn-outline btn-sm" onclick="App.openFAQModal('${escAttr(item.id)}')" title="עריכה" style="padding:4px 8px;">✏️</button>
+                                    <button class="btn btn-danger btn-sm" onclick="App.deleteFAQ('${escAttr(item.id)}')" title="מחיקה" style="padding:4px 8px;">🗑️</button>
+                                    <button class="btn btn-outline btn-sm" onclick="App.moveFAQ('${escAttr(item.id)}','up')" title="למעלה" style="padding:4px 8px;">▲</button>
+                                    <button class="btn btn-outline btn-sm" onclick="App.moveFAQ('${escAttr(item.id)}','down')" title="למטה" style="padding:4px 8px;">▼</button>
                                 </div>
                             </td>
                         </tr>`).join('')
