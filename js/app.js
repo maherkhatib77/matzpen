@@ -4175,10 +4175,18 @@ const App = (() => {
                 '<span style="width:28px;height:28px;border-radius:50%;background:var(--accent,#f59e0b);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏠</span>' +
                 '<span style="font-weight:700;color:var(--accent,#f59e0b);">כוח פנים</span></div>';
         } else if (type === 'שעות ליווי') {
-            // Editable name field for שעות ליווי
-            nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
+            // Editable name field for שעות ליווי with mentor search
+            var searchInputId = 'cd_acc_search_input_' + m.id;
+            var searchResultsId = 'cd_acc_search_results_' + m.id;
+            var selectedMentorId = m.mentorId || '';
+            
+            nameHtml = '<div style="display:flex;align-items:center;gap:8px;position:relative;">' +
                 '<span style="width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🕐</span>' +
-                '<input type="text" class="form-input cd-acc-name" data-inst-id="' + m.id + '" value="' + escAttr(m.fullName || '') + '" placeholder="שם מלווה..." style="min-width:120px;font-size:13px;">' +
+                '<div style="flex:1;min-width:150px;position:relative;">' +
+                    '<input type="text" id="' + searchInputId + '" class="form-input cd-acc-search" data-inst-id="' + m.id + '" value="' + escAttr(m.fullName || '') + '" placeholder="🔍 חפש מנחה..." style="font-size:13px;" oninput="App._filterAccompanimentSearch(\'' + searchInputId + '\', \'' + searchResultsId + '\', \'' + m.id + '\')" onfocus="App._filterAccompanimentSearch(\'' + searchInputId + '\', \'' + searchResultsId + '\', \'' + m.id + '\')" autocomplete="off">' +
+                    '<input type="hidden" id="cd_acc_mentorid_' + m.id + '" value="' + escAttr(selectedMentorId) + '">' +
+                    '<div id="' + searchResultsId + '" style="position:absolute;top:100%;left:0;right:0;z-index:100;background:#fff;border:1px solid var(--gray-200);border-radius:0 0 var(--border-radius) var(--border-radius);max-height:200px;overflow-y:auto;display:none;box-shadow:0 4px 6px rgba(0,0,0,.1);"></div>' +
+                '</div>' +
                 '</div>';
         } else {
             nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
@@ -4655,8 +4663,26 @@ const App = (() => {
 
                     if (type === 'שעות ליווי') {
                         // Read editable name from the input field for שעות ליווי rows
-                        var accNameInput = row.querySelector('.cd-acc-name');
+                        var accNameInput = row.querySelector('.cd-acc-search');
                         if (accNameInput) update.fullName = accNameInput.value;
+                        
+                        // Read mentor ID from hidden field if exists
+                        var accHiddenMentorId = document.getElementById('cd_acc_mentorid_' + instId);
+                        if (accHiddenMentorId && accHiddenMentorId.value) {
+                            update.mentorId = accHiddenMentorId.value;
+                            update.mentorRepoId = accHiddenMentorId.value;
+                            // Fetch mentor details from repo
+                            var mentorData = DataStore.getById(DataStore.KEYS.MENTORS, update.mentorId);
+                            if (mentorData) {
+                                update.fullName = mentorData.fullName || update.fullName;
+                                update.idNumber = mentorData.idNumber || '';
+                                update.phone = mentorData.phone || '';
+                                update.email = mentorData.email || '';
+                                update.performerType = mentorData.performerType || '';
+                                update.lecturerStatus = mentorData.lecturerStatus || '';
+                            }
+                        }
+                        
                         update.isAccompaniment = true;
                         update.performerType = '';
                         accSum += preservedTotal;
@@ -4774,6 +4800,84 @@ const App = (() => {
         if (resultsDiv) {
             setTimeout(function() { resultsDiv.style.display = 'none'; }, 200);
         }
+    }
+
+    // Filter accompaniment mentor search (for שעות ליווי rows)
+    function _filterAccompanimentSearch(inputId, resultsId, instId) {
+        var searchInput = document.getElementById(inputId);
+        var resultsDiv = document.getElementById(resultsId);
+        if (!searchInput || !resultsDiv) return;
+        
+        var query = searchInput.value.trim().toLowerCase();
+        if (!query) { 
+            resultsDiv.style.display = 'none'; 
+            return; 
+        }
+
+        var allMentors = (DataStore.getAll(DataStore.KEYS.MENTORS) || []).filter(function(m) { return m.isActive !== false; });
+        var filtered = allMentors.filter(function(m) {
+            return (m.fullName || '').toLowerCase().includes(query) ||
+                   (m.idNumber || '').includes(query);
+        });
+
+        // Exclude mentors already assigned to this solution (except כוח פנים)
+        if (window._cdSolutionId) {
+            var solId = window._cdSolutionId;
+            var existingInsts = (DataStore.getAll(DataStore.KEYS.SOLUTION_INSTRUCTORS) || []).filter(function(i) { 
+                return i.solutionId === solId && i.id !== instId; 
+            });
+            var usedIds = new Set(existingInsts.filter(function(i) { 
+                return i.mentorId && _getMentorType(i) !== 'כוח פנים'; 
+            }).map(function(i) { return i.mentorId; }));
+            filtered = filtered.filter(function(m) { return !usedIds.has(m.id); });
+        }
+
+        filtered = filtered.slice(0, 15);
+
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:10px;color:var(--gray-400);text-align:center;font-size:13px;">לא נמצאו תוצאות</div>';
+        } else {
+            resultsDiv.innerHTML = filtered.map(function(m) {
+                return '<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100);font-size:14px;" ' +
+                    'onmousedown="App._selectAccompanimentMentor(\'' + inputId + '\', \'' + resultsId + '\', \'' + instId + '\', \'' + m.id + '\')" ' +
+                    'onmouseover="this.style.background=\'var(--gray-50)\'" onmouseout="this.style.background=\'\'">' +
+                    '<strong>' + escAttr(m.fullName) + '</strong>' +
+                    (m.idNumber ? ' <span style="color:var(--gray-400);font-size:12px;direction:ltr;display:inline-block;margin-right:6px;">(' + escAttr(m.idNumber) + ')</span>' : '') +
+                    '</div>';
+            }).join('');
+        }
+        resultsDiv.style.display = 'block';
+    }
+
+    // Select accompaniment mentor from search results
+    function _selectAccompanimentMentor(inputId, resultsId, instId, mentorId) {
+        var searchInput = document.getElementById(inputId);
+        var resultsDiv = document.getElementById(resultsId);
+        var m = DataStore.getById(DataStore.KEYS.MENTORS, mentorId);
+        if (!m) return;
+
+        if (searchInput) searchInput.value = m.fullName + (m.idNumber ? ' (' + m.idNumber + ')' : '');
+        if (resultsDiv) resultsDiv.style.display = 'none';
+        
+        // Update hidden mentor ID field
+        var hiddenField = document.getElementById('cd_acc_mentorid_' + instId);
+        if (hiddenField) hiddenField.value = mentorId;
+        
+        // Update the instructor record
+        var inst = DataStore.getById(DataStore.KEYS.SOLUTION_INSTRUCTORS, instId);
+        if (inst) {
+            inst.mentorId = mentorId;
+            inst.mentorRepoId = mentorId;
+            inst.fullName = m.fullName;
+            inst.idNumber = m.idNumber || '';
+            inst.phone = m.phone || '';
+            inst.email = m.email || '';
+            inst.performerType = m.performerType || '';
+            inst.lecturerStatus = m.lecturerStatus || '';
+            DataStore.update(DataStore.KEYS.SOLUTION_INSTRUCTORS, instId, inst);
+        }
+        
+        _cdRecalc();
     }
 
 
@@ -10198,7 +10302,7 @@ const App = (() => {
         // Multi-select autocomplete
         _msInit, _msOnInput, _msOnKeyDown, _msSelectItem, _msRemoveTag, _msRenderTags, _msCloseDropdown, _msHighlightItem,
         openCompleteDataModal, _cdUpdateCardStyles, _cdOnBudgetStatusChange, _cdRenderFundedStage2, _cdRenderNonFundedStage2, _cdBuildMentorRow, _cdOnTypeChange, _cdRecalc, _cdAddMentorInline, _cdRemoveMentorRow, _cdAddInternalForceRow, _saveCompleteData, _fmtDateRange,
-        _filterMentorSearch, _selectMentorSearchItem, _closeMentorSearch,
+        _filterMentorSearch, _selectMentorSearchItem, _closeMentorSearch, _filterAccompanimentSearch, _selectAccompanimentMentor,
         // New Solution Flow
         startNewSolutionFlow, _selectResponsibilityType, _backToResponsibilitySelection, _ssSchoolInit, _ssOnInput, _ssOnKeyDown, _ssSelectSchool, _ssRemoveSchool, _ssHighlightItem, _ssCloseDropdown, _nsfOnTopicTypeChange, _saveNewSolution,
         // Site settings
