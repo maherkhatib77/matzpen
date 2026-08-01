@@ -18,9 +18,32 @@
  */
 
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+
+// 🛡️ SECURITY FIX: Restrict CORS to specific allowed origins in production
+// In development, allow localhost for testing
+$allowedOrigins = [
+    'http://localhost',
+    'http://127.0.0.1',
+    'https://your-production-domain.com' // TODO: Replace with actual production domain
+];
+
+$origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+if (in_array($origin, $allowedOrigins, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+} else {
+    // Block requests from unauthorized origins
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Origin not allowed']);
+    exit;
+}
+
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// 🛡️ SECURITY FIX: Add security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('X-XSS-Protection: 1; mode=block');
 
 // Handle preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

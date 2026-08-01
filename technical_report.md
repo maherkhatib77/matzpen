@@ -30,6 +30,7 @@
 | **Catalog Module** | `/js/catalog.js` (547 שורות) | תצוגת קטלוג ציבורי | JavaScript |
 | **Registration** | `/js/registration.js` (505 שורות) | רישום משתמשים והשתלמויות | JavaScript |
 | **Global UI** | `/js/global-ui.js` (70 שורות) | רכיבי UI גלובליים | JavaScript |
+| **Dev Creds** | `/js/dev-creds.js` (11 שורות) | פרטי התחברות לפיתוח מקומי ⚠️ | JavaScript |
 | **API Endpoints** | `/api/*.php` (5 קבצים) | REST API לשמירת נתונים | PHP |
 | **Dev Server** | `/server.py` (467 שורות) | שרת פיתוח מקומי סטטי + API | Python |
 | **Data Store** | `/data/*.json` (39 קבצים) | מאגר נתונים מבוסס קבצים | JSON |
@@ -232,6 +233,13 @@ const db = await indexedDB.open('matspanet', 1);
   // js/data.js שורה 169
   password: 'admin123',  // 🔴 סיכון אבטחה!
   ```
+  
+- ⚠️ **קובץ dev-creds.js חשוף:**
+  ```javascript
+  // js/dev-creds.js שורות 9-11
+  { role: 'מנהל מערכת',  user: 'admin',  pass: 'admin123' },
+  { role: 'מדריך פסג״ה', user: 'guide1', pass: 'guide123' },
+  ```
 
 ### 5.3 אימות והרשאות
 
@@ -252,15 +260,58 @@ def _send_cors_headers(self):
     self.send_header('Access-Control-Allow-Headers', 'Content-Type')
 ```
 
+```php
+// api/data-save.php שורות 10-12
+header('Access-Control-Allow-Origin: *');  // 🔴 פתוח לכולם!
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+```
+
 **בעיה:** `Access-Control-Allow-Origin: '*'` מסוכן בסביבת Production.
 
-### 5.5 המלצות אבטחה דחופות
+### 5.5 XSS Vulnerabilities
+
+**מיקום:** `/workspace/js/app.js` (שימוש נרחב ב-`innerHTML`)
+
+```javascript
+// ❌ קיים – סיכון XSS (שורות 754, 1225, 1430, 1524, 1532, 1609...)
+topicSelect.innerHTML = '<option value="">בחר</option>' + opts;
+document.getElementById('section-dashboard').innerHTML = `${statsHtml}...`;
+el.innerHTML = escAttr(_ssSelectedSchool.name) + '...';
+```
+
+**הערה:** אמנם קיימת פונקציית `escAttr()` (שורה 538), אך היא **אינה מגנה מפני XSS בהקשר HTML** – רק בהקשר attribute.
+
+```javascript
+function escAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+                       .replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+```
+
+**סיכון:** הזרקת `<script>` או `onerror=` דרך נתוני משתמשים.
+
+### 5.6 Inline Event Handlers
+
+**מיקום:** `/workspace/js/app.js` (שורות 322-894)
+
+```javascript
+// ❌ inline handlers – CSP violations
+onclick="App._openColVisModal('${catKey}')"
+onclick="App.exportCSV('${dataType}')"
+```
+
+### 5.7 המלצות אבטחה דחופות
 
 1. **הצפנת סיסמאות:** להשתמש ב-bcrypt/Argon2 לפני שמירה
 2. **HTTPS强制:** לוודא שהשרת מוגדר עם SSL/TLS
 3. **Environment Variables:** להעביר סיסמאות Admin דרך ENV vars
 4. **Rate Limiting:** להגביל נסיונות Login ל-5 לדקה
 5. **Audit Logging:** לרשום כל פעולת מחיקה/עדכון ב-activity_log.json
+6. **הסרת dev-creds.js:** למחוק את הקובץ או להעבירו ל-.gitignore
+7. **הגבלת CORS:** להחליף `*` בדומיין ספציפי
+8. **החלפת innerHTML:** להשתמש ב-`textContent` או ב-`createElement`
 
 ---
 
@@ -310,9 +361,9 @@ async function fetchJsonFile(filename) {
 
 | כלי | סטטוס | פירוט |
 |-----|-------|-------|
-| **Client Logs** | ✅ קיים | `console.log/error` בנקודות מפתח |
+| **Client Logs** | ✅ קיים | `console.log/error` בנקודות מפתח (19 הופעות) |
 | **Server Logs** | ⚠️ בסיסי | `print()` ב-server.py, ללא קובץ Log |
-| **Activity Log** | ✅ קיים | `activity_log.json` אך לא מתועד API לכתיבה |
+| **Activity Log** | ✅ קיים | `activity_log.json` (3,134 שורות) אך לא מתועד API לכתיבה |
 | **Monitoring** | ❌ אין | ללא Sentry/DataDog/New Relic |
 | **Alerting** | ❌ אין | ללא התראות על שגיאות Critical |
 
@@ -324,6 +375,19 @@ async function fetchJsonFile(filename) {
 | **Export/Import** | ✅ קיים | פונקציית `backupFull()` ו-`restoreFull()` ב-app.js |
 | **Version Control** | ✅ Git | הקוד ב-Git, אך ה-data לא מגובה |
 | **Point-in-Time Recovery** | ❌ אין | אין Snapshot או Transaction Log |
+
+### 6.5 Event Listener Cleanup
+
+**מיקום:** `/workspace/js/app.js`
+
+```javascript
+// ❌ addEventListener ללא removeEventListener (שורות 2357, 2505, 2696)
+document.addEventListener('click', App._ssOnDocClick);
+document.addEventListener('click', App._essOnDocClick);
+document.addEventListener('click', App._msOnDocClick);
+```
+
+**סיכון:** Memory Leaks, Duplicate Handlers.
 
 ---
 
@@ -337,51 +401,59 @@ async function fetchJsonFile(filename) {
 |---|-------|-------|------|
 | 1 | **הצפנת סיסמאות** - להשתמש ב-bcrypt לפני שמירה ב-users.json | מניעת דליפת סיסמאות | נמוך (2 שעות) |
 | 2 | **הסרת סיסמאות ברירת מחדל** - למחוק `admin123` מהקוד | מניעת גישה לא מורשית | נמוך (15 דקות) |
-| 3 | **הגבלת CORS** - להחליף `*` בדומיין ספציפי | מניעת CSRF | נמוך (30 דקות) |
-| 4 | **הוספת Rate Limiting** ל-login | מניעת Brute Force | בינוני (3 שעות) |
+| 3 | **הסרת dev-creds.js** - למחוק או להעביר ל-.gitignore | מניעת דליפת פרטי התחברות | נמוך (5 דקות) |
+| 4 | **הגבלת CORS** - להחליף `*` בדומיין ספציפי | מניעת CSRF | נמוך (30 דקות) |
+| 5 | **הוספת Rate Limiting** ל-login | מניעת Brute Force | בינוני (3 שעות) |
+| 6 | **החלפת innerHTML** - להשתמש ב-`textContent` או ב-`createElement` | מניעת XSS | גבוה (8 שעות) |
 
 #### 🟠 HIGH (לטפל תוך שבועיים)
 
 | # | פעולה | השפעה | מאמץ |
 |---|-------|-------|------|
-| 5 | **העברת localStorage ל-IndexedDB** | שיפור ביצועים ועקיפת מגבלת 5MB | גבוה (20 שעות) |
-| 6 | **הוספת Unit Tests** - Jest ל-JS, pytest ל-Python | מניעת Regressions | גבוה (40 שעות) |
-| 7 | **הפרדת app.js למודולים** - לפחות 5 קבצים נפרדים | שיפור Maintainability | גבוה (30 שעות) |
-| 8 | **הוספת HTTPS强制** בשרת Production | אבטחת תעבורה | נמוך (2 שעות) |
-| 9 | **Audit Logging מלא** - כל פעולת CRUD נרשמת | Compliance ו-Forensics | בינוני (8 שעות) |
+| 7 | **העברת localStorage ל-IndexedDB** | שיפור ביצועים ועקיפת מגבלת 5MB | גבוה (20 שעות) |
+| 8 | **הוספת Unit Tests** - Jest ל-JS, pytest ל-Python | מניעת Regressions | גבוה (40 שעות) |
+| 9 | **הפרדת app.js למודולים** - לפחות 5 קבצים נפרדים | שיפור Maintainability | גבוה (30 שעות) |
+| 10 | **הוספת HTTPS强制** בשרת Production | אבטחת תעבורה | נמוך (2 שעות) |
+| 11 | **Audit Logging מלא** - כל פעולת CRUD נרשמת | Compliance ו-Forensics | בינוני (8 שעות) |
+| 12 | **הסרת Inline onclick Handlers** - להשתמש ב-addEventListener | CSP compliance | בינוני (6 שעות) |
+| 13 | **Event Listener Cleanup** - להוסיף removeEventListener | מניעת Memory Leaks | בינוני (4 שעות) |
 
 #### 🟡 MEDIUM (לטפל תוך חודש)
 
 | # | פעולה | השפעה | מאמץ |
 |---|-------|-------|------|
-| 10 | **Virtual Scrolling לטבלאות** | שיפור ביצועים עם 1000+ רשומות | בינוני (10 שעות) |
-| 11 | **Web Workers לדחיסת תמונות** | מניעת חסימת UI | בינוני (8 שעות) |
-| 12 | **Swagger Documentation** ל-API | שיפור Developer Experience | נמוך (4 שעות) |
-| 13 | **Environment Variables** לקונפיגורציה | הפרדת Config מ-Code | נמוך (3 שעות) |
-| 14 | **Docker Containerization** | קלות Deployment | בינוני (12 שעות) |
+| 14 | **Virtual Scrolling לטבלאות** | שיפור ביצועים עם 1000+ רשומות | בינוני (10 שעות) |
+| 15 | **Web Workers לדחיסת תמונות** | מניעת חסימת UI | בינוני (8 שעות) |
+| 16 | **Swagger Documentation** ל-API | שיפור Developer Experience | נמוך (4 שעות) |
+| 17 | **Environment Variables** לקונפיגורציה | הפרדת Config מ-Code | נמוך (3 שעות) |
+| 18 | **Docker Containerization** | קלות Deployment | בינוני (12 שעות) |
+| 19 | **הסרת Console Logs** - להשתמש ב-Logger מרכזי | Security & Clean Code | נמוך (2 שעות) |
 
 #### 🟢 LOW (לטפל תוך רבעון)
 
 | # | פעולה | השפעה | מאמץ |
 |---|-------|-------|------|
-| 15 | **שילוב AI לזיהוי שדות Import** | שיפור UX | גבוה (40 שעות) |
-| 16 | **מעבר ל-TypeScript** | Type Safety | גבוה (60 שעות) |
-| 17 | **CI/CD Pipeline** - GitHub Actions | Automation | בינוני (16 שעות) |
-| 18 | **Monitoring עם Sentry** | Observability | נמוך (4 שעות) |
-| 19 | **עיצוב Responsive משופר** | Mobile UX | בינוני (12 שעות) |
+| 20 | **שילוב AI לזיהוי שדות Import** | שיפור UX | גבוה (40 שעות) |
+| 21 | **מעבר ל-TypeScript** | Type Safety | גבוה (60 שעות) |
+| 22 | **CI/CD Pipeline** - GitHub Actions | Automation | בינוני (16 שעות) |
+| 23 | **Monitoring עם Sentry** | Observability | נמוך (4 שעות) |
+| 24 | **עיצוב Responsive משופר** | Mobile UX | בינוני (12 שעות) |
 
 ### 7.2 מפת דרכים אסטרטגית (Roadmap)
 
 ```
 Q1 2026: 🔴 אבטחה קריטית + 🟠 בדיקות
   ├── הצפנת סיסמאות
+  ├── הסרת dev-creds.js
+  ├── החלפת innerHTML
   ├── Unit Tests (50% coverage)
   └── Docker Setup
 
 Q2 2026: 🟠 Refactoring + 🟡 ביצועים
   ├── פיצול app.js ל-5 מודולים
   ├── IndexedDB Migration
-  └── Virtual Scrolling
+  ├── Virtual Scrolling
+  └── הסרת Inline Event Handlers
 
 Q3 2026: 🟡 תשתית + 🟢 חדשנות
   ├── CI/CD Pipeline
@@ -398,13 +470,13 @@ Q4 2026: 🟢 TypeScript + Scale
 
 | קטגוריה | עלות פיתוח (שעות) | עלות תשתית (חודשי) |
 |---------|-------------------|---------------------|
-| **אבטחה קריטית** | 10 שעות | $0 |
+| **אבטחה קריטית** | 15 שעות | $0 |
 | **בדיקות ואמינות** | 50 שעות | $20 (Sentry) |
 | **Refactoring** | 60 שעות | $0 |
 | **ביצועים** | 20 שעות | $0 |
 | **AI/ML** | 40 שעות | $50 (API Calls) |
 | **DevOps** | 20 שעות | $50 (Docker/Cloud) |
-| **סה"כ** | **~200 שעות** | **~$120/חודש** |
+| **סה"כ** | **~205 שעות** | **~$120/חודש** |
 
 ---
 
@@ -426,10 +498,15 @@ Q4 2026: 🟢 TypeScript + Scale
 │   ├── auth.js (220)
 │   ├── catalog.js (547)
 │   ├── data.js (993)
-│   ├── dev-creds.js (11)
+│   ├── dev-creds.js (11) ⚠️
 │   ├── global-ui.js (70)
 │   └── registration.js (505)
-└── data/ (39 קבצי JSON)
+├── data/ (39 קבצי JSON)
+│   ├── users.json (סיסמאות Plain Text) 🔴
+│   ├── mentors.json (תעודות זהות Plain Text) 🔴
+│   ├── guides_repo.json (תעודות זהות Plain Text) 🔴
+│   └── activity_log.json (3,134 שורות)
+└── css/ (5 קבצים, כולל minified)
 ```
 
 ### נספח ב': מטריקות קוד
@@ -443,6 +520,9 @@ Q4 2026: 🟢 TypeScript + Scale
 | קבצי נתונים | 39 JSON files |
 | תלויות חיצוניות | 2 (Google Fonts, Swiper) |
 | אחוז תיעוד | ~15% (הערות שוליים) |
+| Console Logs | 19 הופעות |
+| Inline Handlers | 30+ הופעות |
+| innerHTML שימושים | 50+ הופעות |
 
 ### נספח ג': גיבוי מהיר להמלצות קריטיות
 
@@ -459,9 +539,44 @@ self.send_header('Access-Control-Allow-Origin', 'https://matspanet.education.gov
 # 4. Rate Limiting בסיסי ב-Python
 from collections import defaultdict
 login_attempts = defaultdict(list)
+
+# 5. הסרת dev-creds.js
+rm /workspace/js/dev-creds.js
+# או הוספה ל-.gitignore
+echo "js/dev-creds.js" >> /workspace/.gitignore
+```
+
+### נספח ד': ממצאי אבטחה מפורטים
+
+#### סיסמאות Plain Text ב-users.json
+```json
+{
+  "username": "admin",
+  "password": "admin123",  // 🔴 חשוף!
+  "role": "admin"
+}
+```
+
+#### תעודות זהות ב-mentors.json
+```json
+{
+  "fullName": "פרופ' יהודה אברהם",
+  "idNumber": "206263808",  // 🔴 חשוף!
+  "phone": "050-1234567"
+}
+```
+
+#### תעודות זהות ב-guides_repo.json
+```json
+{
+  "fullName": "רחל כהן",
+  "idNumber": "38370946",  // 🔴 חשוף!
+  "email": "rachel@education.gov.il"
+}
 ```
 
 ---
 
 **חתימה:** דו"ח זה הוכן על ידי מערכת ניתוח קוד אוטומטית  
-**הערה חשובה:** דו"ח זה אינו מהווה תחליף לביקורת אבטחה ידנית על ידי מומחה מוסמך.
+**הערה חשובה:** דו"ח זה אינו מהווה תחליף לביקורת אבטחה ידנית על ידי מומחה מוסמך.  
+**אזהרה:** כל התיקונים המוצעים חייבים להיבדק בסביבת פיתוח לפני הפקה ל-Production.
