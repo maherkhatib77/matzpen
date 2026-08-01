@@ -1,0 +1,22 @@
+[
+  {
+    "value": "רגיל",
+    "label": "רגיל",
+    "labelAr": "التعليم العادي",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yqqrsw5skk2fi7",
+    "createdAt": "2026-07-28T18:02:14.920Z",
+    "updatedAt": "2026-07-29T14:48:11.161Z"
+  },
+  {
+    "value": "חינוך מיוחד",
+    "label": "חינוך מיוחד",
+    "labelAr": "تربية خاصة",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yqqrtbdnl0ee2y",
+    "createdAt": "2026-07-28T18:02:14.921Z",
+    "updatedAt": "2026-07-29T14:48:20.240Z"
+  }
+]

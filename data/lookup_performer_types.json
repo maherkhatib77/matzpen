@@ -1,0 +1,32 @@
+[
+  {
+    "value": "external",
+    "label": "מנחה חיצוני",
+    "labelAr": "محاضر خارجي",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4ysmu9xe6mlkvby",
+    "createdAt": "2026-07-28T18:03:43.137Z",
+    "updatedAt": "2026-07-28T18:03:43.137Z"
+  },
+  {
+    "value": "internal",
+    "label": "מנחה פנימי",
+    "labelAr": "قوى داخلية",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4ysmuako3c4a79n",
+    "createdAt": "2026-07-28T18:03:43.138Z",
+    "updatedAt": "2026-07-28T18:03:43.138Z"
+  },
+  {
+    "value": "pedagogical",
+    "label": "מבצע פדגוגי",
+    "labelAr": "منفذ تربوي",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4ysmub1mk3arr07",
+    "createdAt": "2026-07-28T18:03:43.139Z",
+    "updatedAt": "2026-07-28T18:03:43.139Z"
+  }
+]

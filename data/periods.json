@@ -1,0 +1,58 @@
+[
+  {
+    "hebrewYear": "תשפ\"ה",
+    "englishYear": "2024-2025",
+    "period1Label": "2 מ׳: 09–12",
+    "period1Start": "2024-09-01",
+    "period1End": "2024-12-31",
+    "period2Label": "1 מ׳: 01–08",
+    "period2Start": "2025-01-01",
+    "period2End": "2025-08-31",
+    "isActive": false,
+    "id": "ms4yuolt0wfniynux",
+    "createdAt": "2026-07-28T18:05:18.737Z",
+    "updatedAt": "2026-07-31T13:28:23.189Z"
+  },
+  {
+    "hebrewYear": "תשפ\"ו",
+    "englishYear": "2025-2026",
+    "period1Label": "2 מ׳: 09–12",
+    "period1Start": "2025-09-01",
+    "period1End": "2025-12-31",
+    "period2Label": "1 מ׳: 01–08",
+    "period2Start": "2026-01-01",
+    "period2End": "2026-08-31",
+    "isActive": false,
+    "id": "ms4yuvzwnodaa3m4w",
+    "createdAt": "2026-07-28T18:05:28.316Z",
+    "updatedAt": "2026-07-31T13:28:23.189Z"
+  },
+  {
+    "hebrewYear": "תשפ\"ז",
+    "englishYear": "2026-2027",
+    "period1Label": "2 מ׳: 09–12",
+    "period1Start": "2026-09-01",
+    "period1End": "2026-12-31",
+    "period2Label": "1 מ׳: 01–08",
+    "period2Start": "2027-01-01",
+    "period2End": "2027-08-31",
+    "isActive": true,
+    "id": "ms4yv1ix1xah39iaf",
+    "createdAt": "2026-07-28T18:05:35.481Z",
+    "updatedAt": "2026-07-31T13:28:23.189Z"
+  },
+  {
+    "hebrewYear": "תשפ\"ד",
+    "englishYear": "2023-2024",
+    "period1Label": "2 מ׳: 09–12",
+    "period1Start": "2023-09-01",
+    "period1End": "2023-12-31",
+    "period2Label": "1 מ׳: 01–08",
+    "period2Start": "2024-01-01",
+    "period2End": "2024-08-31",
+    "isActive": false,
+    "id": "ms8vlw24dkkecc2nc",
+    "createdAt": "2026-07-31T11:45:34.348Z",
+    "updatedAt": "2026-07-31T13:28:23.189Z"
+  }
+]

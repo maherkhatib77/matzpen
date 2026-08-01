@@ -1,0 +1,22 @@
+[
+  {
+    "value": "פסגה",
+    "label": "פסגה",
+    "labelAr": "مركز",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yufrxtufo1v2em",
+    "createdAt": "2026-07-28T18:05:07.293Z",
+    "updatedAt": "2026-07-29T15:38:03.741Z"
+  },
+  {
+    "value": "בית-ספרי",
+    "label": "בית-ספרי",
+    "labelAr": "مدرسي",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yufry53czen1qc",
+    "createdAt": "2026-07-28T18:05:07.294Z",
+    "updatedAt": "2026-07-29T15:38:11.105Z"
+  }
+]

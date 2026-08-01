@@ -1,0 +1,42 @@
+[
+  {
+    "value": "פנים אל פנים",
+    "label": "פנים אל פנים",
+    "labelAr": "وجاهي",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yramkyjaomisuw",
+    "createdAt": "2026-07-28T18:02:40.652Z",
+    "updatedAt": "2026-07-28T18:02:40.652Z"
+  },
+  {
+    "value": "סינכרוני",
+    "label": "סינכרוני",
+    "labelAr": "متزامن",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yramlsovnfgqlm",
+    "createdAt": "2026-07-28T18:02:40.653Z",
+    "updatedAt": "2026-07-28T18:02:40.653Z"
+  },
+  {
+    "value": "א-סינכרוני",
+    "label": "א-סינכרוני",
+    "labelAr": "غير متزامن",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yramm58o4o6utx",
+    "createdAt": "2026-07-28T18:02:40.654Z",
+    "updatedAt": "2026-07-28T18:02:40.654Z"
+  },
+  {
+    "value": "היברידי",
+    "label": "היברידי",
+    "labelAr": "مدمج",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yramn1rlx1knth",
+    "createdAt": "2026-07-28T18:02:40.655Z",
+    "updatedAt": "2026-07-28T18:02:40.655Z"
+  }
+]

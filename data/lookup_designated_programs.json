@@ -1,0 +1,52 @@
+[
+  {
+    "value": "תוכנית מנהיגות חינוכית",
+    "label": "תוכנית מנהיגות חינוכית",
+    "labelAr": "برنامج القيادة التربوية",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yu6ellqqpyj6xn",
+    "createdAt": "2026-07-28T18:04:55.149Z",
+    "updatedAt": "2026-07-28T18:04:55.149Z"
+  },
+  {
+    "value": "תוכנית חדשנות פדגוגית",
+    "label": "תוכנית חדשנות פדגוגית",
+    "labelAr": "برنامج الابتكار التربوي",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yu6em77rd44vm5",
+    "createdAt": "2026-07-28T18:04:55.150Z",
+    "updatedAt": "2026-07-28T18:04:55.150Z"
+  },
+  {
+    "value": "תוכנית להכלה וגיוון",
+    "label": "תוכנית להכלה וגיוון",
+    "labelAr": "برنامج الشمول والتنوع",
+    "order": 3,
+    "isActive": true,
+    "id": "ms4yu6enkaciziz2v",
+    "createdAt": "2026-07-28T18:04:55.151Z",
+    "updatedAt": "2026-07-28T18:04:55.151Z"
+  },
+  {
+    "value": "תוכנית קידום מצוינות",
+    "label": "תוכנית קידום מצוינות",
+    "labelAr": "برنامج تعزيز التميز",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4yu6eoellykh2nh",
+    "createdAt": "2026-07-28T18:04:55.152Z",
+    "updatedAt": "2026-07-28T18:04:55.152Z"
+  },
+  {
+    "value": "תוכנית טכנולוגיות למידה",
+    "label": "תוכנית טכנולוגיות למידה",
+    "labelAr": "برنامج تكنولوجيات التعلم",
+    "order": 5,
+    "isActive": true,
+    "id": "ms4yu6eoxzbzmuroz",
+    "createdAt": "2026-07-28T18:04:55.152Z",
+    "updatedAt": "2026-07-28T18:04:55.152Z"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "value": "תקציב רגיל",
+    "label": "תקציב רגיל",
+    "labelAr": "ميزانية عادية",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4yrr2klatxjqjmc",
+    "createdAt": "2026-07-28T18:03:01.965Z",
+    "updatedAt": "2026-07-28T18:03:01.965Z"
+  },
+  {
+    "value": "חומש",
+    "label": "חומש",
+    "labelAr": "خمسي",
+    "order": 2,
+    "isActive": true,
+    "id": "ms4yrr2mcd0z9ambe",
+    "createdAt": "2026-07-28T18:03:01.966Z",
+    "updatedAt": "2026-07-28T18:03:01.966Z"
+  }
+]
