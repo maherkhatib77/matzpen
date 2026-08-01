@@ -3921,10 +3921,13 @@ const App = (() => {
         html += '<div style="font-weight:700;font-size:15px;color:var(--gray-800);margin-bottom:12px;">📊 שלב 2: חלוקת שעות אקדמיות <span style="font-weight:400;font-size:12px;color:var(--gray-400);">(מתוקצב)</span></div>';
 
         // Part 2 — Academic hours distribution (read-only budget info + period distribution)
+        // IMPORTANT: Display EXACT values from DB - no fabrication of data
         var _dispBTLabel = getLookupLabel(DataStore.KEYS.LOOKUP_BUDGET_TYPES, s.budgetTypeValue) || s.budgetTypeValue || '';
-        var _dispFundedH = s.budgetedHours || 0;
-        var _dispP2 = s.period2Hours != null ? s.period2Hours : '';
-        var _dispP1 = s.period1Hours != null ? s.period1Hours : '';
+        var _dispFundedH = s.budgetedHours != null ? s.budgetedHours : 0;
+        
+        // Display exact period hours from DB - show 0 as "0", not empty
+        var _dispP1 = s.period1Hours != null && s.period1Hours !== '' ? parseFloat(s.period1Hours) || 0 : 0;
+        var _dispP2 = s.period2Hours != null && s.period2Hours !== '' ? parseFloat(s.period2Hours) || 0 : 0;
 
         html += '<div style="margin-bottom:14px;display:flex;flex-direction:column;gap:10px;">' +
             // Object 1: Budget type + funded hours (read-only display)
@@ -3942,8 +3945,9 @@ const App = (() => {
             (function() {
                 var _p1Range = window._cdP1Range || '';
                 var _p2Range = window._cdP2Range || '';
-                var _p1Num = parseFloat(_dispP1) || 0;
-                var _p2Num = parseFloat(_dispP2) || 0;
+                // _dispP1 and _dispP2 are already numbers from line 3929-3930
+                var _p1Num = _dispP1;
+                var _p2Num = _dispP2;
                 var _pSum = _p1Num + _p2Num;
                 var _solTotal = s.academicHours || 0;
                 var _matchStyle = (_solTotal > 0 && Math.abs(_pSum - _solTotal) < 0.01) ? 'color:#166534;' : (_pSum > _solTotal ? 'color:#dc2626;' : 'color:var(--gray-800);');
@@ -3961,7 +3965,7 @@ const App = (() => {
                     '<div class="form-group" style="margin-bottom:0;min-width:110px;">' +
                         '<label style="font-size:13px;font-weight:600;">סה״כ תקופות</label>' +
                         '<div style="font-size:10px;color:var(--gray-400);margin-bottom:2px;">' + _p1Num + ' + ' + _p2Num + '</div>' +
-                        '<div style="padding:8px 12px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--border-radius);font-size:14px;font-weight:700;text-align:center;' + _matchStyle + '">' + (_pSum > 0 ? _pSum : '—') + '</div>' +
+                        '<div style="padding:8px 12px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--border-radius);font-size:14px;font-weight:700;text-align:center;' + _matchStyle + '">' + (_pSum > 0 ? _pSum : (_pSum === 0 ? '0' : '—')) + '</div>' +
                     '</div>' +
                     '<div class="form-group" style="margin-bottom:0;min-width:110px;">' +
                         '<label style="font-size:13px;font-weight:600;">שעות אקדמיות</label>' +
@@ -4059,8 +4063,9 @@ const App = (() => {
             });
         }
 
-        var p1 = internalInst.period1Hours || 0;
-        var p2 = internalInst.period2Hours || 0;
+        // IMPORTANT: Display EXACT values from DB - show 0 as "0", not empty
+        var p1 = internalInst.period1Hours != null && internalInst.period1Hours !== '' ? parseFloat(internalInst.period1Hours) || 0 : 0;
+        var p2 = internalInst.period2Hours != null && internalInst.period2Hours !== '' ? parseFloat(internalInst.period2Hours) || 0 : 0;
 
         // Build HTML
         var html = '';
@@ -4120,23 +4125,34 @@ const App = (() => {
         // For special rows: fixed total from totalAcademicHours
         var fixedTotal = isSpecialRow ? (m.totalAcademicHours || 0) : 0;
 
-        // Show empty (not 0) when no hours were explicitly entered
+        // IMPORTANT: Display EXACT values from DB — show 0 as "0", not as empty string
+        // This ensures what you see is exactly what's stored, no fabrication
         var mP1, mP2, mTotal;
-        if (isSpecialRow) {
-            // Special rows: display actual imported period values (P1/P2) just like regular rows
-            var spP1Raw = m.period1Hours;
-            var spP2Raw = m.period2Hours;
-            mP1 = (spP1Raw !== null && spP1Raw !== undefined && spP1Raw !== '' && spP1Raw !== 0) ? spP1Raw : '';
-            mP2 = (spP2Raw !== null && spP2Raw !== undefined && spP2Raw !== '' && spP2Raw !== 0) ? spP2Raw : '';
-            mTotal = fixedTotal > 0 ? fixedTotal : '';
+        
+        // period1Hours = תקופה ב' (09-12), period2Hours = תקופה א' (01-08)
+        var rawP1 = m.period1Hours;  // תקופה ב'
+        var rawP2 = m.period2Hours;  // תקופה א'
+        
+        // Convert to number, defaulting to 0 only if truly null/undefined/empty string
+        // But preserve explicit 0 values from DB
+        if (rawP1 === null || rawP1 === undefined || rawP1 === '') {
+            mP1 = 0;
         } else {
-            var mP1Raw = m.period1Hours;
-            var mP2Raw = m.period2Hours;
-            mP1 = (mP1Raw !== null && mP1Raw !== undefined && mP1Raw !== '' && mP1Raw !== 0) ? mP1Raw : '';
-            mP2 = (mP2Raw !== null && mP2Raw !== undefined && mP2Raw !== '' && mP2Raw !== 0) ? mP2Raw : '';
-            var mP1Num = parseFloat(mP1) || 0;
-            var mP2Num = parseFloat(mP2) || 0;
-            mTotal = mP1Num + mP2Num;
+            mP1 = parseFloat(rawP1) || 0;
+        }
+        
+        if (rawP2 === null || rawP2 === undefined || rawP2 === '') {
+            mP2 = 0;
+        } else {
+            mP2 = parseFloat(rawP2) || 0;
+        }
+        
+        if (isSpecialRow) {
+            // Special rows: display the exact period values from DB
+            mTotal = fixedTotal > 0 ? fixedTotal : (mP1 + mP2);
+        } else {
+            // Regular rows: sum of periods
+            mTotal = mP1 + mP2;
         }
 
         // Type column: special rows show static "רגיל", regular rows get dropdown
@@ -4173,17 +4189,16 @@ const App = (() => {
 
         var rowBg = type === 'כוח פנים' ? 'background:#fffbeb;' : (type === 'שעות ליווי' ? 'background:#eff6ff;' : '');
 
-        // For special rows: P1/P2 columns show editable inputs, total is read-only fixed value
+        // IMPORTANT: Display EXACT values from DB in all input fields
+        // No fabrication - what you see is exactly what's stored
         var p2CellHtml, p1CellHtml, totalCellHtml;
-        if (isSpecialRow) {
-            p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-            p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-            totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + mTotal + '</td>';
-        } else {
-            p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-            p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-            totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + (mTotal > 0 ? mTotal : '') + '</td>';
-        }
+        
+        // P1/P2 inputs: always show the exact numeric value (0 displays as "0")
+        p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+        p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+        
+        // Total column: show actual calculated sum (never hide real 0 values)
+        totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + mTotal + '</td>';
 
         return '<tr data-inst-id="' + m.id + '" style="' + rowBg + '">' +
             '<td>' + typeCellHtml + '</td>' +
@@ -4294,8 +4309,14 @@ const App = (() => {
             var row = sel.closest('tr');
             if (!row) return;
             var isSpecialRecalc = (type === 'כוח פנים' || type === 'שעות ליווי');
-            var p2Val = parseFloat(row.querySelector('.cd-acad-p2')?.value) || 0;
-            var p1Val = parseFloat(row.querySelector('.cd-acad-p1')?.value) || 0;
+            
+            // Get raw values from inputs - empty string means user cleared it, treat as 0
+            var p2Raw = row.querySelector('.cd-acad-p2')?.value;
+            var p1Raw = row.querySelector('.cd-acad-p1')?.value;
+            
+            // Convert to numbers: empty string or invalid = 0, otherwise parse
+            var p2Val = (p2Raw === '' || p2Raw === null || p2Raw === undefined) ? 0 : parseFloat(p2Raw) || 0;
+            var p1Val = (p1Raw === '' || p1Raw === null || p1Raw === undefined) ? 0 : parseFloat(p1Raw) || 0;
             var total = p1Val + p2Val;
 
             if (isSpecialRecalc) {
@@ -4382,8 +4403,12 @@ const App = (() => {
             if (type !== 'כוח פנים' && type !== 'שעות ליווי') return;
             var row = sel.closest('tr');
             if (!row) return;
-            var sp1 = parseFloat(row.querySelector('.cd-acad-p1')?.value) || 0;
-            var sp2 = parseFloat(row.querySelector('.cd-acad-p2')?.value) || 0;
+            
+            // Get raw values and convert properly (same logic as main recalc)
+            var sp1Raw = row.querySelector('.cd-acad-p1')?.value;
+            var sp2Raw = row.querySelector('.cd-acad-p2')?.value;
+            var sp1 = (sp1Raw === '' || sp1Raw === null || sp1Raw === undefined) ? 0 : parseFloat(sp1Raw) || 0;
+            var sp2 = (sp2Raw === '' || sp2Raw === null || sp2Raw === undefined) ? 0 : parseFloat(sp2Raw) || 0;
             var spSum = sp1 + sp2;
             if (spSum > 0) {
                 var instId = sel.getAttribute('data-inst-id');
@@ -4415,8 +4440,13 @@ const App = (() => {
         allRows.forEach(function(sel) {
             var row = sel.closest('tr');
             if (!row) return;
-            var p1Val = parseFloat(row.querySelector('.cd-acad-p1')?.value) || 0;
-            var p2Val = parseFloat(row.querySelector('.cd-acad-p2')?.value) || 0;
+            
+            // Get raw values and convert properly (same logic as main recalc)
+            var p1Raw = row.querySelector('.cd-acad-p1')?.value;
+            var p2Raw = row.querySelector('.cd-acad-p2')?.value;
+            var p1Val = (p1Raw === '' || p1Raw === null || p1Raw === undefined) ? 0 : parseFloat(p1Raw) || 0;
+            var p2Val = (p2Raw === '' || p2Raw === null || p2Raw === undefined) ? 0 : parseFloat(p2Raw) || 0;
+            
             if (p1Val === 0) allHaveHoursP1 = false;
             if (p2Val === 0) allHaveHoursP2 = false;
             if (p1Val > 0 || p2Val > 0) anyHoursEntered = true;
@@ -4589,8 +4619,12 @@ const App = (() => {
                 var type = sel.value;
                 var row = sel.closest('tr');
                 if (!row || !instId) return;
-                var p1 = parseFloat(row.querySelector('.cd-acad-p1')?.value) || 0;
-                var p2 = parseFloat(row.querySelector('.cd-acad-p2')?.value) || 0;
+                
+                // Get raw values and convert properly (same logic as main recalc)
+                var p1Raw = row.querySelector('.cd-acad-p1')?.value;
+                var p2Raw = row.querySelector('.cd-acad-p2')?.value;
+                var p1 = (p1Raw === '' || p1Raw === null || p1Raw === undefined) ? 0 : parseFloat(p1Raw) || 0;
+                var p2 = (p2Raw === '' || p2Raw === null || p2Raw === undefined) ? 0 : parseFloat(p2Raw) || 0;
                 var total = p1 + p2;
 
                 // For special rows (כוח פנים, שעות ליווי): preserve totalAcademicHours, but still save P1/P2
