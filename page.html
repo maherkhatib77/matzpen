@@ -99,6 +99,7 @@
                 var pages = DataStore.getAll(DataStore.KEYS.CUSTOM_PAGES) || [];
                 var page = pages.find(function(p) { return p.filename === slug; });
                 if (!page) { show404(); return; }
+                // Display Arabic title as primary (system default language), Hebrew as subtitle if both exist
                 document.getElementById('pageTitle').textContent = page.titleAr || page.titleHe || '';
                 document.getElementById('pageSubtitle').textContent = (page.titleHe && page.titleAr) ? page.titleHe : '';
                 document.getElementById('pageContent').innerHTML = page.content || '';
