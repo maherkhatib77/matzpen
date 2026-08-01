@@ -5285,20 +5285,16 @@ function _saveCompleteData(solutionId) {
 
                 <!-- Card 4: Main Content -->
                 <div class="card">
-                    <div class="card-header"><span class="card-title">📝 תוכן מרכזי</span></div>
+                    <div class="card-header"><span class="card-title">📝 תוכן מרכזי (עברי וערבי מאוחד)</span></div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div style="display:flex;flex-direction:column;gap:12px;">
                             <div>
-                                <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block;">עברית</label>
-                                <div id="hpMainHe" class="hp-quill-editor" style="min-height:150px;">${hp.mainContent?.he || ''}</div>
+                                <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block;">תוכן עשיר (עברית + ערבית)</label>
+                                <textarea id="hpMainRich" class="form-input" rows="10" placeholder="הזן תוכן בעברית ובערבית...">${escAttr(hp.mainContent?.combined || hp.mainContent?.he || '')}</textarea>
                             </div>
-                            <div>
-                                <label style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;display:block;">ערבית</label>
-                                <div id="hpMainAr" class="hp-quill-editor" style="min-height:150px;" dir="rtl">${hp.mainContent?.ar || ''}</div>
+                            <div style="margin-top:16px;text-align:center;">
+                                <button class="btn btn-primary" onclick="App._saveHomepageContent()">💾 שמור תוכן</button>
                             </div>
-                        </div>
-                        <div style="margin-top:16px;text-align:center;">
-                            <button class="btn btn-primary" onclick="App._saveHomepageContent()">💾 שמור תוכן</button>
                         </div>
                     </div>
                 </div>
@@ -5322,38 +5318,15 @@ function _saveCompleteData(solutionId) {
                 </div>
 
             </div>
+
             <style>
                 @media (max-width: 768px) {
                     #mainContent [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
                 }
-                .hp-quill-editor .ql-toolbar { border: 1px solid var(--border-color, #d1d5db); border-bottom: none; border-radius: 8px 8px 0 0; background: #f9fafb; }
-                .hp-quill-editor .ql-container { border: 1px solid var(--border-color, #d1d5db); border-radius: 0 0 8px 8px; font-family: inherit; font-size: 14px; min-height: 150px; }
-                .hp-quill-editor .ql-editor { min-height: 120px; }
-                .hp-quill-editor .ql-snow .ql-stroke { border-color: #d1d5db !important; }
             </style>
         `;
-
-        // Initialize Quill WYSIWYG editors for Main Content
-        if (typeof Quill !== 'undefined') {
-            var quillHeEl = document.getElementById('hpMainHe');
-            var quillArEl = document.getElementById('hpMainAr');
-            if (quillHeEl) {
-                var savedHe = quillHeEl.innerHTML || '';
-                quillHeEl.innerHTML = '';
-                _hpQuillHe = new Quill(quillHeEl, { theme: 'snow' });
-                if (savedHe && savedHe.trim()) _hpQuillHe.root.innerHTML = savedHe;
-            }
-            if (quillArEl) {
-                var savedAr = quillArEl.innerHTML || '';
-                quillArEl.innerHTML = '';
-                _hpQuillAr = new Quill(quillArEl, { theme: 'snow' });
-                if (savedAr && savedAr.trim()) _hpQuillAr.root.innerHTML = savedAr;
-            }
-        }
     }
 
-    var _hpQuillHe = null;
-    var _hpQuillAr = null;
 
     function _renderHomepageNavTable(hp) {
         const items = (hp.navItems || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -5402,10 +5375,10 @@ function _saveCompleteData(solutionId) {
     }
 
     function _saveHomepageContent() {
-        var mainHe = _hpQuillHe ? _hpQuillHe.root.innerHTML : '';
-        var mainAr = _hpQuillAr ? _hpQuillAr.root.innerHTML : '';
+        var mainRich = document.getElementById('hpMainRich');
+        var content = mainRich ? mainRich.value : '';
         DataStore.updateHomepage({
-            mainContent: { he: mainHe, ar: mainAr }
+            mainContent: { combined: content, he: content, ar: content }
         });
         showToast('התוכן נשמר', 'success');
     }
