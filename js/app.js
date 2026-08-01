@@ -4498,10 +4498,12 @@ function _cdRecalc() {
             isAccompaniment: false
         });
 
-        // Clear search
+        // Clear search and close dropdown
         window._cdSelectedMentorId = null;
         var searchInput = document.getElementById('cd_newMentorSearch');
+        var resultsDiv = document.getElementById('cd_newMentorSearchResults');
         if (searchInput) searchInput.value = '';
+        if (resultsDiv) resultsDiv.style.display = 'none';
 
         // Add row to table
         var tbody = document.getElementById('cd_mentorTbody');
@@ -4762,6 +4764,10 @@ function _saveCompleteData(solutionId) {
             _fillInstFromRepo();
         } else if (prefix === 'cd_newMentor') {
             window._cdSelectedMentorId = mentorId;
+            // Task 1: Close dropdown immediately after selection for better UX
+            setTimeout(function() { 
+                if (resultsDiv) resultsDiv.style.display = 'none'; 
+            }, 50);
         }
     }
 
