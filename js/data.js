@@ -153,6 +153,45 @@ const DataStore = (() => {
         return new Date().toISOString();
     }
 
+    /**
+     * Hash פשוט לסיסמאות (SHA-256 באמצעות Web Crypto API אם זמין, אחרת fallback)
+     * @param {string} str - המחרוזת להפיכה ל-hash
+     * @returns {Promise<string>} ה-hash כמחרוזת הקסדצימלית
+     */
+    async function _hashPassword(str) {
+        if (!str) return '';
+        try {
+            if (window.crypto && window.crypto.subtle) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(str);
+                const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+        } catch (e) {
+            console.warn('[DataStore] Web Crypto not available, using fallback hash');
+        }
+        // Fallback: simple djb2 hash (לא מאובטח אך שומר על תאימות)
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) + hash) + str.charCodeAt(i);
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash).toString(16);
+    }
+
+    /**
+     * משווה סיסמה ל-hash שמור
+     * @param {string} password - הסיסמה הנקלטת
+     * @param {string} storedHash - ה-hash השמור
+     * @returns {Promise<boolean>} האם הסיסמה תואמת
+     */
+    async function _verifyPassword(password, storedHash) {
+        if (!password || !storedHash) return false;
+        const hash = await _hashPassword(password);
+        return hash === storedHash;
+    }
+
     // ======================== נתוני ברירת מחדל (Default Data) ========================
 
     /**
@@ -166,7 +205,7 @@ const DataStore = (() => {
         {
             id: 'usr_admin_001',
             username: 'admin',
-            password: 'admin123',
+            password: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',
             fullName: 'מנהל מערכת',
             email: 'admin@matspanet.co.il',
             role: 'admin',
@@ -177,7 +216,7 @@ const DataStore = (() => {
         {
             id: 'usr_guide1_001',
             username: 'guide1',
-            password: 'guide123',
+            password: '6b51d431df7e2f9a0a00701450db539e6b73be30f7d55c4a8f5ddcf9a08628b1',
             fullName: 'רחל כהן',
             email: 'rachel@education.gov.il',
             role: 'guide',
@@ -188,7 +227,7 @@ const DataStore = (() => {
         {
             id: 'usr_guide2_001',
             username: 'guide2',
-            password: 'guide123',
+            password: '6b51d431df7e2f9a0a00701450db539e6b73be30f7d55c4a8f5ddcf9a08628b1',
             fullName: 'דוד לוי',
             email: 'david@education.gov.il',
             role: 'guide',
@@ -987,7 +1026,11 @@ const DataStore = (() => {
         importData,
 
         // אתחול (מחזיר Promise)
-        init
+        init,
+
+        // פונקציות עזר לסיסמאות (משמשות את Auth module)
+        _hashPassword,
+        _verifyPassword
     };
 
 })();

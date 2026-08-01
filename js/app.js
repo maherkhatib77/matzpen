@@ -2352,9 +2352,13 @@ const App = (() => {
         input.addEventListener('keydown', function(e) { App._ssOnKeyDown(e); });
         input.addEventListener('focus', function() { App._ssOnInput(this.value); });
         container.appendChild(input);
-        // Click outside to close
+        // Click outside to close - עם cleanup כדי למנוע memory leaks
         setTimeout(function() {
-            document.addEventListener('click', App._ssOnDocClick);
+            var handler = function(e) { App._ssOnDocClick(e); };
+            document.addEventListener('click', handler);
+            // שמירת ה-handler ל-cleanup עתידי
+            if (!App._cleanupHandlers) App._cleanupHandlers = [];
+            App._cleanupHandlers.push({ target: document, event: 'click', handler: handler });
         }, 0);
     }
 
@@ -2362,6 +2366,19 @@ const App = (() => {
         const ac = document.getElementById('nsf_ssAutocomplete');
         if (ac && !ac.contains(e.target)) {
             App._ssCloseDropdown();
+        }
+    }
+    
+    function _ssCleanupDocClick() {
+        // ניקוי ה-event listener כדי למנוע memory leaks
+        if (App._cleanupHandlers) {
+            for (var i = App._cleanupHandlers.length - 1; i >= 0; i--) {
+                var h = App._cleanupHandlers[i];
+                if (h.event === 'click' && h.target === document) {
+                    h.target.removeEventListener(h.event, h.handler);
+                    App._cleanupHandlers.splice(i, 1);
+                }
+            }
         }
     }
 
