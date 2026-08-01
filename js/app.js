@@ -2352,13 +2352,9 @@ const App = (() => {
         input.addEventListener('keydown', function(e) { App._ssOnKeyDown(e); });
         input.addEventListener('focus', function() { App._ssOnInput(this.value); });
         container.appendChild(input);
-        // Click outside to close - עם cleanup כדי למנוע memory leaks
+        // Click outside to close
         setTimeout(function() {
-            var handler = function(e) { App._ssOnDocClick(e); };
-            document.addEventListener('click', handler);
-            // שמירת ה-handler ל-cleanup עתידי
-            if (!App._cleanupHandlers) App._cleanupHandlers = [];
-            App._cleanupHandlers.push({ target: document, event: 'click', handler: handler });
+            document.addEventListener('click', App._ssOnDocClick);
         }, 0);
     }
 
@@ -2366,19 +2362,6 @@ const App = (() => {
         const ac = document.getElementById('nsf_ssAutocomplete');
         if (ac && !ac.contains(e.target)) {
             App._ssCloseDropdown();
-        }
-    }
-    
-    function _ssCleanupDocClick() {
-        // ניקוי ה-event listener כדי למנוע memory leaks
-        if (App._cleanupHandlers) {
-            for (var i = App._cleanupHandlers.length - 1; i >= 0; i--) {
-                var h = App._cleanupHandlers[i];
-                if (h.event === 'click' && h.target === document) {
-                    h.target.removeEventListener(h.event, h.handler);
-                    App._cleanupHandlers.splice(i, 1);
-                }
-            }
         }
     }
 
@@ -3866,7 +3849,7 @@ const App = (() => {
         }
     }
 
-    function _cdRenderFundedStage2() {
+function _cdRenderFundedStage2() {
     var stage2 = document.getElementById('cd_stage2');
     if (!stage2) return;
     var solId = window._cdSolutionId;
@@ -4065,9 +4048,8 @@ const App = (() => {
             });
         }
 
-        // IMPORTANT: Display EXACT values from DB - show 0 as "0", not empty
-        var p1 = internalInst.period1Hours != null && internalInst.period1Hours !== '' ? parseFloat(internalInst.period1Hours) || 0 : 0;
-        var p2 = internalInst.period2Hours != null && internalInst.period2Hours !== '' ? parseFloat(internalInst.period2Hours) || 0 : 0;
+        var p1 = internalInst.period1Hours || 0;
+        var p2 = internalInst.period2Hours || 0;
 
         // Build HTML
         var html = '';
@@ -4127,34 +4109,23 @@ const App = (() => {
         // For special rows: fixed total from totalAcademicHours
         var fixedTotal = isSpecialRow ? (m.totalAcademicHours || 0) : 0;
 
-        // IMPORTANT: Display EXACT values from DB — show 0 as "0", not as empty string
-        // This ensures what you see is exactly what's stored, no fabrication
+        // Show empty (not 0) when no hours were explicitly entered
         var mP1, mP2, mTotal;
-        
-        // period1Hours = תקופה ב' (09-12), period2Hours = תקופה א' (01-08)
-        var rawP1 = m.period1Hours;  // תקופה ב'
-        var rawP2 = m.period2Hours;  // תקופה א'
-        
-        // Convert to number, defaulting to 0 only if truly null/undefined/empty string
-        // But preserve explicit 0 values from DB
-        if (rawP1 === null || rawP1 === undefined || rawP1 === '') {
-            mP1 = 0;
-        } else {
-            mP1 = parseFloat(rawP1) || 0;
-        }
-        
-        if (rawP2 === null || rawP2 === undefined || rawP2 === '') {
-            mP2 = 0;
-        } else {
-            mP2 = parseFloat(rawP2) || 0;
-        }
-        
         if (isSpecialRow) {
-            // Special rows: display the exact period values from DB
-            mTotal = fixedTotal > 0 ? fixedTotal : (mP1 + mP2);
+            // Special rows: display actual imported period values (P1/P2) just like regular rows
+            var spP1Raw = m.period1Hours;
+            var spP2Raw = m.period2Hours;
+            mP1 = (spP1Raw !== null && spP1Raw !== undefined && spP1Raw !== '' && spP1Raw !== 0) ? spP1Raw : '';
+            mP2 = (spP2Raw !== null && spP2Raw !== undefined && spP2Raw !== '' && spP2Raw !== 0) ? spP2Raw : '';
+            mTotal = fixedTotal > 0 ? fixedTotal : '';
         } else {
-            // Regular rows: sum of periods
-            mTotal = mP1 + mP2;
+            var mP1Raw = m.period1Hours;
+            var mP2Raw = m.period2Hours;
+            mP1 = (mP1Raw !== null && mP1Raw !== undefined && mP1Raw !== '' && mP1Raw !== 0) ? mP1Raw : '';
+            mP2 = (mP2Raw !== null && mP2Raw !== undefined && mP2Raw !== '' && mP2Raw !== 0) ? mP2Raw : '';
+            var mP1Num = parseFloat(mP1) || 0;
+            var mP2Num = parseFloat(mP2) || 0;
+            mTotal = mP1Num + mP2Num;
         }
 
         // Type column: special rows show static "רגיל", regular rows get dropdown
@@ -4177,18 +4148,10 @@ const App = (() => {
                 '<span style="width:28px;height:28px;border-radius:50%;background:var(--accent,#f59e0b);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏠</span>' +
                 '<span style="font-weight:700;color:var(--accent,#f59e0b);">כוח פנים</span></div>';
         } else if (type === 'שעות ליווי') {
-            // Editable name field for שעות ליווי with mentor search
-            var searchInputId = 'cd_acc_search_input_' + m.id;
-            var searchResultsId = 'cd_acc_search_results_' + m.id;
-            var selectedMentorId = m.mentorId || '';
-            
-            nameHtml = '<div style="display:flex;align-items:center;gap:8px;position:relative;">' +
+            // Editable name field for שעות ליווי
+            nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
                 '<span style="width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🕐</span>' +
-                '<div style="flex:1;min-width:150px;position:relative;">' +
-                    '<input type="text" id="' + searchInputId + '" class="form-input cd-acc-search" data-inst-id="' + m.id + '" value="' + escAttr(m.fullName || '') + '" placeholder="🔍 חפש מנחה..." style="font-size:13px;" oninput="App._filterAccompanimentSearch(\'' + searchInputId + '\', \'' + searchResultsId + '\', \'' + m.id + '\')" onfocus="App._filterAccompanimentSearch(\'' + searchInputId + '\', \'' + searchResultsId + '\', \'' + m.id + '\')" autocomplete="off">' +
-                    '<input type="hidden" id="cd_acc_mentorid_' + m.id + '" value="' + escAttr(selectedMentorId) + '">' +
-                    '<div id="' + searchResultsId + '" style="position:absolute;top:100%;left:0;right:0;z-index:100;background:#fff;border:1px solid var(--gray-200);border-radius:0 0 var(--border-radius) var(--border-radius);max-height:200px;overflow-y:auto;display:none;box-shadow:0 4px 6px rgba(0,0,0,.1);"></div>' +
-                '</div>' +
+                '<input type="text" class="form-input cd-acc-name" data-inst-id="' + m.id + '" value="' + escAttr(m.fullName || '') + '" placeholder="שם מלווה..." style="min-width:120px;font-size:13px;">' +
                 '</div>';
         } else {
             nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
@@ -4199,16 +4162,17 @@ const App = (() => {
 
         var rowBg = type === 'כוח פנים' ? 'background:#fffbeb;' : (type === 'שעות ליווי' ? 'background:#eff6ff;' : '');
 
-        // IMPORTANT: Display EXACT values from DB in all input fields
-        // No fabrication - what you see is exactly what's stored
+        // For special rows: P1/P2 columns show editable inputs, total is read-only fixed value
         var p2CellHtml, p1CellHtml, totalCellHtml;
-        
-        // P1/P2 inputs: always show the exact numeric value (0 displays as "0")
-        p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-        p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
-        
-        // Total column: show actual calculated sum (never hide real 0 values)
-        totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + mTotal + '</td>';
+        if (isSpecialRow) {
+            p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+            p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+            totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + mTotal + '</td>';
+        } else {
+            p2CellHtml = '<td><input type="number" class="form-input cd-acad-p2" data-inst-id="' + m.id + '" value="' + mP2 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+            p1CellHtml = '<td><input type="number" class="form-input cd-acad-p1" data-inst-id="' + m.id + '" value="' + mP1 + '" min="0" step="0.5" style="width:90px;text-align:center;" oninput="App._cdRecalc()"></td>';
+            totalCellHtml = '<td style="text-align:center;font-weight:700;" class="cd-acad-total">' + (mTotal > 0 ? mTotal : '') + '</td>';
+        }
 
         return '<tr data-inst-id="' + m.id + '" style="' + rowBg + '">' +
             '<td>' + typeCellHtml + '</td>' +
@@ -4806,84 +4770,6 @@ function _saveCompleteData(solutionId) {
         if (resultsDiv) {
             setTimeout(function() { resultsDiv.style.display = 'none'; }, 200);
         }
-    }
-
-    // Filter accompaniment mentor search (for שעות ליווי rows)
-    function _filterAccompanimentSearch(inputId, resultsId, instId) {
-        var searchInput = document.getElementById(inputId);
-        var resultsDiv = document.getElementById(resultsId);
-        if (!searchInput || !resultsDiv) return;
-        
-        var query = searchInput.value.trim().toLowerCase();
-        if (!query) { 
-            resultsDiv.style.display = 'none'; 
-            return; 
-        }
-
-        var allMentors = (DataStore.getAll(DataStore.KEYS.MENTORS) || []).filter(function(m) { return m.isActive !== false; });
-        var filtered = allMentors.filter(function(m) {
-            return (m.fullName || '').toLowerCase().includes(query) ||
-                   (m.idNumber || '').includes(query);
-        });
-
-        // Exclude mentors already assigned to this solution (except כוח פנים)
-        if (window._cdSolutionId) {
-            var solId = window._cdSolutionId;
-            var existingInsts = (DataStore.getAll(DataStore.KEYS.SOLUTION_INSTRUCTORS) || []).filter(function(i) { 
-                return i.solutionId === solId && i.id !== instId; 
-            });
-            var usedIds = new Set(existingInsts.filter(function(i) { 
-                return i.mentorId && _getMentorType(i) !== 'כוח פנים'; 
-            }).map(function(i) { return i.mentorId; }));
-            filtered = filtered.filter(function(m) { return !usedIds.has(m.id); });
-        }
-
-        filtered = filtered.slice(0, 15);
-
-        if (filtered.length === 0) {
-            resultsDiv.innerHTML = '<div style="padding:10px;color:var(--gray-400);text-align:center;font-size:13px;">לא נמצאו תוצאות</div>';
-        } else {
-            resultsDiv.innerHTML = filtered.map(function(m) {
-                return '<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--gray-100);font-size:14px;" ' +
-                    'onmousedown="App._selectAccompanimentMentor(\'' + inputId + '\', \'' + resultsId + '\', \'' + instId + '\', \'' + m.id + '\')" ' +
-                    'onmouseover="this.style.background=\'var(--gray-50)\'" onmouseout="this.style.background=\'\'">' +
-                    '<strong>' + escAttr(m.fullName) + '</strong>' +
-                    (m.idNumber ? ' <span style="color:var(--gray-400);font-size:12px;direction:ltr;display:inline-block;margin-right:6px;">(' + escAttr(m.idNumber) + ')</span>' : '') +
-                    '</div>';
-            }).join('');
-        }
-        resultsDiv.style.display = 'block';
-    }
-
-    // Select accompaniment mentor from search results
-    function _selectAccompanimentMentor(inputId, resultsId, instId, mentorId) {
-        var searchInput = document.getElementById(inputId);
-        var resultsDiv = document.getElementById(resultsId);
-        var m = DataStore.getById(DataStore.KEYS.MENTORS, mentorId);
-        if (!m) return;
-
-        if (searchInput) searchInput.value = m.fullName + (m.idNumber ? ' (' + m.idNumber + ')' : '');
-        if (resultsDiv) resultsDiv.style.display = 'none';
-        
-        // Update hidden mentor ID field
-        var hiddenField = document.getElementById('cd_acc_mentorid_' + instId);
-        if (hiddenField) hiddenField.value = mentorId;
-        
-        // Update the instructor record
-        var inst = DataStore.getById(DataStore.KEYS.SOLUTION_INSTRUCTORS, instId);
-        if (inst) {
-            inst.mentorId = mentorId;
-            inst.mentorRepoId = mentorId;
-            inst.fullName = m.fullName;
-            inst.idNumber = m.idNumber || '';
-            inst.phone = m.phone || '';
-            inst.email = m.email || '';
-            inst.performerType = m.performerType || '';
-            inst.lecturerStatus = m.lecturerStatus || '';
-            DataStore.update(DataStore.KEYS.SOLUTION_INSTRUCTORS, instId, inst);
-        }
-        
-        _cdRecalc();
     }
 
 
@@ -10308,7 +10194,7 @@ function _saveCompleteData(solutionId) {
         // Multi-select autocomplete
         _msInit, _msOnInput, _msOnKeyDown, _msSelectItem, _msRemoveTag, _msRenderTags, _msCloseDropdown, _msHighlightItem,
         openCompleteDataModal, _cdUpdateCardStyles, _cdOnBudgetStatusChange, _cdRenderFundedStage2, _cdRenderNonFundedStage2, _cdBuildMentorRow, _cdOnTypeChange, _cdRecalc, _cdAddMentorInline, _cdRemoveMentorRow, _cdAddInternalForceRow, _saveCompleteData, _fmtDateRange,
-        _filterMentorSearch, _selectMentorSearchItem, _closeMentorSearch, _filterAccompanimentSearch, _selectAccompanimentMentor,
+        _filterMentorSearch, _selectMentorSearchItem, _closeMentorSearch,
         // New Solution Flow
         startNewSolutionFlow, _selectResponsibilityType, _backToResponsibilitySelection, _ssSchoolInit, _ssOnInput, _ssOnKeyDown, _ssSelectSchool, _ssRemoveSchool, _ssHighlightItem, _ssCloseDropdown, _nsfOnTopicTypeChange, _saveNewSolution,
         // Site settings

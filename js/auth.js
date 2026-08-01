@@ -46,23 +46,12 @@ const Auth = (() => {
         return str.normalize('NFC').replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF]/g, '');
     }
 
-    async function login(username, password) {
+    function login(username, password) {
         const users = DataStore.getAll(DataStore.KEYS.USERS);
         const cleanUser = _sanitizeInput(username);
-        const user = users.find(u => _sanitizeInput(u.username) === cleanUser);
+        const cleanPass = _sanitizeInput(password);
+        const user = users.find(u => _sanitizeInput(u.username) === cleanUser && _sanitizeInput(u.password) === cleanPass);
         if (!user) {
-            return { success: false, message: 'שם משתמש או סיסמה שגויים' };
-        }
-        // תמיכה גם בסיסמאות ישנות (plain text) וגם ב-hash חדש
-        let passwordValid = false;
-        if (user.password && user.password.length === 64) {
-            // נראה כמו SHA-256 hash (64 תווים הקסדצימליים)
-            passwordValid = await DataStore._verifyPassword(password, user.password);
-        } else {
-            // fallback לסיסמה ישנה (plain text) - לתאימות לאחור
-            passwordValid = (_sanitizeInput(user.password) === _sanitizeInput(password));
-        }
-        if (!passwordValid) {
             return { success: false, message: 'שם משתמש או סיסמה שגויים' };
         }
         const session = DataStore.setSession(user);
@@ -171,36 +160,22 @@ const Auth = (() => {
         DataStore.update(DataStore.KEYS.USERS, userId, { permissions: {} });
     }
 
-    async function changePassword(userId, oldPassword, newPassword) {
+    function changePassword(userId, oldPassword, newPassword) {
         const user = DataStore.getById(DataStore.KEYS.USERS, userId);
         if (!user) return { success: false, message: 'משתמש לא נמצא' };
-        
-        // תמיכה גם בסיסמאות ישנות (plain text) וגם ב-hash חדש
-        let oldPasswordValid = false;
-        if (user.password && user.password.length === 64) {
-            oldPasswordValid = await DataStore._verifyPassword(oldPassword, user.password);
-        } else {
-            oldPasswordValid = (_sanitizeInput(user.password) === _sanitizeInput(oldPassword));
-        }
-        
-        if (!oldPasswordValid) return { success: false, message: 'סיסמה נוכחית שגויה' };
+        if (user.password !== oldPassword) return { success: false, message: 'סיסמה נוכחית שגויה' };
         if (newPassword.length < 4) return { success: false, message: 'הסיסמה החדשה חייבת להכיל לפחות 4 תווים' };
-        
-        // Hash הסיסמה החדשה לפני השמירה
-        const hashedPassword = await DataStore._hashPassword(newPassword);
-        DataStore.update(DataStore.KEYS.USERS, userId, { password: hashedPassword });
+        DataStore.update(DataStore.KEYS.USERS, userId, { password: newPassword });
         return { success: true, message: 'הסיסמה שונתה בהצלחה' };
     }
 
-    async function createUser(userData) {
+    function createUser(userData) {
         const users = DataStore.getAll(DataStore.KEYS.USERS);
         if (users.find(u => u.username === userData.username)) {
             return { success: false, message: 'שם משתמש כבר קיים במערכת' };
         }
         const role = _normalizeRole(userData.role);
-        // Hash הסיסמה לפני השמירה
-        const hashedPassword = await DataStore._hashPassword(userData.password);
-        const user = DataStore.create(DataStore.KEYS.USERS, { ...userData, role, password: hashedPassword });
+        const user = DataStore.create(DataStore.KEYS.USERS, { ...userData, role });
         return { success: true, user };
     }
 
