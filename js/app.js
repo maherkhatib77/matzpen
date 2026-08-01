@@ -627,7 +627,7 @@ const App = (() => {
         var _LANG_KEY = 'matspanet_ui_lang';
 
         function getUiLang() {
-                // Back Office: settings.json language takes precedence (default: Hebrew)
+                // Back Office: settings.json language takes precedence (default: Arabic)
                 try {
                         if (typeof DataStore !== 'undefined' && DataStore.getSettings) {
                                 var d = (DataStore.getSettings() || {}).language;
@@ -638,7 +638,7 @@ const App = (() => {
                         var s = localStorage.getItem(_LANG_KEY);
                         if (s === 'ar' || s === 'he') return s;
                 } catch (e) {}
-                return 'he';
+                return 'ar';
         }
 
         function t(key) {
@@ -8475,6 +8475,8 @@ function _saveCompleteData(solutionId) {
         if (role === 'admin' || role === 'system_admin') return true;
         // If user has no permissions object at all, default: show all (backward compat)
         if (!currentUser.permissions) return true;
+        // Homepage and FAQ are always visible to all users
+        if (sectionId === 'homepage' || sectionId === 'faq') return true;
         const perm = currentUser.permissions[sectionId];
         return perm === 'view' || perm === 'full';
     }
@@ -9922,7 +9924,7 @@ function _saveCompleteData(solutionId) {
     var _cpEditorInit = false;
     var _cpCurrentEditId = null;
     function _cpEsc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-    function _cpLang() { return (DataStore.getSettings() || {}).language || document.documentElement.lang || 'he'; }
+    function _cpLang() { return (DataStore.getSettings() || {}).language || document.documentElement.lang || 'ar'; }
     function _cpSanitizeHtml(html) {
         if (!html) return '';
         html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
@@ -10007,7 +10009,10 @@ function _saveCompleteData(solutionId) {
                 var previewBtn = isAr ? '👁️ معاينة' : '👁️ תצוגה';
                 var linkBtn = isAr ? '🔗 رابط' : '🔗 קישור';
                 var pageUrl = _cpGetPageUrl(p.filename);
-                html += '<tr><td><strong>' + _cpEsc(p.titleHe || '') + '</strong>' + (p.titleAr ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleAr) + '</span>' : '') + '</td>' +
+                // Display title based on current language - Arabic is default/primary
+                var displayTitle = isAr ? (p.titleAr || p.titleHe || '') : (p.titleHe || p.titleAr || '');
+                var secondaryTitle = isAr && p.titleHe && p.titleAr ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleHe) + '</span>' : (!isAr && p.titleAr && p.titleHe ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleAr) + '</span>' : '');
+                html += '<tr><td><strong>' + _cpEsc(displayTitle) + '</strong>' + secondaryTitle + '</td>' +
                     '<td style="direction:ltr;unicode-bidi:embed;font-family:monospace;font-size:13px;">' + _cpEsc(p.filename) + '</td>' +
                     '<td><span class="cp-status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                     '<td>' + menuBadge + '</td>' +
@@ -10206,9 +10211,10 @@ function _saveCompleteData(solutionId) {
         if (!data) return;
         var title = _cpLang() === 'ar' ? 'معاينة' : 'תצוגה מקדימה';
         var closeBtn = _cpLang() === 'ar' ? '❌ إغلاق' : '❌ סגור';
+        // Display title based on current language - Arabic is default/primary
+        var displayTitle = (_cpLang() === 'ar' && data.titleAr) ? data.titleAr : (data.titleHe || data.titleAr || '');
         var bodyHtml = '<div style="direction:rtl;text-align:right;">' +
-            '<h2 style="font-size:22px;font-weight:800;margin-bottom:8px;">' + _cpEsc(data.titleHe || '') + '</h2>' +
-            (data.titleAr ? '<p style="color:var(--gray-500);font-size:16px;margin-bottom:20px;">' + _cpEsc(data.titleAr) + '</p>' : '') +
+            '<h2 style="font-size:22px;font-weight:800;margin-bottom:8px;">' + _cpEsc(displayTitle) + '</h2>' +
             '<div style="border-top:2px solid var(--gray-200);padding-top:16px;line-height:1.9;">' + data.content + '</div></div>';
         showModal(title, bodyHtml, '<button class="btn btn-ghost" onclick="App.closeModal()" type="button">' + closeBtn + '</button>');
     }
