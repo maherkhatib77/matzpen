@@ -5346,6 +5346,9 @@ function _saveCompleteData(solutionId) {
                 }
             </style>
         `;
+
+        // Initialize TinyMCE after rendering
+        setTimeout(function() { _initHpTinyMCE(); }, 50);
     }
 
 
@@ -5398,6 +5401,7 @@ function _saveCompleteData(solutionId) {
     }
 
     var _hpTinyMCEInit = false;
+
     function _initHpTinyMCE() {
         if (typeof tinymce === 'undefined') {
             console.warn('[Homepage] TinyMCE not loaded yet');
@@ -5414,16 +5418,23 @@ function _saveCompleteData(solutionId) {
             } catch(e) { console.error('[Homepage] Error destroying editor:', e); }
             _hpTinyMCEInit = false;
         }
+        // Check if textarea exists
+        var textarea = document.getElementById('hpMainRich');
+        if (!textarea) {
+            console.warn('[Homepage] Textarea #hpMainRich not found');
+            return;
+        }
         // Initialize new editor
         try {
             tinymce.init({
                 selector: '#hpMainRich',
-                height: 450,
+                height: 500,
                 directionality: 'rtl',
                 language: 'he_IL',
+                language_url: 'https://cdn.jsdelivr.net/npm/tinymce@6.8.5/langs/he_IL.min.js',
                 menubar: 'file edit view insert format table tools',
-                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste wordcount help directionality textcolor',
-                toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize | forecolor backcolor | alignleft aligncenter alignright justify | ltr rtl | bullist numlist | outdent indent | table | link image | hr | removeformat | code | help',
+                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste wordcount help directionality textcolor emoticons pagebreak nonbreaking toc hr codesample',
+                toolbar: 'undo redo | styles fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright justify | rtl ltr | bullist numlist outdent indent | table | link image media | emoticons charmap | hr codesample | removeformat | code | help',
                 content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 15px; line-height: 1.8; padding: 16px; direction: rtl; } img { max-width: 100%; height: auto; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; } h1 { font-size: 26px; } h2 { font-size: 22px; } h3 { font-size: 18px; }',
                 branding: false,
                 promotion: false,
@@ -5456,6 +5467,8 @@ function _saveCompleteData(solutionId) {
             mainContent: { combined: content, he: content, ar: content }
         });
         showToast('התוכן נשמר', 'success');
+        // Re-render and re-initialize TinyMCE after a short delay
+        setTimeout(function() { renderHomepage(); _initHpTinyMCE(); }, 100);
     }
 
     function _saveHomepageFooter() {
