@@ -535,6 +535,11 @@ const App = (() => {
     }
 
     // ============ HELPER FUNCTIONS ============
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    
     function escAttr(str) {
         if (!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
