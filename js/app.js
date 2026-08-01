@@ -1372,6 +1372,7 @@ const App = (() => {
         { id: 'activity-log',    label: 'מעקב והיסטוריה',     icon: '📊' },
         { id: 'recycle-bin',     label: 'סל מחזור',            icon: '🗑️' },
         { id: 'settings',        label: 'הגדרות',              icon: '⚙️' },
+        { id: 'homepage',        label: 'דף שער',              icon: '🏠' },
         { id: 'custom-pages',   label: 'יצירת דף חדש',        icon: '📄' }
     ];
 
