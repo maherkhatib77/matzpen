@@ -10295,7 +10295,7 @@ function _saveCompleteData(solutionId) {
         // Guides Repo
         openGuideRepoModal, saveGuideRepo, deleteGuideRepo, clearAllGuidesRepo, filterGuidesRepo, _previewGuideImage, moveGuideRepo,
         // Homepage
-        renderHomepage, _saveHomepageHeader, _saveHomepageContent, _saveHomepageFooter,
+        renderHomepage, _saveHomepageHeader, _saveHomepageContent, _saveHomepageFooter, _initHpTinyMCE,
         openHomepageNavModal, saveHomepageNavItem, deleteHomepageNavItem, moveHomepageNavItem,
         openHomepageSidebarModal, saveHomepageSidebarItem, deleteHomepageSidebarItem, moveHomepageSidebarItem,
         _previewHomepageLogo,
