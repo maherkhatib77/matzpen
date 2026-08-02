@@ -9986,18 +9986,17 @@ function _saveCompleteData(solutionId) {
     }
     function renderCustomPages() {
         var items = (DataStore.getAll(DataStore.KEYS.CUSTOM_PAGES) || []).slice().sort(function(a,b) { return (b.updatedAt || '').localeCompare(a.updatedAt || ''); });
-        var isAr = _cpLang() === 'ar';
-        var btnNew = isAr ? '➕ إنشاء صفحة جديدة' : '➕ צור דף חדש';
-        var colName = isAr ? 'اسم الصفحة' : 'שם הדף';
-        var colFilename = isAr ? 'اسم الملف' : 'שם קובץ';
-        var colStatus = isAr ? 'الحالة' : 'סטטוס';
-        var colMenu = isAr ? 'القائمة' : 'תפריט';
-        var colDate = isAr ? 'تاريخ التحديث' : 'תאריך עדכון';
-        var colActions = isAr ? 'إجراءات' : 'פעולות';
-        var emptyTitle = isAr ? 'لا توجد صفحات' : 'אין דפים';
-        var emptySub = isAr ? 'أنشئ صفحتك الأولى' : 'צור את הדף הראשון שלך';
-        var emptyBtn = isAr ? '➕ إنشاء صفحة جديدة' : '➕ צור דף חדש';
-        var headerLabel = isAr ? 'إنشاء صفحة جديدة' : 'יצירת דף חדש';
+        var btnNew = '➕ צור דף חדש';
+        var colName = 'שם הדף';
+        var colFilename = 'שם קובץ';
+        var colStatus = 'סטטוס';
+        var colMenu = 'תפריט';
+        var colDate = 'תאריך עדכון';
+        var colActions = 'פעולות';
+        var emptyTitle = 'אין דפים';
+        var emptySub = 'צור את הדף הראשון שלך';
+        var emptyBtn = '➕ צור דף חדש';
+        var headerLabel = 'יצירת דף חדש';
         var html = _lookupTableHeader(headerLabel, items.length, '📄',
             '<button class="btn btn-sm" style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:700;" onclick="App.openCustomPageModal()">' + btnNew + '</button>');
         if (!items.length) {
@@ -10007,18 +10006,18 @@ function _saveCompleteData(solutionId) {
                 '<th>' + colName + '</th><th>' + colFilename + '</th><th>' + colStatus + '</th><th>' + colMenu + '</th><th>' + colDate + '</th><th>' + colActions + '</th></tr></thead><tbody>';
             items.forEach(function(p) {
                 var statusClass = p.status === 'published' ? 'cp-status-published' : 'cp-status-draft';
-                var statusText = p.status === 'published' ? (isAr ? 'منشور' : 'מפורסם') : (isAr ? 'مسودة' : 'טיוטה');
+                var statusText = p.status === 'published' ? 'מפורסם' : 'טיוטה';
                 var menuLoc = p.menuLocation || 'none';
-                var menuBadge = menuLoc === 'top' ? '<span class="cp-status-badge cp-status-published">' + (isAr ? 'علوية' : 'עליון') + '</span>' : menuLoc === 'sidebar' ? '<span class="cp-status-badge" style="background:#eff6ff;color:#2563eb;">' + (isAr ? 'جانبية' : 'צדדי') + '</span>' : '<span class="cp-status-badge cp-status-draft">' + (isAr ? 'بدون' : 'ללא') + '</span>';
-                var dateStr = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString(isAr ? 'ar-IL' : 'he-IL') : '-';
-                var editBtn = isAr ? '✏️ تعديل' : '✏️ עריכה';
-                var deleteBtn = isAr ? '🗑️ حذف' : '🗑️ מחיקה';
-                var previewBtn = isAr ? '👁️ معاينة' : '👁️ תצוגה';
-                var linkBtn = isAr ? '🔗 رابط' : '🔗 קישור';
+                var menuBadge = menuLoc === 'top' ? '<span class="cp-status-badge cp-status-published">עליון</span>' : menuLoc === 'sidebar' ? '<span class="cp-status-badge" style="background:#eff6ff;color:#2563eb;">צדדי</span>' : '<span class="cp-status-badge cp-status-draft">ללא</span>';
+                var dateStr = p.updatedAt ? new Date(p.updatedAt).toLocaleDateString('he-IL') : '-';
+                var editBtn = '✏️ עריכה';
+                var deleteBtn = '🗑️ מחיקה';
+                var previewBtn = '👁️ תצוגה';
+                var linkBtn = '🔗 קישור';
                 var pageUrl = _cpGetPageUrl(p.filename);
-                // Display title based on current language - Arabic is default/primary
-                var displayTitle = isAr ? (p.titleAr || p.titleHe || '') : (p.titleHe || p.titleAr || '');
-                var secondaryTitle = isAr && p.titleHe && p.titleAr ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleHe) + '</span>' : (!isAr && p.titleAr && p.titleHe ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleAr) + '</span>' : '');
+                // Display title in Hebrew (admin language) with Arabic as secondary
+                var displayTitle = p.titleHe || p.titleAr || '';
+                var secondaryTitle = p.titleAr && p.titleHe ? '<br><span style="color:var(--gray-400);font-size:13px;">' + _cpEsc(p.titleAr) + '</span>' : '';
                 html += '<tr><td><strong>' + _cpEsc(displayTitle) + '</strong>' + secondaryTitle + '</td>' +
                     '<td style="direction:ltr;unicode-bidi:embed;font-family:monospace;font-size:13px;">' + _cpEsc(p.filename) + '</td>' +
                     '<td><span class="cp-status-badge ' + statusClass + '">' + statusText + '</span></td>' +
@@ -10027,7 +10026,7 @@ function _saveCompleteData(solutionId) {
                     '<td><div class="cp-table-actions">' +
                     '<button class="btn btn-outline btn-sm" onclick="App.editCustomPage(\'' + p.id + '\')">' + editBtn + '</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="App.previewCustomPage(\'' + p.id + '\')">' + previewBtn + '</button>' +
-                    '<button class="btn btn-outline btn-sm" onclick="App._openPageLink(\'' + p.filename + '\')" title="' + (isAr ? 'فتح الصفحة' : 'פתח את הדף') + '">' + linkBtn + '</button>' +
+                    '<button class="btn btn-outline btn-sm" onclick="App._openPageLink(\'' + p.filename + '\')" title="פתח את הדף">' + linkBtn + '</button>' +
                     '<button class="btn btn-outline btn-sm" onclick="App.deleteCustomPage(\'' + p.id + '\')" style="color:var(--danger, #e53e3e);">' + deleteBtn + '</button>' +
                     '</div></td></tr>';
             });
@@ -10051,19 +10050,19 @@ function _saveCompleteData(solutionId) {
     }
     function openCustomPageModal(editId) {
         _cpCurrentEditId = editId || null;
-        var isAr = _cpLang() === 'ar';
-        var title = isAr ? (editId ? 'تعديل الصفحة' : 'إنشاء صفحة جديدة') : (editId ? 'עריכת דף' : 'יצירת דף חדש');
-        var lblFilename = isAr ? 'اسم الملف (بالإنجليزية)' : 'שם קובץ (באנגלית)';
-        var lblTitleHe = isAr ? 'عنوان الصفحة (بالعبرية)' : 'כותרת הדף (בעברית)';
-        var lblTitleAr = isAr ? 'عنوان الصفحة (بالعربية)' : 'כותרת הדף (בערבית)';
-        var lblStatus = isAr ? 'الحالة' : 'סטטוס';
-        var lblMenuLoc = isAr ? 'موقع الرابط في القائمة' : 'מיקום קישור בתפריט';
-        var lblMenuLabelHe = isAr ? 'نص القائمة (بالعبرية)' : 'טקסט תפריט (בעברית)';
-        var lblMenuLabelAr = isAr ? 'نص القائمة (بالعربية)' : 'טקסט תפריט (בערבית)';
-        var lblContent = isAr ? 'محتوى الصفحة' : 'תוכן הדף';
-        var btnSave = isAr ? '💾 حفظ' : '💾 שמור';
-        var btnCancel = isAr ? '❌ إلغاء' : '❌ ביטול';
-        var btnPreview = isAr ? '👁️ معاينة' : '👁️ תצוגה מקדימה';
+        var title = 'יצירת דף חדש';
+        if (editId) title = 'עריכת דף';
+        var lblFilename = 'שם קובץ (באנגלית)';
+        var lblTitleHe = 'כותרת הדף (בעברית)';
+        var lblTitleAr = 'כותרת הדף (בערבית)';
+        var lblStatus = 'סטטוס';
+        var lblMenuLoc = 'מיקום קישור בתפריט';
+        var lblMenuLabelHe = 'טקסט תפריט (בעברית)';
+        var lblMenuLabelAr = 'טקסט תפריט (בערבית)';
+        var lblContent = 'תוכן הדף';
+        var btnSave = '💾 שמור';
+        var btnCancel = '❌ ביטול';
+        var btnPreview = '👁️ תצוגה מקדימה';
         var existing = editId ? DataStore.getAll(DataStore.KEYS.CUSTOM_PAGES).find(function(p) { return p.id === editId; }) : null;
         var valFilename = existing ? _cpEsc(existing.filename) : '';
         var valTitleHe = existing ? _cpEsc(existing.titleHe || '') : '';
@@ -10074,11 +10073,11 @@ function _saveCompleteData(solutionId) {
         var valMenuLabelAr = existing ? _cpEsc(existing.menuLabelAr || '') : '';
         var disabledAttr = existing ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : '';
         var statusOpts = (valStatus === 'published' ?
-            '<option value="published" selected>' + (isAr ? 'منشور' : 'מפורסם') + '</option><option value="draft">' + (isAr ? 'مسودة' : 'טיוטה') + '</option>' :
-            '<option value="draft" selected>' + (isAr ? 'مسودة' : 'טיוטה') + '</option><option value="published">' + (isAr ? 'منشور' : 'מפורסם') + '</option>');
-        var menuLocOpts = '<option value="none"' + (valMenuLoc === 'none' ? ' selected' : '') + '>' + (isAr ? 'بدون رابط' : 'ללא קישור') + '</option>' +
-            '<option value="top"' + (valMenuLoc === 'top' ? ' selected' : '') + '>' + (isAr ? 'القائمة العلوية' : 'תפריט עליון') + '</option>' +
-            '<option value="sidebar"' + (valMenuLoc === 'sidebar' ? ' selected' : '') + '>' + (isAr ? 'القائمة الجانبية' : 'תפריט צדדי') + '</option>';
+            '<option value="published" selected>מפורסם</option><option value="draft">טיוטה</option>' :
+            '<option value="draft" selected>טיוטה</option><option value="published">מפורסם</option>');
+        var menuLocOpts = '<option value="none"' + (valMenuLoc === 'none' ? ' selected' : '') + '>ללא קישור</option>' +
+            '<option value="top"' + (valMenuLoc === 'top' ? ' selected' : '') + '>תפריט עליון</option>' +
+            '<option value="sidebar"' + (valMenuLoc === 'sidebar' ? ' selected' : '') + '>תפריט צדדי</option>';
         var menuLabelsStyle = valMenuLoc !== 'none' ? 'display:flex;' : 'display:none;';
         var bodyHtml = '<div class="cp-editor-wrap">' +
             '<div class="cp-field-row">' +
@@ -10093,8 +10092,8 @@ function _saveCompleteData(solutionId) {
                 '<div class="cp-field-group" style="max-width:260px;"><label>' + lblMenuLoc + '</label><select id="cpMenuLocation" onchange="App._cpOnMenuLocChange()">' + menuLocOpts + '</select></div>' +
             '</div>' +
             '<div class="cp-field-row" id="cpMenuLabelsRow" style="' + menuLabelsStyle + '">' +
-                '<div class="cp-field-group"><label>' + lblMenuLabelHe + '</label><input type="text" id="cpMenuLabelHe" placeholder="' + (isAr ? 'النص بالعبرية' : 'הטקסט בעברית') + '" value="' + valMenuLabelHe + '"></div>' +
-                '<div class="cp-field-group"><label>' + lblMenuLabelAr + '</label><input type="text" id="cpMenuLabelAr" placeholder="' + (isAr ? 'النص بالعربية' : 'הטקסט בערבית') + '" value="' + valMenuLabelAr + '" dir="rtl"></div>' +
+                '<div class="cp-field-group"><label>' + lblMenuLabelHe + '</label><input type="text" id="cpMenuLabelHe" placeholder="הטקסט בעברית" value="' + valMenuLabelHe + '"></div>' +
+                '<div class="cp-field-group"><label>' + lblMenuLabelAr + '</label><input type="text" id="cpMenuLabelAr" placeholder="הטקסט בערבית" value="' + valMenuLabelAr + '" dir="rtl"></div>' +
             '</div>' +
             '<div class="cp-field-group" style="margin-bottom:10px;flex:none;"><label>' + lblContent + '</label></div>' +
             '<div class="cp-editor-container"><textarea id="cpEditor">' + (existing ? existing.content : '') + '</textarea></div>' +
@@ -10131,11 +10130,11 @@ function _saveCompleteData(solutionId) {
         var menuLabelHe = document.getElementById('cpMenuLabelHe').value.trim();
         var menuLabelAr = document.getElementById('cpMenuLabelAr').value.trim();
         var content = document.getElementById('cpEditor').value;
-        if (!filename) { showToast(_cpLang() === 'ar' ? 'يجب إدخال اسم الملف' : 'חובה להזין שם קובץ', 'error'); return; }
-        if (!titleHe && !titleAr) { showToast(_cpLang() === 'ar' ? 'يجب إدخال عنوان' : 'חובה להזין כותרת', 'error'); return; }
+        if (!filename) { showToast('חובה להזין שם קובץ', 'error'); return; }
+        if (!titleHe && !titleAr) { showToast('חובה להזין כותרת', 'error'); return; }
         var pages = DataStore.getAll(DataStore.KEYS.CUSTOM_PAGES) || [];
         var dup = pages.find(function(p) { return p.filename === filename && p.id !== _cpCurrentEditId; });
-        if (dup) { showToast(_cpLang() === 'ar' ? 'اسم الملف موجود بالفعل' : 'שם קובץ כבר קיים', 'error'); return; }
+        if (dup) { showToast('שם קובץ כבר קיים', 'error'); return; }
         content = _cpSanitizeHtml(content);
         var now = new Date().toISOString();
         var pageData = { filename: filename, titleHe: titleHe, titleAr: titleAr, status: status, content: content, menuLocation: menuLocation, menuLabelHe: menuLabelHe, menuLabelAr: menuLabelAr, updatedAt: now };
@@ -10146,30 +10145,30 @@ function _saveCompleteData(solutionId) {
             var oldPage = pages.find(function(p) { return p.id === _cpCurrentEditId; });
             oldMenuLocation = oldPage ? (oldPage.menuLocation || 'none') : null;
             DataStore.update(DataStore.KEYS.CUSTOM_PAGES, _cpCurrentEditId, pageData);
-            showToast(_cpLang() === 'ar' ? 'تم تحديث الصفحة' : 'הדף עודכן בהצלחה', 'success');
+            showToast('הדף עודכן בהצלחה', 'success');
         } else {
             var newItem = DataStore.create(DataStore.KEYS.CUSTOM_PAGES, pageData);
             savedPageId = newItem.id;
-            showToast(_cpLang() === 'ar' ? 'تم إنشاء الصفحة' : 'הדף נוצר בהצלחה', 'success');
+            showToast('הדף נוצר בהצלחה', 'success');
         }
         // Update homepage menu
         _cpUpdateHomepageMenu({ id: savedPageId, filename: filename, titleHe: titleHe, titleAr: titleAr, menuLocation: menuLocation, menuLabelHe: menuLabelHe, menuLabelAr: menuLabelAr }, oldMenuLocation);
-        // Save HTML file to server
+        // Save HTML file to server - send Arabic title for the generated page
         try {
             fetch('/api/create-page-file', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename: filename + '.html', title: titleHe, content: content })
+                body: JSON.stringify({ filename: filename + '.html', title: titleAr || titleHe, content: content })
             }).then(function(r) {
                 if (!r.ok) {
                     return r.text().then(function(txt) {
-                        showToast(_cpLang() === 'ar' ? 'خطأ في الخادم (' + r.status + '): ' + txt : '⚠️ שגיאת שרת (' + r.status + '): ' + txt, 'error');
+                        showToast('⚠️ שגיאת שרת (' + r.status + '): ' + txt, 'error');
                     });
                 }
                 return r.json();
             }).then(function(data) {
-                if (data && !data.success) { console.error('Failed to create page file:', data.error); showToast(_cpLang() === 'ar' ? 'تحذير: لم يتم إنشاء ملف HTML: ' + data.error : '⚠️ שגיאה ביצירת קובץ HTML: ' + data.error, 'warning'); }
-            }).catch(function(e) { console.error('Error creating page file:', e); showToast(_cpLang() === 'ar' ? 'فشل الاتصال بالخادم: ' + e.message : '⚠️ כשל בתקשורת עם השרת: ' + e.message, 'error'); });
+                if (data && !data.success) { console.error('Failed to create page file:', data.error); showToast('⚠️ שגיאה ביצירת קובץ HTML: ' + data.error, 'warning'); }
+            }).catch(function(e) { console.error('Error creating page file:', e); showToast('⚠️ כשל בתקשורת עם השרת: ' + e.message, 'error'); });
         } catch(e) { console.error('Error creating page file:', e); }
         if (typeof tinymce !== 'undefined') { var editor = tinymce.get('cpEditor'); if (editor) { editor.destroy(); _cpEditorInit = false; } }
         var modalEl = document.querySelector('#modalOverlay .modal');
@@ -10178,7 +10177,7 @@ function _saveCompleteData(solutionId) {
         renderCustomPages();
     }
     function deleteCustomPage(id) {
-        var msg = _cpLang() === 'ar' ? 'هل أنت متأكد من حذف هذه الصفحة؟' : 'האם למחוק דף זה?';
+        var msg = 'האם למחוק דף זה?';
         confirmDialog('⚠️ ' + msg, function() {
             // Get page filename for HTML file deletion
             var pages = DataStore.getAll(DataStore.KEYS.CUSTOM_PAGES) || [];
@@ -10197,7 +10196,7 @@ function _saveCompleteData(solutionId) {
                     }).catch(function() { /* silent */ });
                 } catch(e) { /* silent */ }
             }
-            showToast(_cpLang() === 'ar' ? 'تم حذف الصفحة' : 'הדף נמחק', 'success');
+            showToast('הדף נמחק', 'success');
             renderCustomPages();
         });
     }

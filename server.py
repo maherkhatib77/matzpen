@@ -543,6 +543,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
         </div>
     </header>
     <main class="cp-content" id="pageContent">
+        <div class="cp-hero"><h1 class="cp-hero-title">''' + escape(title) + '''</h1></div>
         ''' + content + '''
     </main>
     <footer class="cp-footer" id="globalFooterText">
