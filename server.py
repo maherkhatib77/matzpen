@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Matspanet - Local Development Server
-with enhanced error handling for ConnectionAbortedError
-"""
-
 import os
 import sys
 import json
@@ -16,47 +11,97 @@ import datetime
 import traceback
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-import threading
-import time
 
 # ============================================================
-# הגדרות בסיסיות
+# הגדרות עם טיימאוטים מורחבים
 # ============================================================
 
 PORT = 8000
 DATA_FOLDER = "data"
 PAGES_FOLDER = "pages"
 
-# הגדרת טיימאוט לחיבורים
-socket.setdefaulttimeout(60)  # 60 שניות
+# הגדרת טיימאוט גבוה יותר - 120 שניות
+TIMEOUT = 120  # שונה מ-60 ל-120
+
+# הגדרת טיימאוט גלובלי לחיבורים
+socket.setdefaulttimeout(TIMEOUT)
 
 # התעלמות משגיאות BrokenPipe
 try:
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 except AttributeError:
-    pass  # Windows לא תומך ב-SIGPIPE
+    pass  # Windows
 
 # ============================================================
-# מחלקת Handler מותאמת עם טיפול בשגיאות
+# מחלקת Handler עם טיימאוט מורחב
 # ============================================================
 
 class CustomHandler(SimpleHTTPRequestHandler):
-    """Handler מותאם עם טיפול משופר בשגיאות חיבור"""
+    """Handler מותאם עם טיימאוט מורחב"""
     
-    server_version = "Matspanet/1.0"
+    server_version = "Matspanet/2.0"
+    timeout = TIMEOUT  # הוספת timeout בכתובת המחלקה
     
     def __init__(self, *args, **kwargs):
-        # הגדרת טיימאוט לקריאה וכתיבה
         super().__init__(*args, **kwargs)
+        # הגדרת טיימאוט לחיבור עצמו
         if hasattr(self, 'connection'):
-            self.connection.settimeout(30)
+            try:
+                self.connection.settimeout(TIMEOUT)
+            except:
+                pass
+        
+        # הגדרת טיימאוט לקריאה ולכתיבה
+        if hasattr(self, 'rfile'):
+            try:
+                self.rfile._sock.settimeout(TIMEOUT)
+            except:
+                pass
+        
+        if hasattr(self, 'wfile'):
+            try:
+                self.wfile._sock.settimeout(TIMEOUT)
+            except:
+                pass
     
     # ============================================================
-    # שיטת do_GET עם טיפול בשגיאות (פתרון 1)
+    # שיטת handle_one_request עם טיפול בטיימאוט
+    # ============================================================
+    
+    def handle_one_request(self):
+        """טיפול בבקשה אחת עם הגנה מפני Timeout"""
+        try:
+            # הגדרת טיימאוט לפני כל בקשה
+            if hasattr(self, 'connection'):
+                try:
+                    self.connection.settimeout(TIMEOUT)
+                except:
+                    pass
+            
+            super().handle_one_request()
+            
+        except socket.timeout:
+            print(f"⏰  Request timed out: {self.client_address[0]}")
+            try:
+                self.send_error(408, "Request Timeout")
+            except:
+                pass
+        except TimeoutError as e:
+            print(f"⏰  Request timed out: {e}")
+            try:
+                self.send_error(408, "Request Timeout")
+            except:
+                pass
+        except Exception as e:
+            print(f"❌  Error handling request: {e}")
+            traceback.print_exc()
+    
+    # ============================================================
+    # שיטת do_GET עם טיימאוט מורחב
     # ============================================================
     
     def do_GET(self):
-        """טיפול בבקשת GET עם הגנה מפני ניתוקים"""
+        """טיפול בבקשת GET עם טיימאוט מורחב"""
         try:
             # בדיקה אם זו בקשת API
             if self.path.startswith('/api/'):
@@ -66,66 +111,65 @@ class CustomHandler(SimpleHTTPRequestHandler):
             # טיפול בבקשת קובץ רגילה
             super().do_GET()
             
+        except socket.timeout:
+            print(f"⏰  GET request timed out: {self.path}")
+            try:
+                self.send_error(408, "Request Timeout")
+            except:
+                pass
         except ConnectionAbortedError as e:
             print(f"⚠️  Client disconnected during GET: {e}")
-            # לא מחזירים תגובה כי החיבור כבר נותק
         except BrokenPipeError as e:
             print(f"⚠️  Broken pipe during GET: {e}")
-        except ConnectionResetError as e:
-            print(f"⚠️  Connection reset during GET: {e}")
-        except socket.timeout as e:
-            print(f"⚠️  Socket timeout during GET: {e}")
+        except TimeoutError as e:
+            print(f"⏰  GET request timed out: {e}")
         except Exception as e:
             print(f"❌  Error in GET request: {e}")
             traceback.print_exc()
-            try:
-                self.send_error(500, f"Internal Server Error: {str(e)}")
-            except:
-                pass
     
     # ============================================================
-    # שיטת do_POST עם טיפול בשגיאות (פתרון 1)
+    # שיטת do_POST עם טיימאוט מורחב
     # ============================================================
     
     def do_POST(self):
-        """טיפול בבקשת POST עם הגנה מפני ניתוקים"""
+        """טיפול בבקשת POST עם טיימאוט מורחב"""
         try:
             if self.path.startswith('/api/'):
                 self.handle_api_request()
             else:
                 self.send_error(404, "Not Found")
                 
+        except socket.timeout:
+            print(f"⏰  POST request timed out: {self.path}")
+            try:
+                self.send_error(408, "Request Timeout")
+            except:
+                pass
         except ConnectionAbortedError as e:
             print(f"⚠️  Client disconnected during POST: {e}")
         except BrokenPipeError as e:
             print(f"⚠️  Broken pipe during POST: {e}")
-        except ConnectionResetError as e:
-            print(f"⚠️  Connection reset during POST: {e}")
-        except socket.timeout as e:
-            print(f"⚠️  Socket timeout during POST: {e}")
+        except TimeoutError as e:
+            print(f"⏰  POST request timed out: {e}")
         except Exception as e:
             print(f"❌  Error in POST request: {e}")
             traceback.print_exc()
-            try:
-                self.send_error(500, f"Internal Server Error: {str(e)}")
-            except:
-                pass
     
     # ============================================================
-    # שיטת copyfile עם הגנה (פתרון 2)
+    # שיטת copyfile עם טיימאוט מורחב
     # ============================================================
     
     def copyfile(self, source, outputfile):
-        """
-        העתקת קובץ עם הגנה מפני ניתוקי חיבור
-        """
+        """העתקת קובץ עם טיימאוט מורחב"""
         try:
             # הגדרת טיימאוט לכתיבה
             if hasattr(outputfile, 'settimeout'):
-                outputfile.settimeout(60)
+                try:
+                    outputfile.settimeout(TIMEOUT)
+                except:
+                    pass
             
-            # העתקת הקובץ עם טיפול בשגיאות
-            chunk_size = 8192  # קריאה בנתחים קטנים להגנה
+            chunk_size = 8192
             while True:
                 try:
                     buf = source.read(chunk_size)
@@ -133,67 +177,29 @@ class CustomHandler(SimpleHTTPRequestHandler):
                         break
                     outputfile.write(buf)
                     
-                    # ניקוי מאגר הכתיבה מעת לעת
                     if hasattr(outputfile, 'flush'):
                         outputfile.flush()
                         
+                except socket.timeout:
+                    print(f"⏰  Timeout during file copy")
+                    return
+                except TimeoutError:
+                    print(f"⏰  Timeout during file copy")
+                    return
                 except (ConnectionAbortedError, BrokenPipeError, ConnectionResetError) as e:
                     print(f"⚠️  Client disconnected during file copy: {e}")
-                    return
-                except socket.timeout as e:
-                    print(f"⚠️  Socket timeout during file copy: {e}")
                     return
                     
         except Exception as e:
             print(f"❌  Error copying file: {e}")
             traceback.print_exc()
-            raise
     
     # ============================================================
-    # שיטת copyfileobj מותאמת (פתרון 2 - הרחבה)
-    # ============================================================
-    
-    def copyfileobj_enhanced(self, source, outputfile, length=8192):
-        """
-        העתקת אובייקט קובץ עם הגנה מפני ניתוקים
-        """
-        try:
-            if hasattr(outputfile, 'settimeout'):
-                outputfile.settimeout(60)
-            
-            while True:
-                try:
-                    buf = source.read(length)
-                    if not buf:
-                        break
-                    
-                    # ניסיון כתיבה עם הגנה
-                    try:
-                        outputfile.write(buf)
-                    except (ConnectionAbortedError, BrokenPipeError, ConnectionResetError) as e:
-                        print(f"⚠️  Client disconnected during write: {e}")
-                        return
-                    
-                    if hasattr(outputfile, 'flush'):
-                        outputfile.flush()
-                        
-                except (ConnectionAbortedError, BrokenPipeError, ConnectionResetError) as e:
-                    print(f"⚠️  Client disconnected during read: {e}")
-                    return
-                except socket.timeout as e:
-                    print(f"⚠️  Socket timeout during copy: {e}")
-                    return
-                    
-        except Exception as e:
-            print(f"❌  Error in enhanced copy: {e}")
-            traceback.print_exc()
-    
-    # ============================================================
-    # טיפול בבקשות API
+    # שיטת handle_api_request עם טיימאוט מורחב
     # ============================================================
     
     def handle_api_request(self):
-        """טיפול בבקשות API"""
+        """טיפול בבקשות API עם טיימאוט מורחב"""
         try:
             parsed_path = urlparse(self.path)
             endpoint = parsed_path.path
@@ -205,27 +211,46 @@ class CustomHandler(SimpleHTTPRequestHandler):
             else:
                 self.send_error(404, "API endpoint not found")
                 
+        except socket.timeout:
+            print(f"⏰  API request timed out")
+            try:
+                self.send_error(408, "Request Timeout")
+            except:
+                pass
+        except TimeoutError as e:
+            print(f"⏰  API request timed out: {e}")
         except Exception as e:
             print(f"❌  API error: {e}")
             traceback.print_exc()
-            try:
-                self.send_error(500, f"API Error: {str(e)}")
-            except:
-                pass
     
     def handle_data_save(self):
-        """שמירת נתונים"""
+        """שמירת נתונים עם טיימאוט מורחב"""
         try:
             content_length = int(self.headers.get('Content-Length', 0))
             if content_length > 0:
-                post_data = self.rfile.read(content_length)
-                data = json.loads(post_data.decode('utf-8'))
+                # קריאת הנתונים עם טיימאוט
+                try:
+                    post_data = self.rfile.read(content_length)
+                except socket.timeout:
+                    print(f"⏰  Timeout reading POST data")
+                    self.send_error(408, "Request Timeout")
+                    return
+                except TimeoutError:
+                    print(f"⏰  Timeout reading POST data")
+                    self.send_error(408, "Request Timeout")
+                    return
+                
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                except json.JSONDecodeError as e:
+                    print(f"❌  JSON decode error: {e}")
+                    self.send_error(400, "Invalid JSON data")
+                    return
                 
                 # שמירת הנתונים
                 filename = data.get('filename', 'activity_log.json')
                 filepath = os.path.join(DATA_FOLDER, filename)
                 
-                # יצירת תיקייה אם לא קיימת
                 os.makedirs(DATA_FOLDER, exist_ok=True)
                 
                 with open(filepath, 'w', encoding='utf-8') as f:
@@ -239,13 +264,13 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 
                 print(f"✅  Saved {filename} ({len(post_data)} bytes)")
                 
-        except json.JSONDecodeError as e:
-            print(f"❌  JSON decode error: {e}")
-            self.send_error(400, "Invalid JSON data")
         except Exception as e:
             print(f"❌  Error saving data: {e}")
             traceback.print_exc()
-            self.send_error(500, f"Error saving data: {str(e)}")
+            try:
+                self.send_error(500, f"Error saving data: {str(e)}")
+            except:
+                pass
     
     def handle_data_load(self):
         """טעינת נתונים"""
@@ -274,11 +299,11 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.send_error(500, f"Error loading data: {str(e)}")
     
     # ============================================================
-    # שיטת log_message מותאמת (הדפסת שגיאות יפות)
+    # שיטת log_message מותאמת
     # ============================================================
     
     def log_message(self, format, *args):
-        """הדפסת הודעות לוג בצורה מותאמת"""
+        """הדפסת הודעות לוג"""
         try:
             message = format % args
             print(f"🔄  {self.client_address[0]} - {message}")
@@ -286,13 +311,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
             pass
 
 # ============================================================
-# פונקציות הרצת השרת
+# הרצת השרת
 # ============================================================
 
 def run_server(port=PORT):
-    """הרצת השרת עם טיפול משופר בשגיאות"""
+    """הרצת השרת עם טיימאוט מורחב"""
     
-    # בדיקת תיקיות נדרשות
     for folder in [DATA_FOLDER, PAGES_FOLDER]:
         if not os.path.exists(folder):
             os.makedirs(folder)
@@ -300,20 +324,20 @@ def run_server(port=PORT):
     
     handler = CustomHandler
     
-    # יצירת השרת עם טיימאוט
     try:
         with HTTPServer(("", port), handler) as httpd:
-            # הגדרת טיימאוט לסוקט
-            httpd.socket.settimeout(60)
-            httpd.timeout = 60
+            # הגדרת טיימאוט לסוקט הראשי
+            httpd.socket.settimeout(TIMEOUT)
+            httpd.timeout = TIMEOUT
             
             print("=" * 60)
-            print(" 🧭  Matspanet - Local Dev Server")
+            print(" 🧭  Matspanet - Local Dev Server (v2)")
             print("=" * 60)
             print(f" 📂  Data folder  : {os.path.abspath(DATA_FOLDER)}")
             print(f" 📂  Pages folder : {os.path.abspath(PAGES_FOLDER)}")
             print(f" 🌐  Address      : http://localhost:{port}")
             print(f" 🔐  Login page   : http://localhost:{port}/login.html")
+            print(f" ⏰  Timeout      : {TIMEOUT} seconds")
             print("=" * 60)
             print(" 🟢  Press Ctrl+C to stop")
             print("=" * 60)
@@ -341,7 +365,6 @@ def run_server(port=PORT):
 # ============================================================
 
 if __name__ == "__main__":
-    # קבלת פורט משורת הפקודה אם צוין
     port = PORT
     if len(sys.argv) > 1:
         try:
@@ -351,5 +374,4 @@ if __name__ == "__main__":
             print("   Usage: python server.py [port]")
             sys.exit(1)
     
-    # הרצת השרת
     run_server(port)
