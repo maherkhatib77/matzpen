@@ -632,7 +632,7 @@ const App = (() => {
         var _LANG_KEY = 'matspanet_ui_lang';
 
         function getUiLang() {
-                // Back Office: settings.json language takes precedence (default: Arabic)
+                // Back Office: settings.json language takes precedence (default: Hebrew for Back End)
                 try {
                         if (typeof DataStore !== 'undefined' && DataStore.getSettings) {
                                 var d = (DataStore.getSettings() || {}).language;
@@ -643,7 +643,7 @@ const App = (() => {
                         var s = localStorage.getItem(_LANG_KEY);
                         if (s === 'ar' || s === 'he') return s;
                 } catch (e) {}
-                return 'ar';
+                return 'he'; // Default to Hebrew for Back End
         }
 
         function t(key) {
@@ -700,6 +700,7 @@ const App = (() => {
                 }
                 _translateTextNodes(document.getElementById('sidebarNav'));
                 _translateTextNodes(document.getElementById('headerTitle'));
+                // מתג שפה הוסר מה-Back End - קוד זה נשמר לתאימות עתידית בלבד
                 try {
                         document.querySelectorAll('.ms-lang-opt').forEach(function (b) {
                                 b.classList.toggle('is-active', b.getAttribute('data-lang') === lang);
@@ -714,13 +715,13 @@ const App = (() => {
                 try { localStorage.setItem(_LANG_KEY, lang); } catch (e) {}
                 applyUiLang(lang);
         }
-        function toggleUiLang() { setUiLang(getUiLang() === 'ar' ? 'he' : 'ar'); }
+        // פונקציית toggleUiLang הוסרה - Back End עברי בלבד ללא החלפת שפה
         function __ms_translateHeader() { _translateTextNodes(document.getElementById('headerTitle')); }
 
         // חשיפה גלובלית
         window.getUiLang = getUiLang;
-        window.setUiLang = setUiLang;
-        window.toggleUiLang = toggleUiLang;
+        // window.setUiLang = setUiLang;  // לא בשימוש ב-Back End (עברית בלבד)
+        // window.toggleUiLang = toggleUiLang;  // הוסר
         window.applyUiLang = applyUiLang;
         window.t = t;
         window.__ms_translateHeader = __ms_translateHeader;
