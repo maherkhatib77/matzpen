@@ -9,37 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.5/tinymce.min.js" referrerpolicy="origin"></script>
         
         <style>
-        /* ===== מתג שפה — מצפן נט ===== */
-        .ms-lang{
-          position:relative; display:inline-flex; align-items:center; gap:2px;
-          padding:3px; border-radius:999px; direction:ltr;
-          background:rgba(15,24,32,.06); border:1px solid rgba(15,24,32,.10);
-          backdrop-filter:saturate(1.1);
-        }
-        .ms-lang-opt{
-          position:relative; z-index:2; appearance:none; cursor:pointer;
-          min-width:34px; height:30px; padding:0 10px; border:none; background:transparent;
-          border-radius:999px; font:700 13px/1 'Noto Sans Hebrew','Tajawal',system-ui,sans-serif;
-          color:#475560; letter-spacing:.2px;
-          display:inline-flex; align-items:center; justify-content:center; gap:5px;
-          transition:color .25s ease, transform .15s ease;
-        }
-        .ms-lang-opt .ms-lang-glyph{ font-size:14px; line-height:1; }
-        .ms-lang-opt:hover:not(.is-active){ color:#09787a; background:rgba(12,167,170,.08); }
-        .ms-lang-opt.is-active{ color:#fff; transform:translateY(-1px); }
-        .ms-lang-opt:focus-visible{ outline:2px solid #0ca7aa; outline-offset:2px; }
-        /* ה"גלולה" הפעילה — מונחת מאחורי הכפתור הפעיל ע"י JS, עובדת בכל כיוון */
-        .ms-lang-thumb{
-          position:absolute; z-index:1; top:3px; left:0; height:30px; width:34px;
-          border-radius:999px; pointer-events:none;
-          background:linear-gradient(135deg,#0ca7aa,#09787a);
-          box-shadow:0 6px 16px -6px rgba(12,167,170,.7);
-          transition:transform .32s cubic-bezier(.22,1,.36,1), width .32s cubic-bezier(.22,1,.36,1);
-        }
-        @media (prefers-reduced-motion:reduce){ .ms-lang-thumb{ transition:none; } }
-        /* אנימציית מעבר שפה חלקה על כל המסך */
-        html.ms-lang-switching body{ animation:msLangFade .42s ease; }
-        @keyframes msLangFade{ 0%{opacity:.35; filter:saturate(.6)} 100%{opacity:1; filter:none} }
+        /* ===== מתג שפה — הוסר מה-Back End (עברית בלבד) ===== */
         </style>
         
 </head>
@@ -76,16 +46,6 @@
                 <h1 class="header-title" id="headerTitle">📊 לוח בקרה</h1>
                 <div id="activePeriodBadge" style="margin-right:auto;margin-left:8px;"></div>
                 <div class="header-actions">
-                                        <!-- מתג שפה: עברית / ערבית — ברמת המשתמש -->
-                                        <div class="ms-lang" id="msLangSwitch" role="group" aria-label="בחירת שפה / اختيار اللغة">
-                                          <span class="ms-lang-thumb" id="msLangThumb"></span>
-                                          <button type="button" class="ms-lang-opt" data-lang="he" aria-pressed="false" title="עברית">
-                                                <span class="ms-lang-glyph">א</span><span>עב</span>
-                                          </button>
-                                          <button type="button" class="ms-lang-opt" data-lang="ar" aria-pressed="false" title="العربية">
-                                                <span class="ms-lang-glyph">ع</span><span>رب</span>
-                                          </button>
-                                        </div>
                     <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ הדפסה</button>
                 </div>
             </header>
@@ -178,73 +138,6 @@
         } else {
             console.error('[Dashboard] ❌ DataStore לא הוגדר! בדוק את js/data.js');
         }
-
-(function () {
-    'use strict';
-    var switchEl = document.getElementById('msLangSwitch');
-    var thumb    = document.getElementById('msLangThumb');
-
-    // מניח את ה"גלולה" מתחת לכפתור הפעיל (קורא מיקומים אמיתיים → עובד ב‑RTL וב‑LTR)
-    function placeThumb() {
-        if (!switchEl || !thumb) return;
-        var active = switchEl.querySelector('.ms-lang-opt.is-active') ||
-                     switchEl.querySelector('.ms-lang-opt[data-lang="he"]');
-        if (!active) return;
-        var r = active.getBoundingClientRect();
-        var p = switchEl.getBoundingClientRect();
-        thumb.style.width = r.width + 'px';
-        thumb.style.transform = 'translateX(' + (r.left - p.left) + 'px)';
-    }
-
-    function wire() {
-        if (!switchEl) return;
-        switchEl.querySelectorAll('.ms-lang-opt').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var lang = btn.getAttribute('data-lang');
-                // אנימציית מעבר חלקה
-                document.documentElement.classList.add('ms-lang-switching');
-                setTimeout(function () { document.documentElement.classList.remove('ms-lang-switching'); }, 460);
-                if (window.setUiLang) window.setUiLang(lang);
-                placeThumb();
-            });
-        });
-        window.addEventListener('resize', placeThumb);
-        // אם המערכת תחליף שפה ממקום אחר — ניישר את המתג
-        document.addEventListener('matspanet:langchange', placeThumb);
-    }
-
-    function firstPaint() {
-        if (window.applyUiLang) window.applyUiLang(window.getUiLang ? window.getUiLang() : 'he');
-        placeThumb();
-    }
-
-    // המתג מוכן מיד
-    if (document.readyState === 'loading')
-        document.addEventListener('DOMContentLoaded', function () { wire(); placeThumb(); });
-    else { wire(); placeThumb(); }
-
-    // תרגום ראשוני ברגע שהתפריט נבנה (ה‑sidebar נוצר דינמית ע"י app.js)
-    var sb = document.getElementById('sidebarNav');
-    if (sb) {
-        var done = false;
-        var fire = function () { if (done) return; if (sb.children.length) { done = true; mo.disconnect(); firstPaint(); } };
-        var mo = new MutationObserver(fire);
-        mo.observe(sb, { childList: true });
-        if (sb.children.length) fire();
-        setTimeout(function () { if (!done) { done = true; mo.disconnect(); firstPaint(); } }, 1500); // רשת ביטחון
-    } else {
-        setTimeout(firstPaint, 400);
-    }
-
-    // הכותרת העליונה משתנה בכל ניווט — מתרגמים אותה אוטומטית בלי לגעת ב‑app.js
-    var ht = document.getElementById('headerTitle');
-    if (ht) {
-        new MutationObserver(function () {
-            if (window.__ms_translateHeader) window.__ms_translateHeader();
-        }).observe(ht, { childList: true, characterData: true, subtree: true });
-    }
-})();
-                
     </script>
 </body>
 </html>
