@@ -3,8 +3,8 @@
    RTL Hebrew | Edraak-inspired Teal Palette
    ======================================== */
 
-/* Google Fonts - Noto Sans Arabic & Tajawal for Hebrew/Arabic typography */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
+/* Google Fonts - Cairo for Arabic headings, Noto Sans Arabic for Arabic body, Rubik for Hebrew */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Rubik:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ============ DESIGN TOKENS ============ */
 :root {
@@ -69,7 +69,9 @@
     --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Typography */
-    --font-family: 'Noto Sans Arabic', 'Tajawal', 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-hebrew: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-arabic: 'Noto Sans Arabic', 'Cairo', sans-serif;
+    --font-family-headings: 'Cairo', 'Rubik', sans-serif;
 }
 
 /* ============ RESET & BASE ============ */
@@ -88,7 +90,7 @@ html {
 }
 
 body {
-    font-family: var(--font-family);
+    font-family: var(--font-family-hebrew);
     direction: rtl;
     text-align: right;
     color: var(--gray-700);
@@ -100,10 +102,22 @@ body {
     overflow-x: hidden;
 }
 
+/* Apply Arabic font for Arabic content */
+[lang="ar"], .arabic-text {
+    font-family: var(--font-family-arabic);
+}
+
 h1, h2, h3, h4, h5, h6 {
     color: var(--gray-800);
     font-weight: 700;
     line-height: 1.3;
+    font-family: var(--font-family-headings);
+}
+
+/* Apply Arabic headings font for Arabic content */
+[lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] h4, [lang="ar"] h5, [lang="ar"] h6,
+.arabic-text h1, .arabic-text h2, .arabic-text h3, .arabic-text h4, .arabic-text h5, .arabic-text h6 {
+    font-family: 'Cairo', var(--font-family-headings);
 }
 
 a {
