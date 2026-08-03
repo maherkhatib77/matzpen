@@ -1358,7 +1358,19 @@ const App = (() => {
             case 'faq': renderFAQ(); break;
             case 'custom-pages': renderCustomPages(); break;
             case 'settings': renderSettings(); break;
-            case 'new-solution': renderNewSolutionFlow(); break;
+            case 'new-solution': 
+                // Destroy TinyMCE editors when leaving the page
+                if (currentSection !== 'new-solution' && typeof tinymce !== 'undefined') {
+                    try {
+                        var descEditor = tinymce.get('nsf_desc');
+                        var notesEditor = tinymce.get('nsf_notes');
+                        if (descEditor) { descEditor.save(); descEditor.destroy(); }
+                        if (notesEditor) { notesEditor.save(); notesEditor.destroy(); }
+                        _nsfTinyMCEInit = false;
+                    } catch(e) {}
+                }
+                renderNewSolutionFlow(); 
+                break;
         }
         closeSidebarMobile();
     }
@@ -2121,6 +2133,16 @@ const App = (() => {
     }
 
     function _backToResponsibilitySelection() {
+        // Destroy TinyMCE editors when going back
+        if (typeof tinymce !== 'undefined') {
+            try {
+                var descEditor = tinymce.get('nsf_desc');
+                var notesEditor = tinymce.get('nsf_notes');
+                if (descEditor) { descEditor.save(); descEditor.destroy(); }
+                if (notesEditor) { notesEditor.save(); notesEditor.destroy(); }
+                _nsfTinyMCEInit = false;
+            } catch(e) {}
+        }
         _newSolFlow.step = 1;
         _newSolFlow.responsibilityType = null;
         renderNewSolutionFlow();
@@ -2189,6 +2211,12 @@ const App = (() => {
                             <div class="form-group full-width">
                                 <label>${3 + numOffset}. תיאור פתרון למידה</label>
                                 <textarea id="nsf_desc" class="form-textarea" placeholder="תיאור מפורט של פתרון הלמידה"></textarea>
+                            </div>
+
+                            <!-- 18. Notes -->
+                            <div class="form-group full-width">
+                                <label>${18 + numOffset}. הערה כללית</label>
+                                <textarea id="nsf_notes" class="form-textarea" placeholder="הערות נוספות..."></textarea>
                             </div>
 
                             <!-- 4. Guide -->
@@ -2301,12 +2329,6 @@ const App = (() => {
                                     <span style="font-size:13px;color:var(--gray-500);" id="nsf_catalogLabel">מוסתר</span>
                                 </div>
                             </div>
-
-                            <!-- 18. Notes -->
-                            <div class="form-group full-width">
-                                <label>${18 + numOffset}. הערה כללית</label>
-                                <textarea id="nsf_notes" class="form-textarea" placeholder="הערות נוספות..."></textarea>
-                            </div>
                         </div>
 
                         <!-- Action Buttons -->
@@ -2330,6 +2352,8 @@ const App = (() => {
         _msInit();
         // Init single-select school autocomplete
         if (isSchool) _ssSchoolInit();
+        // Initialize TinyMCE for description and notes fields
+        setTimeout(function() { _initNsfTinyMCE(); }, 300);
     }
 
     // ================================================================
@@ -2864,6 +2888,14 @@ const App = (() => {
     }
 
     function _saveNewSolution() {
+        // Save TinyMCE content before saving
+        if (typeof tinymce !== 'undefined') {
+            var descEditor = tinymce.get('nsf_desc');
+            var notesEditor = tinymce.get('nsf_notes');
+            if (descEditor) descEditor.save();
+            if (notesEditor) notesEditor.save();
+        }
+
         const name = (document.getElementById('nsf_name').value || '').trim();
         const guideId = document.getElementById('nsf_guide').value;
         const respType = _newSolFlow.responsibilityType || '';
@@ -2932,6 +2964,16 @@ const App = (() => {
         }
 
         showToast('הפתרון נוסף לקטלוג בהצלחה!', 'success');
+        // Destroy TinyMCE editors before leaving
+        if (typeof tinymce !== 'undefined') {
+            try {
+                var descEditor = tinymce.get('nsf_desc');
+                var notesEditor = tinymce.get('nsf_notes');
+                if (descEditor) { descEditor.save(); descEditor.destroy(); }
+                if (notesEditor) { notesEditor.save(); notesEditor.destroy(); }
+                _nsfTinyMCEInit = false;
+            } catch(e) {}
+        }
         _newSolFlow = { step: 1, responsibilityType: null, editingId: null };
         updateSolutionsCount();
         showSection('solutions');
@@ -5440,6 +5482,73 @@ function _saveCompleteData(solutionId) {
             });
         } catch(e) {
             console.error('[Homepage] Error initializing TinyMCE:', e);
+        }
+    }
+
+    // ================================================================
+    //  TinyMCE INITIALIZATION FOR NEW SOLUTION FORM
+    // ================================================================
+    var _nsfTinyMCEInit = false;
+    function _initNsfTinyMCE() {
+        if (typeof tinymce === 'undefined') {
+            console.warn('[NewSolution] TinyMCE not loaded yet');
+            return;
+        }
+        // Destroy existing editors if any
+        if (_nsfTinyMCEInit) {
+            try {
+                var descEditor = tinymce.get('nsf_desc');
+                var notesEditor = tinymce.get('nsf_notes');
+                if (descEditor) { descEditor.save(); descEditor.destroy(); }
+                if (notesEditor) { notesEditor.save(); notesEditor.destroy(); }
+            } catch(e) { console.error('[NewSolution] Error destroying editors:', e); }
+            _nsfTinyMCEInit = false;
+        }
+        // Initialize new editors for description and notes fields
+        try {
+            tinymce.init({
+                selector: '#nsf_desc',
+                height: 300,
+                directionality: 'rtl',
+                language: 'he_IL',
+                menubar: 'file edit view insert format table tools',
+                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste wordcount help directionality textcolor',
+                toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize | forecolor backcolor | alignleft aligncenter alignright justify | ltr rtl | bullist numlist | outdent indent | table | link image | hr | removeformat | code | help',
+                content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 15px; line-height: 1.8; padding: 16px; direction: rtl; } img { max-width: 100%; height: auto; } table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #ddd; padding: 8px; } h1 { font-size: 26px; } h2 { font-size: 22px; } h3 { font-size: 18px; }',
+                branding: false,
+                promotion: false,
+                resize: true,
+                statusbar: true,
+                paste_data_images: true,
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        console.log('[NewSolution] TinyMCE description editor initialized');
+                    });
+                }
+            });
+            tinymce.init({
+                selector: '#nsf_notes',
+                height: 200,
+                directionality: 'rtl',
+                language: 'he_IL',
+                menubar: false,
+                plugins: 'advlist autolink lists link charmap searchreplace visualblocks code directionality textcolor',
+                toolbar: 'undo redo | bold italic underline | forecolor backcolor | alignleft aligncenter alignright | bullist numlist | link | removeformat | code',
+                content_style: 'body { font-family: Noto Sans Hebrew, Tajawal, Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 12px; direction: rtl; }',
+                branding: false,
+                promotion: false,
+                resize: true,
+                statusbar: true,
+                paste_data_images: false,
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        _nsfTinyMCEInit = true;
+                        console.log('[NewSolution] TinyMCE initialized successfully');
+                    });
+                }
+            });
+        } catch(e) {
+            console.error('[NewSolution] Error initializing TinyMCE:', e);
         }
     }
 
@@ -10264,7 +10373,7 @@ function _saveCompleteData(solutionId) {
         openCompleteDataModal, _cdUpdateCardStyles, _cdOnBudgetStatusChange, _cdRenderFundedStage2, _cdRenderNonFundedStage2, _cdBuildMentorRow, _cdOnTypeChange, _cdRecalc, _cdAddMentorInline, _cdRemoveMentorRow, _cdAddInternalForceRow, _saveCompleteData, _fmtDateRange,
         _filterMentorSearch, _selectMentorSearchItem, _closeMentorSearch,
         // New Solution Flow
-        startNewSolutionFlow, _selectResponsibilityType, _backToResponsibilitySelection, _ssSchoolInit, _ssOnInput, _ssOnKeyDown, _ssSelectSchool, _ssRemoveSchool, _ssHighlightItem, _ssCloseDropdown, _nsfOnTopicTypeChange, _saveNewSolution,
+        startNewSolutionFlow, _selectResponsibilityType, _backToResponsibilitySelection, _ssSchoolInit, _ssOnInput, _ssOnKeyDown, _ssSelectSchool, _ssRemoveSchool, _ssHighlightItem, _ssCloseDropdown, _nsfOnTopicTypeChange, _initNsfTinyMCE, _saveNewSolution,
         // Site settings
         saveSiteSettings,
         // Year Context
