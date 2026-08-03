@@ -1601,22 +1601,22 @@ const App = (() => {
             const pct = budgetH > 0 ? Math.min(100, Math.round((usedH / budgetH) * 100)) : 0;
             statsHtml = `
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon blue">📝</div><div class="stat-info"><h3>${solutions.length}</h3><p>פתרונות למידה</p></div></div>
+                <div class="stat-card"><div class="stat-icon cyan">📝</div><div class="stat-info"><h3>${solutions.length}</h3><p>פתרונות למידה</p></div></div>
                 <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><h3>${activeSol}</h3><p>פעילים</p></div></div>
                 <div class="stat-card"><div class="stat-icon purple">👨‍🏫</div><div class="stat-info"><h3>${relMentors}</h3><p>מנחים</p></div></div>
-                <div class="stat-card"><div class="stat-icon red">⏱️</div><div class="stat-info"><h3>${budgetH} שע'</h3><p>שעות מתוקצבות | ${pct}%</p></div></div>
+                <div class="stat-card"><div class="stat-icon red">⏱️</div><div class="stat-info"><h3>${budgetH}</h3><p>שעות מתוקצבות</p></div></div>
             </div>`;
         } else {
             const totalUsedHours = stats.totalPeriod1Hours + stats.totalPeriod2Hours;
             const pct = stats.totalBudgetedHours > 0 ? Math.min(100, Math.round((totalUsedHours / stats.totalBudgetedHours) * 100)) : 0;
             statsHtml = `
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-icon blue">📝</div><div class="stat-info"><h3>${stats.totalSolutions}</h3><p>פתרונות למידה</p></div></div>
+                <div class="stat-card"><div class="stat-icon cyan">📝</div><div class="stat-info"><h3>${stats.totalSolutions}</h3><p>פתרונות למידה</p></div></div>
                 <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><h3>${stats.activeSolutions}</h3><p>פעילים</p></div></div>
                 <div class="stat-card"><div class="stat-icon orange">⏳</div><div class="stat-info"><h3>${stats.pendingSolutions}</h3><p>ממתינים לאישור</p></div></div>
                 <div class="stat-card"><div class="stat-icon purple">👨‍🏫</div><div class="stat-info"><h3>${stats.totalMentors}</h3><p>מנחים</p></div></div>
                 <div class="stat-card"><div class="stat-icon blue">📋</div><div class="stat-info"><h3>${stats.totalGuidesRepo}</h3><p>מדריכים</p></div></div>
-                <div class="stat-card"><div class="stat-icon red">⏱️</div><div class="stat-info"><h3>${stats.totalBudgetedHours} שע'</h3><p>שעות מתוקצבות | ${pct}%</p></div></div>
+                <div class="stat-card"><div class="stat-icon red">⏱️</div><div class="stat-info"><h3>${stats.totalBudgetedHours}</h3><p>שעות מתוקצבות</p></div></div>
             </div>`;
         }
 
