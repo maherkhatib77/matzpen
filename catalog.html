@@ -9,7 +9,7 @@
     <style>
         /* Catalog-specific overrides — standalone page (no sidebar/dashboard shell) */
         body {
-            font-family: 'Noto Sans Arabic', 'Tajawal', sans-serif;
+            font-family: 'Noto Sans Arabic', sans-serif;
             background: var(--gray-50);
             color: var(--gray-800);
             margin: 0;
@@ -17,6 +17,11 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        /* Apply Cairo font for headings in Arabic */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
         }
 
         /* ── Header ── */
