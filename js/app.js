@@ -2151,7 +2151,7 @@ const App = (() => {
     function _renderSolutionForm(container) {
         const respType = _newSolFlow.responsibilityType;
         const respLabel = respType ? (getLookupLabel(DataStore.KEYS.LOOKUP_RESPONSIBILITY_TYPES, respType) || respType) : '';
-        const isSchool = (respType === 'school');
+        const isSchool = (respType === 'school' || respType === 'school_managed');
         const guides = DataStore.getAll(DataStore.KEYS.GUIDES_REPO) || [];
         const mentors = DataStore.getAll(DataStore.KEYS.MENTORS) || [];
 
@@ -2211,12 +2211,6 @@ const App = (() => {
                             <div class="form-group full-width">
                                 <label>${3 + numOffset}. תיאור פתרון למידה</label>
                                 <textarea id="nsf_desc" class="form-textarea" placeholder="תיאור מפורט של פתרון הלמידה"></textarea>
-                            </div>
-
-                            <!-- 18. Notes -->
-                            <div class="form-group full-width">
-                                <label>${18 + numOffset}. הערה כללית</label>
-                                <textarea id="nsf_notes" class="form-textarea" placeholder="הערות נוספות..."></textarea>
                             </div>
 
                             <!-- 4. Guide -->
@@ -2328,6 +2322,12 @@ const App = (() => {
                                     <label class="toggle-switch"><input type="checkbox" id="nsf_showInCatalog"><span class="toggle-slider"></span></label>
                                     <span style="font-size:13px;color:var(--gray-500);" id="nsf_catalogLabel">מוסתר</span>
                                 </div>
+                            </div>
+
+                            <!-- 18. Notes (General Remark - TinyMCE, at bottom) -->
+                            <div class="form-group full-width">
+                                <label>${18 + numOffset}. הערה כללית</label>
+                                <textarea id="nsf_notes" class="form-textarea" placeholder="הערות נוספות..."></textarea>
                             </div>
                         </div>
 
@@ -2899,7 +2899,7 @@ const App = (() => {
         const name = (document.getElementById('nsf_name').value || '').trim();
         const guideId = document.getElementById('nsf_guide').value;
         const respType = _newSolFlow.responsibilityType || '';
-        const isSchool = (respType === 'school');
+        const isSchool = (respType === 'school' || respType === 'school_managed');
 
         // Validation
         if (!respType) { showToast('יש לבחור סוג אחריות', 'error'); return; }
