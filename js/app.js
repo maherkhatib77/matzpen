@@ -5935,7 +5935,7 @@ function _saveCompleteData(solutionId) {
                     <select class="filter-select" id="budgetOrgF" onchange="App.filterBudgets()"><option value="">כל היחידות</option></select>
                     ${_colVisBtnHtml('budgets')}
                 </div>
-                <div id="budgetsTableDiv">${_renderBudgetsTable(items)}</div>
+                <div id="budgetsTableDiv">${_renderBudgetsTable(items, yearTitle, activeHebrewYear)}</div>
             </div></div>`;
         
         // Populate organizational units filter - רק יחידות מהשנה הפעילה
@@ -5953,7 +5953,7 @@ function _saveCompleteData(solutionId) {
         _applyTableFeatures('budgets');
     }
 
-    function _renderBudgetsTable(items) {
+    function _renderBudgetsTable(items, yearTitle, activeHebrewYear) {
         if (!items.length) return `<div class="empty-state"><div class="empty-icon">💰</div><h3>אין תקציבים${yearTitle ? ` לשנת ${activeHebrewYear}` : ''}</h3><button class="btn btn-primary" onclick="App.openBudgetModal()">➕ הוסף תקציב</button></div>`;
         return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th data-key="budgetCode">קוד תקציב</th><th data-key="hebrewYear">שנה עברית</th><th data-key="englishYear">שנה לועזית</th><th data-key="period">תקופה</th><th data-key="estimationStatus">ידוע/משוערך</th><th data-key="organizationalUnit">יחידה ארגונית</th><th data-key="budgetFor">תקציב עבור</th><th data-key="description">תיאור</th><th data-key="notes">הערה</th><th data-key="amount">סכום (₪)</th><th data-key="planningBalance">יתרת תכנון (₪)</th><th data-key="managementBalance">יתרת ניהול (₪)</th><th data-key="freeBudgetBalance">יתרה פנויה (₪)</th><th>פעולות</th></tr></thead><tbody>
         ${items.map(b => `<tr>
