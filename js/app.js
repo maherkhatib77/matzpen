@@ -5834,13 +5834,20 @@ function _saveCompleteData(solutionId) {
     //  BUDGETS (תקציבים)
     // ================================================================
     function renderBudgets() {
-        const items = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
+        const allItems = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
+        
+        // קבלת שנה נבחרת מהפילטר
+        const selectedYear = document.getElementById('budgetYearF') ? document.getElementById('budgetYearF').value : '';
+        
+        // סינון ראשוני לפי שנה נבחרת (אם קיימת)
+        let items = selectedYear ? allItems.filter(b => b.hebrewYear === selectedYear) : allItems;
+        
         const totalAmount = items.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
         const totalFree = items.reduce((s, b) => s + (parseFloat(b.freeBudgetBalance) || 0), 0);
         const totalPlanning = items.reduce((s, b) => s + (parseFloat(b.planningBalance) || 0), 0);
         const totalManagement = items.reduce((s, b) => s + (parseFloat(b.managementBalance) || 0), 0);
         
-        // Calculate KPIs
+        // Calculate KPIs - רק לשנה הנבחרת
         const utilizationRate = totalAmount > 0 ? ((totalAmount - totalFree) / totalAmount * 100).toFixed(1) : 0;
         const avgBudgetPerUnit = (() => {
             const units = {};
@@ -5860,21 +5867,24 @@ function _saveCompleteData(solutionId) {
         })();
         
         const actionBar = _buildActionBar('budgets', 'App.openBudgetModal()', 'App.deleteAllBudgets()', items.length);
+        
+        // כותרת המציינת את השנה הנבחרת
+        const yearTitle = selectedYear ? ` - שנת תקציב ${selectedYear}` : '';
 
         document.getElementById('section-budgets').innerHTML = `
             <div class="stats-grid" style="margin-bottom:20px;">
-                <div class="stat-card"><div class="stat-icon blue">💰</div><div class="stat-info"><h3>${items.length}</h3><p>תקציבים</p></div></div>
-                <div class="stat-card"><div class="stat-icon green">📊</div><div class="stat-info"><h3>${totalAmount.toLocaleString('he-IL')} ₪</h3><p>סה"כ תקציב</p></div></div>
-                <div class="stat-card"><div class="stat-icon orange">📈</div><div class="stat-info"><h3>${totalFree.toLocaleString('he-IL')} ₪</h3><p>יתרה פנויה</p></div></div>
-                <div class="stat-card"><div class="stat-icon purple">🎯</div><div class="stat-info"><h3>${utilizationRate}%</h3><p>אחוז ניצול תקציב</p></div></div>
-                <div class="stat-card"><div class="stat-icon cyan">🏢</div><div class="stat-info"><h3>${avgBudgetPerUnit} ₪</h3><p>ממוצע ליחידה ארגונית</p></div></div>
-                <div class="stat-card"><div class="stat-icon pink">💵</div><div class="stat-info"><h3>${knownVsEstimated.known.toLocaleString('he-IL', { maximumFractionDigits: 0 })} ₪</h3><p>תקציב ידוע</p></div></div>
+                <div class="stat-card"><div class="stat-icon blue">💰</div><div class="stat-info"><h3>${items.length}</h3><p>תקציבים${yearTitle}</p></div></div>
+                <div class="stat-card"><div class="stat-icon green">📊</div><div class="stat-info"><h3>${totalAmount.toLocaleString('he-IL')} ₪</h3><p>סה"כ תקציב${yearTitle}</p></div></div>
+                <div class="stat-card"><div class="stat-icon orange">📈</div><div class="stat-info"><h3>${totalFree.toLocaleString('he-IL')} ₪</h3><p>יתרה פנויה${yearTitle}</p></div></div>
+                <div class="stat-card"><div class="stat-icon purple">🎯</div><div class="stat-info"><h3>${utilizationRate}%</h3><p>אחוז ניצול תקציב${yearTitle}</p></div></div>
+                <div class="stat-card"><div class="stat-icon cyan">🏢</div><div class="stat-info"><h3>${avgBudgetPerUnit} ₪</h3><p>ממוצע ליחידה ארגונית${yearTitle}</p></div></div>
+                <div class="stat-card"><div class="stat-icon pink">💵</div><div class="stat-info"><h3>${knownVsEstimated.known.toLocaleString('he-IL', { maximumFractionDigits: 0 })} ₪</h3><p>תקציב ידוע${yearTitle}</p></div></div>
             </div>
             
             <!-- KPI Breakdown Cards -->
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;">
                 <div class="card"><div class="card-body">
-                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">📊 חלוקה לפי סטטוס תקציב</h4>
+                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">📊 חלוקה לפי סטטוס תקציב${yearTitle}</h4>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--success-bg,#f0fdf4);border-radius:6px;">
                             <span style="font-size:13px;color:var(--success,#16a34a);font-weight:600;">✅ ידוע</span>
@@ -5888,7 +5898,7 @@ function _saveCompleteData(solutionId) {
                 </div></div>
                 
                 <div class="card"><div class="card-body">
-                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">🎯 חלוקה לפי סוג תקציב</h4>
+                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">🎯 חלוקה לפי סוג תקציב${yearTitle}</h4>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--primary-bg,#eff6ff);border-radius:6px;">
                             <span style="font-size:13px;color:var(--primary,#0ea5e9);font-weight:600;">📚 פתרון למידה</span>
@@ -5902,7 +5912,7 @@ function _saveCompleteData(solutionId) {
                 </div></div>
                 
                 <div class="card"><div class="card-body">
-                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">💹 יתרות תקציביות</h4>
+                    <h4 style="margin:0 0 12px 0;font-size:14px;color:var(--gray-700);display:flex;align-items:center;gap:8px;">💹 יתרות תקציביות${yearTitle}</h4>
                     <div style="display:flex;flex-direction:column;gap:8px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--gray-50);border-radius:6px;">
                             <span style="font-size:13px;color:var(--gray-600);font-weight:600;">📋 יתרת תכנון</span>
@@ -5916,20 +5926,20 @@ function _saveCompleteData(solutionId) {
                 </div></div>
             </div>
             
-            ${_lookupTableHeader('תקציבים', items.length, '💰')}
+            ${_lookupTableHeader('תקציבים' + yearTitle, items.length, '💰')}
             <div class="card"><div class="card-body">
                 ${actionBar}
                 <div class="toolbar">
                     <input type="text" class="search-input" id="budgetSearch" placeholder="🔍 חיפוש..." oninput="App.filterBudgets()">
-                    <select class="filter-select" id="budgetYearF" onchange="App.filterBudgets()"><option value="">כל השנים</option>${getHebrewYearOptions()}</select>
-                    <select class="filter-select" id="budgetPeriodF" onchange="App.filterBudgets()"><option value="">כל התקופות</option><option value="שנה">שנה</option><option value="חצי שנה">חצי שנה</option><option value="רבעון">רבעון</option><option value="שליש שנה">שליש שנה</option><option value="2 מ׳: 09–12">2 מ׳: 09–12</option><option value="1 מ׳: 01–08">1 מ׳: 01–08</option></select>
+                    <select class="filter-select" id="budgetYearF" onchange="App.renderBudgets()"><option value="">בחר שנה עברית</option>${getHebrewYearOptions()}</select>
+                    <select class="filter-select" id="budgetPeriodF" onchange="App.filterBudgets()"><option value="">כל התקופות</option><option value="1">תקופה 1 (ינואר-אוגוסט)</option><option value="2">תקופה 2 (ספטמבר-דצמבר)</option></select>
                     <select class="filter-select" id="budgetOrgF" onchange="App.filterBudgets()"><option value="">כל היחידות</option></select>
                     ${_colVisBtnHtml('budgets')}
                 </div>
                 <div id="budgetsTableDiv">${_renderBudgetsTable(items)}</div>
             </div></div>`;
         
-        // Populate organizational units filter
+        // Populate organizational units filter - רק יחידות מהשנה הנבחרת
         const orgUnits = [...new Set(items.map(b => b.organizationalUnit).filter(Boolean))];
         const orgFilter = document.getElementById('budgetOrgF');
         if (orgFilter) {
