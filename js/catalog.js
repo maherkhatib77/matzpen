@@ -25,6 +25,8 @@ const CatalogPage = (() => {
     let lookupEducationTypes = [];
     let solutionInstructors = [];
     let mentorsRepo = [];
+    let periods = [];
+    let selectedPeriodId = null; // User-selected period for viewing data
 
     // ======================== Color Map for Knowledge Fields ========================
     const FIELD_COLORS = {
