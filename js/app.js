@@ -3745,11 +3745,15 @@ const App = (() => {
         var totalHours = s.academicHours || 0;
         var guide = DataStore.getById(DataStore.KEYS.GUIDES_REPO, s.guideId);
 
-        // Period labels from system config
+        // Period labels from system config - use ACTIVE period, not just first one
         var periods = DataStore.getAll(DataStore.KEYS.PERIODS) || [];
-        var curPeriod = periods.length > 0 ? periods[0] : null;
-        var p1Label = (curPeriod && curPeriod.period1Label) ? curPeriod.period1Label : 'תקופה א׳';
-        var p2Label = (curPeriod && curPeriod.period2Label) ? curPeriod.period2Label : 'תקופה ב׳';
+        var curPeriod = null;
+        for (var i = 0; i < periods.length; i++) {
+            if (periods[i].isActive) { curPeriod = periods[i]; break; }
+        }
+        if (!curPeriod && periods.length > 0) { curPeriod = periods[0]; }
+        var p1Label = (curPeriod && curPeriod.period1Label) ? curPeriod.period1Label : 'תקופה 1 (01-08)';
+        var p2Label = (curPeriod && curPeriod.period2Label) ? curPeriod.period2Label : 'תקופה 2 (09-12)';
         var p1Range = curPeriod ? _fmtDateRange(curPeriod.period1Start, curPeriod.period1End) : '';
         var p2Range = curPeriod ? _fmtDateRange(curPeriod.period2Start, curPeriod.period2End) : '';
 
@@ -5838,12 +5842,14 @@ function _saveCompleteData(solutionId) {
     function renderBudgets() {
         const allItems = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
         
-        // הצגת כל התקציבים מכל השנים (כמו בקטלוג פתרונות הלמידה)
-        // השנה הפעילה משמשת כהקשר ראשוני אך לא מגבילה את התצוגה
+        // סינון תקציבים לפי השנה העברית הפעילה בלבד
         const activePeriod = AppContext.activePeriod;
         const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
         
-        let items = allItems; // הצגת כל התקציבים ללא סינון לפי שנה
+        // הצגת תקציבים השייכים לשנה הפעילה בלבד
+        let items = activeHebrewYear 
+            ? allItems.filter(b => b.hebrewYear === activeHebrewYear)
+            : allItems;
         
         // עדכון מסנן השנה לערך ברירת מחדל של השנה הפעילה
         setTimeout(() => {
@@ -5943,7 +5949,7 @@ function _saveCompleteData(solutionId) {
                 <div class="toolbar">
                     <input type="text" class="search-input" id="budgetSearch" placeholder="🔍 חיפוש..." oninput="App.filterBudgets()">
                     <select class="filter-select" id="budgetYearF" onchange="App.filterBudgets()"><option value="">כל השנים</option></select>
-                    <select class="filter-select" id="budgetPeriodF" onchange="App.filterBudgets()"><option value="">כל התקופות</option><option value="1">תקופה 1 (ינואר-אוגוסט)</option><option value="2">תקופה 2 (ספטמבר-דצמבר)</option></select>
+                    <select class="filter-select" id="budgetPeriodF" onchange="App.filterBudgets()"><option value="">כל התקופות</option><option value="1">תקופה 1 (01-08)</option><option value="2">תקופה 2 (09-12)</option></select>
                     <select class="filter-select" id="budgetOrgF" onchange="App.filterBudgets()"><option value="">כל היחידות</option></select>
                     ${_colVisBtnHtml('budgets')}
                 </div>
@@ -6008,10 +6014,18 @@ function _saveCompleteData(solutionId) {
         const period = document.getElementById('budgetPeriodF').value;
         const org = document.getElementById('budgetOrgF').value;
         
-        let items = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
+        // התחל מתקציבי השנה הפעילה בלבד
+        const activePeriod = AppContext.activePeriod;
+        const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
+        let items = activeHebrewYear 
+            ? (DataStore.getAll(DataStore.KEYS.BUDGETS) || []).filter(b => b.hebrewYear === activeHebrewYear)
+            : (DataStore.getAll(DataStore.KEYS.BUDGETS) || []);
         
-        // החל סינונים לפי בחירת המשתמש
-        if (year) items = items.filter(b => b.hebrewYear === year);
+        // החל סינונים נוספים לפי בחירת המשתמש (בתוך השנה הפעילה)
+        if (year && year !== activeHebrewYear) {
+            // אם המשתמש בחר שנה שונה מהשנה הפעילה, הצג את כל התקציבים מאותה שנה
+            items = (DataStore.getAll(DataStore.KEYS.BUDGETS) || []).filter(b => b.hebrewYear === year);
+        }
         if (search) items = items.filter(b => (b.description||'').toLowerCase().includes(search) || (b.budgetCode||'').toLowerCase().includes(search) || (b.organizationalUnit||'').toLowerCase().includes(search) || (b.hebrewYear||'').includes(search));
         if (period) items = items.filter(b => b.period === period);
         if (org) items = items.filter(b => b.organizationalUnit === org);
