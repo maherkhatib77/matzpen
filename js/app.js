@@ -5836,11 +5836,11 @@ function _saveCompleteData(solutionId) {
     function renderBudgets() {
         const allItems = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
         
-        // קבלת שנה נבחרת מהפילטר
-        const selectedYear = document.getElementById('budgetYearF') ? document.getElementById('budgetYearF').value : '';
+        // סינון לפי השנה העברית הפעילה בלבד (כמו בקטלוג פתרונות הלמידה)
+        const activePeriod = AppContext.activePeriod;
+        const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
         
-        // סינון ראשוני לפי שנה נבחרת (אם קיימת)
-        let items = selectedYear ? allItems.filter(b => b.hebrewYear === selectedYear) : allItems;
+        let items = activeHebrewYear ? allItems.filter(b => b.hebrewYear === activeHebrewYear) : allItems;
         
         const totalAmount = items.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
         const totalFree = items.reduce((s, b) => s + (parseFloat(b.freeBudgetBalance) || 0), 0);
@@ -5868,8 +5868,8 @@ function _saveCompleteData(solutionId) {
         
         const actionBar = _buildActionBar('budgets', 'App.openBudgetModal()', 'App.deleteAllBudgets()', items.length);
         
-        // כותרת המציינת את השנה הנבחרת
-        const yearTitle = selectedYear ? ` - שנת תקציב ${selectedYear}` : '';
+        // כותרת המציינת את השנה הפעילה
+        const yearTitle = activeHebrewYear ? ` - שנת תקציב ${activeHebrewYear}` : '';
 
         document.getElementById('section-budgets').innerHTML = `
             <div class="stats-grid" style="margin-bottom:20px;">
@@ -5931,7 +5931,6 @@ function _saveCompleteData(solutionId) {
                 ${actionBar}
                 <div class="toolbar">
                     <input type="text" class="search-input" id="budgetSearch" placeholder="🔍 חיפוש..." oninput="App.filterBudgets()">
-                    <select class="filter-select" id="budgetYearF" onchange="App.renderBudgets()"><option value="">בחר שנה עברית</option>${getHebrewYearOptions()}</select>
                     <select class="filter-select" id="budgetPeriodF" onchange="App.filterBudgets()"><option value="">כל התקופות</option><option value="1">תקופה 1 (ינואר-אוגוסט)</option><option value="2">תקופה 2 (ספטמבר-דצמבר)</option></select>
                     <select class="filter-select" id="budgetOrgF" onchange="App.filterBudgets()"><option value="">כל היחידות</option></select>
                     ${_colVisBtnHtml('budgets')}
@@ -5939,7 +5938,7 @@ function _saveCompleteData(solutionId) {
                 <div id="budgetsTableDiv">${_renderBudgetsTable(items)}</div>
             </div></div>`;
         
-        // Populate organizational units filter - רק יחידות מהשנה הנבחרת
+        // Populate organizational units filter - רק יחידות מהשנה הפעילה
         const orgUnits = [...new Set(items.map(b => b.organizationalUnit).filter(Boolean))];
         const orgFilter = document.getElementById('budgetOrgF');
         if (orgFilter) {
@@ -5955,7 +5954,7 @@ function _saveCompleteData(solutionId) {
     }
 
     function _renderBudgetsTable(items) {
-        if (!items.length) return `<div class="empty-state"><div class="empty-icon">💰</div><h3>אין תקציבים</h3><button class="btn btn-primary" onclick="App.openBudgetModal()">➕ הוסף תקציב</button></div>`;
+        if (!items.length) return `<div class="empty-state"><div class="empty-icon">💰</div><h3>אין תקציבים${yearTitle ? ` לשנת ${activeHebrewYear}` : ''}</h3><button class="btn btn-primary" onclick="App.openBudgetModal()">➕ הוסף תקציב</button></div>`;
         return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th data-key="budgetCode">קוד תקציב</th><th data-key="hebrewYear">שנה עברית</th><th data-key="englishYear">שנה לועזית</th><th data-key="period">תקופה</th><th data-key="estimationStatus">ידוע/משוערך</th><th data-key="organizationalUnit">יחידה ארגונית</th><th data-key="budgetFor">תקציב עבור</th><th data-key="description">תיאור</th><th data-key="notes">הערה</th><th data-key="amount">סכום (₪)</th><th data-key="planningBalance">יתרת תכנון (₪)</th><th data-key="managementBalance">יתרת ניהול (₪)</th><th data-key="freeBudgetBalance">יתרה פנויה (₪)</th><th>פעולות</th></tr></thead><tbody>
         ${items.map(b => `<tr>
             <td style="direction:ltr"><strong>${b.budgetCode || '—'}</strong></td>
@@ -5977,12 +5976,16 @@ function _saveCompleteData(solutionId) {
 
     function filterBudgets() {
         const search = document.getElementById('budgetSearch').value.toLowerCase();
-        const year = document.getElementById('budgetYearF').value;
         const period = document.getElementById('budgetPeriodF').value;
         const org = document.getElementById('budgetOrgF').value;
+        // סינון לפי השנה הפעילה בלבד
+        const activePeriod = AppContext.activePeriod;
+        const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
         let items = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
+        // סנן ראשית לפי שנה פעילה
+        if (activeHebrewYear) items = items.filter(b => b.hebrewYear === activeHebrewYear);
+        // החל סינונים נוספים
         if (search) items = items.filter(b => (b.description||'').toLowerCase().includes(search) || (b.budgetCode||'').toLowerCase().includes(search) || (b.organizationalUnit||'').toLowerCase().includes(search));
-        if (year) items = items.filter(b => b.hebrewYear === year);
         if (period) items = items.filter(b => b.period === period);
         if (org) items = items.filter(b => b.organizationalUnit === org);
         _resetPagination('budgets');
