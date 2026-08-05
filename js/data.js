@@ -483,6 +483,16 @@ const DataStore = (() => {
             }
             return Array.isArray(parsed) ? parsed : [];
         } catch (e) {
+            // טיפול מיוחד למאגר מרצים - אם יש שגיאת Quota או parsing, מאפסים את המאגר
+            if (key === KEYS.MENTORS) {
+                console.warn('[DataStore] ⚠️ מאגר המרצים פגום או חורג מהמכסה. מאפסים מאגר.');
+                try {
+                    localStorage.removeItem(getKey(KEYS.MENTORS));
+                } catch (removeErr) {
+                    console.error('[DataStore] ❌ לא ניתן לאפס מאגר מרצים:', removeErr);
+                }
+                return [];
+            }
             console.error('[DataStore] Error parsing data for key:', key, e);
             return (key === KEYS.SETTINGS || key === KEYS.SESSION || key === KEYS.HOMEPAGE) ? null : [];
         }
@@ -905,6 +915,13 @@ const DataStore = (() => {
             if (stored !== null) continue;
             const filename = KEY_TO_FILE[key];
             if (!filename) continue;
+            
+            // דילוג על מאגר מרצים - הקובץ גדול מדי ל-localStorage (חורג מ-5MB)
+            if (key === KEYS.MENTORS) {
+                console.log('[DataStore] ⚠️ דילוג על טעינת מאגר המרצים מקובץ JSON - יש לייבא ידנית דרך הממשק');
+                continue;
+            }
+            
             const data = await fetchJsonFile(filename);
             if (data !== null) {
                 localStorage.setItem(getKey(key), JSON.stringify(data));

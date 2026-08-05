@@ -1172,7 +1172,7 @@ const App = (() => {
                 showToast('יוצא בהצלחה', 'success');
                 return;
             } else if (type === 'mentors') {
-                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה (עברית)': m.fullNameHe || '', 'שם מרצה (ערבית)': m.fullNameAr || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסמך': m.isCertifiedLecturer || '', 'מומחה בתחומו': m.expertInField || '', 'סטטוס': m.lecturerStatus || '' });
+                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה (עברית)': m.fullNameHe || '', 'שם מרצה (ערבית)': m.fullNameAr || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסמך': m.isCertifiedLecturer || '', 'מומחה בתחומו': m.expertInField || '', 'סטטוס': m.lecturerStatus || '' }));
                 sheetName = 'מרצים';
             } else if (type === 'guides_repo') {
                 data = items.map(g => ({ 'ת.ז.': g.idNumber || '', 'שם מלא (עברית)': g.fullNameHe || g.fullName || '', 'שם מלא (ערבית)': g.fullNameAr || '', 'תפקיד': g.position || '', 'טלפון': g.phone || '', 'דוא"ל': g.email || '', 'תחומי התמחות': g.specializations || '' }));
