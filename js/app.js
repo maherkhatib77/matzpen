@@ -5842,20 +5842,20 @@ function _saveCompleteData(solutionId) {
     function renderBudgets() {
         const allItems = DataStore.getAll(DataStore.KEYS.BUDGETS) || [];
         
-        // סינון תקציבים לפי השנה העברית הפעילה בלבד
-        const activePeriod = AppContext.activePeriod;
-        const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
+        // סינון תקציבים לפי השנה העברית הנבחרת בתפריט העליון (displayPeriod)
+        const displayPeriod = AppContext.displayPeriod;
+        const displayHebrewYear = displayPeriod ? displayPeriod.hebrewYear : null;
         
-        // הצגת תקציבים השייכים לשנה הפעילה בלבד
-        let items = activeHebrewYear 
-            ? allItems.filter(b => b.hebrewYear === activeHebrewYear)
+        // הצגת תקציבים השייכים לשנה הנבחרת בתפריט העליון
+        let items = displayHebrewYear 
+            ? allItems.filter(b => b.hebrewYear === displayHebrewYear)
             : allItems;
         
-        // עדכון מסנן השנה לערך ברירת מחדל של השנה הפעילה
+        // עדכון מסנן השנה לערך ברירת מחדל של השנה הנבחרת
         setTimeout(() => {
             const yearFilter = document.getElementById('budgetYearF');
-            if (yearFilter && activeHebrewYear && !yearFilter.value) {
-                yearFilter.value = activeHebrewYear;
+            if (yearFilter && displayHebrewYear && !yearFilter.value) {
+                yearFilter.value = displayHebrewYear;
             }
         }, 0);
         
@@ -5885,8 +5885,8 @@ function _saveCompleteData(solutionId) {
         
         const actionBar = _buildActionBar('budgets', 'App.openBudgetModal()', 'App.deleteAllBudgets()', items.length);
         
-        // כותרת המציינת את השנה הפעילה
-        const yearTitle = activeHebrewYear ? ` - שנת תקציב ${activeHebrewYear}` : '';
+        // כותרת המציינת את השנה הנבחרת
+        const yearTitle = displayHebrewYear ? ` - שנת תקציב ${displayHebrewYear}` : '';
 
         document.getElementById('section-budgets').innerHTML = `
             <div class="stats-grid" style="margin-bottom:20px;">
@@ -5953,7 +5953,7 @@ function _saveCompleteData(solutionId) {
                     <select class="filter-select" id="budgetOrgF" onchange="App.filterBudgets()"><option value="">כל היחידות</option></select>
                     ${_colVisBtnHtml('budgets')}
                 </div>
-                <div id="budgetsTableDiv">${_renderBudgetsTable(items, yearTitle, activeHebrewYear)}</div>
+                <div id="budgetsTableDiv">${_renderBudgetsTable(items, yearTitle, displayHebrewYear)}</div>
             </div></div>`;
         
         // Populate year filter - כל השנים הקיימות במערכת
@@ -5966,9 +5966,9 @@ function _saveCompleteData(solutionId) {
                 opt.textContent = year;
                 yearFilter.appendChild(opt);
             });
-            // Set default to active year
-            if (activeHebrewYear) {
-                yearFilter.value = activeHebrewYear;
+            // Set default to display year
+            if (displayHebrewYear) {
+                yearFilter.value = displayHebrewYear;
             }
         }
         
@@ -6014,16 +6014,16 @@ function _saveCompleteData(solutionId) {
         const period = document.getElementById('budgetPeriodF').value;
         const org = document.getElementById('budgetOrgF').value;
         
-        // התחל מתקציבי השנה הפעילה בלבד
-        const activePeriod = AppContext.activePeriod;
-        const activeHebrewYear = activePeriod ? activePeriod.hebrewYear : null;
-        let items = activeHebrewYear 
-            ? (DataStore.getAll(DataStore.KEYS.BUDGETS) || []).filter(b => b.hebrewYear === activeHebrewYear)
+        // התחל מתקציבי השנה הנבחרת בתפריט העליון (displayPeriod)
+        const displayPeriod = AppContext.displayPeriod;
+        const displayHebrewYear = displayPeriod ? displayPeriod.hebrewYear : null;
+        let items = displayHebrewYear 
+            ? (DataStore.getAll(DataStore.KEYS.BUDGETS) || []).filter(b => b.hebrewYear === displayHebrewYear)
             : (DataStore.getAll(DataStore.KEYS.BUDGETS) || []);
         
-        // החל סינונים נוספים לפי בחירת המשתמש (בתוך השנה הפעילה)
-        if (year && year !== activeHebrewYear) {
-            // אם המשתמש בחר שנה שונה מהשנה הפעילה, הצג את כל התקציבים מאותה שנה
+        // החל סינונים נוספים לפי בחירת המשתמש (בתוך השנה הנבחרת)
+        if (year && year !== displayHebrewYear) {
+            // אם המשתמש בחר שנה שונה מהשנה הנבחרת, הצג את כל התקציבים מאותה שנה
             items = (DataStore.getAll(DataStore.KEYS.BUDGETS) || []).filter(b => b.hebrewYear === year);
         }
         if (search) items = items.filter(b => (b.description||'').toLowerCase().includes(search) || (b.budgetCode||'').toLowerCase().includes(search) || (b.organizationalUnit||'').toLowerCase().includes(search) || (b.hebrewYear||'').includes(search));
@@ -6061,9 +6061,9 @@ function _saveCompleteData(solutionId) {
         const b = id ? DataStore.getById(DataStore.KEYS.BUDGETS, id) : null;
         editingItem = b;
         
-        // ברירת מחדל לשנה הפעילה בעת יצירת תקציב חדש
-        const activePeriod = AppContext.activePeriod;
-        const defaultHebrewYear = b ? b.hebrewYear : (activePeriod ? activePeriod.hebrewYear : '');
+        // ברירת מחדל לשנה הנבחרת בתפריט העליון בעת יצירת תקציב חדש
+        const displayPeriod = AppContext.displayPeriod;
+        const defaultHebrewYear = b ? b.hebrewYear : (displayPeriod ? displayPeriod.hebrewYear : '');
         
         const bAmount = b ? (parseFloat(b.amount) || 0) : 0;
         const bPlan = b ? (parseFloat(b.planningBalance) || 0) : 0;
