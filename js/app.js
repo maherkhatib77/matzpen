@@ -551,6 +551,22 @@ const App = (() => {
         if (!str) return '';
         return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
+    
+    /**
+     * Returns the mentor/guide name according to the new logic:
+     * - If fullNameAr (Arabic name) exists and is not empty, return it
+     * - Otherwise, return fullNameHe (Hebrew name) as fallback
+     * This ensures professional Arabic names are displayed when available,
+     * with Hebrew names as backup when translation is not yet provided.
+     */
+    function getMentorName(m) {
+        if (!m) return '';
+        // Priority: Arabic name if exists and not empty, otherwise Hebrew name
+        if (m.fullNameAr && m.fullNameAr.trim() !== '') {
+            return m.fullNameAr;
+        }
+        return m.fullNameHe || m.fullName || '';
+    }
 
     /**
      * Normalize a date value to YYYY-MM-DD for <input type="date"> compatibility.
@@ -837,7 +853,7 @@ const App = (() => {
         return mentors.map(m => `
             <label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:4px 0;cursor:pointer;">
                 <input type="checkbox" name="mentor_select" value="${m.id}" ${selectedArr.includes(m.id) ? 'checked' : ''} style="width:16px;height:16px;">
-                ${escAttr(m.fullName)}${m.idNumber ? ' <span style="color:var(--gray-400);font-size:11px;">(' + escAttr(m.idNumber) + ')</span>' : ''}
+                ${escAttr(getMentorName(m))}${m.idNumber ? ' <span style="color:var(--gray-400);font-size:11px;">(' + escAttr(m.idNumber) + ')</span>' : ''}
             </label>
         `).join('');
     }
@@ -925,7 +941,7 @@ const App = (() => {
     // ============ SOLUTION FLAT ROW BUILDER (29 columns, one row per mentor, smart tagging) ============
     function _getMentorType(m) {
         if (!m) return 'רגיל';
-        if ((m.fullName || '') === 'כוח פנים') return 'כוח פנים';
+        if ((getMentorName(m) || '') === 'כוח פנים') return 'כוח פנים';
         if (m.performerType === 'כוח פנים') return 'כוח פנים';
         if (!!m.isAccompaniment) return 'שעות ליווי';
         return 'רגיל';
@@ -1008,7 +1024,7 @@ const App = (() => {
         for (var j = 0; j < insts.length; j++) {
             var m = insts[j];
             var mType = _getMentorType(m);
-            var mName = m.fullName || '';
+            var mName = getMentorName(m) || '';
             var isSpecialExport = (mType === 'כוח פנים' || mType === 'שעות ליווי');
             var mP2, mP1;
             if (isSpecialExport) {
@@ -1131,10 +1147,10 @@ const App = (() => {
                 showToast('יוצא בהצלחה', 'success');
                 return;
             } else if (type === 'mentors') {
-                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה': m.fullName || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסב': m.isConverted || '', 'מומחה בתחומו': m.isExpert || '', 'סטטוס': m.status || '' }));
+                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה': getMentorName(m) || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסב': m.isConverted || '', 'מומחה בתחומו': m.isExpert || '', 'סטטוס': m.status || '' }));
                 sheetName = 'מרצים';
             } else if (type === 'guides_repo') {
-                data = items.map(g => ({ 'ת.ז.': g.idNumber || '', 'שם מלא (עברית)': g.fullName || '', 'שם מלא (ערבית)': g.fullNameAr || '', 'תפקיד': g.position || '', 'טלפון': g.phone || '', 'דוא"ל': g.email || '', 'תחומי התמחות': g.specializations || '' }));
+                data = items.map(g => ({ 'ת.ז.': g.idNumber || '', 'שם מלא (עברית)': g.fullNameHe || g.fullName || '', 'שם מלא (ערבית)': g.fullNameAr || '', 'תפקיד': g.position || '', 'טלפון': g.phone || '', 'דוא"ל': g.email || '', 'תחומי התמחות': g.specializations || '' }));
                 sheetName = 'מדריכים';
             } else if (type === 'budgets') {
                 data = items.map(b => ({ 'קוד תקציב': b.budgetCode || '', 'שנת תקציב (עברית)': b.hebrewYear || '', 'שנת תקציב': b.englishYear || '', 'תקופה': b.period || '', 'ידוע / משוערך': b.estimationStatus || '', 'צבע הכסף': b.moneyColor || '', 'יחידה אירגונית מנהלת': b.organizationalUnit || '', 'תקציב עבור': b.budgetFor || '', 'תיאור תקציב': b.description || '', 'הערה': b.notes || '', 'סכום (₪)': b.amount || 0, 'יתרת תכנון (₪)': b.planningBalance || 0, 'יתרת ניהול (₪)': b.managementBalance || 0, 'יתרת תקציב פנויה (₪)': b.freeBudgetBalance || 0 }));
@@ -1771,7 +1787,7 @@ const App = (() => {
             }
             var isBudgeted = s.budgetType === 'כן' || s.budgetType === 'מתוקצב' || (s.budgetedHours || 0) > 0;
             // Aggregated mentor data for in-app table
-            var allNames = insts.map(function(m) { return escAttr(m.fullName); }).join('; ');
+            var allNames = insts.map(function(m) { return escAttr(getMentorName(m)); }).join('; ');
             var allTypes = insts.map(function(m) { return _getMentorType(m); }).filter(function(t, idx, arr) { return arr.indexOf(t) === idx; }).join(', ');
             var allP2 = insts.reduce(function(sum, m) { return sum + (m.period1Hours || 0); }, 0);
             var allP1 = insts.reduce(function(sum, m) { return sum + (m.period2Hours || 0); }, 0);
@@ -1870,7 +1886,7 @@ const App = (() => {
                 <div style="max-height:200px;overflow-y:auto;">
                 <table class="data-table" style="font-size:12px;"><thead><tr><th>שם</th><th>סוג מבצע</th><th>סך שעות</th><th>2 מ׳</th><th>1 מ׳</th><th>פעולות</th></tr></thead><tbody>
                 ${existingMentors.map(m => `<tr>
-                    <td>${escAttr(m.fullName)}</td>
+                    <td>${escAttr(getMentorName(m))}</td>
                     <td>${getLookupLabel(DataStore.KEYS.LOOKUP_PERFORMER_TYPES, m.performerType) || '—'}</td>
                     <td>${m.totalAcademicHours || 0}</td>
                     <td>${m.period1Hours || 0}</td>
@@ -1990,7 +2006,7 @@ const App = (() => {
         if (mentors.length === 0) { msgEl.innerHTML = ''; return; }
         // Exclude "כוח פנים" hours from budget comparison
         var totalMen = mentors.reduce(function(s, m) {
-            if ((m.fullName || '') === 'כוח פנים') return s;
+            if ((getMentorName(m) || '') === 'כוח פנים') return s;
             return s + (parseFloat(m.totalAcademicHours) || 0);
         }, 0);
         var diff = totalMen - budgetedH;
@@ -2751,10 +2767,11 @@ const App = (() => {
             if (m.isActive === false) return false;
             if (_msSelectedIds.indexOf(m.id) !== -1) return false;
             if (!term) return true;
-            return (m.fullName || '').toLowerCase().indexOf(term) !== -1 ||
+            var name = getMentorName(m);
+            return (name || '').toLowerCase().indexOf(term) !== -1 ||
                    (m.idNumber || '').indexOf(term) !== -1 ||
                    (m.phone || '').indexOf(term) !== -1;
-        }).sort(function(a, b) { return (a.fullName || '').localeCompare(b.fullName || '', 'he'); });
+        }).sort(function(a, b) { return (getMentorName(a) || '').localeCompare(getMentorName(b) || '', 'he'); });
         _msFilteredItems = filtered;
         _msHighlightIdx = -1;
         _msRenderDropdown(filtered);
@@ -2773,7 +2790,7 @@ const App = (() => {
         div.className = 'ms-dropdown';
         div.innerHTML = items.map(function(m, i) {
             return '<div class="ms-item" data-idx="' + i + '" data-id="' + escAttr(m.id) + '" onmousedown="App._msSelectItem(\'' + escAttr(m.id) + '\')" onmouseenter="App._msHighlightItem(' + i + ')">' +
-                '<span class="ms-item-name">' + escAttr(m.fullName) + '</span>' +
+                '<span class="ms-item-name">' + escAttr(getMentorName(m)) + '</span>' +
                 (m.idNumber ? '<span class="ms-item-sub">' + escAttr(m.idNumber) + '</span>' : '') +
             '</div>';
         }).join('');
@@ -2862,7 +2879,7 @@ const App = (() => {
             if (!mentor) return;
             var tag = document.createElement('span');
             tag.className = 'ms-tag';
-            tag.innerHTML = escAttr(mentor.fullName) + '<button type="button" class="ms-tag-remove" onclick="event.stopPropagation();App._msRemoveTag(\'' + id + '\')">✕</button>';
+            tag.innerHTML = escAttr(getMentorName(mentor)) + '<button type="button" class="ms-tag-remove" onclick="event.stopPropagation();App._msRemoveTag(\'' + id + '\')">✕</button>';
             container.insertBefore(tag, input);
         });
     }
@@ -2958,7 +2975,8 @@ const App = (() => {
                     DataStore.create(DataStore.KEYS.SOLUTION_INSTRUCTORS, {
                         solutionId: newSolution.id,
                         mentorId: mentor.id,
-                        fullName: mentor.fullName,
+                        fullNameHe: mentor.fullNameHe || mentor.fullName,
+                        fullNameAr: mentor.fullNameAr || '',
                         idNumber: mentor.idNumber,
                         phone: mentor.phone,
                         email: mentor.email,
@@ -3038,7 +3056,7 @@ const App = (() => {
                 <div style="max-height:250px;overflow-y:auto;">
                 <table class="data-table" style="font-size:12px;"><thead><tr><th>שם</th><th>ת.ז.</th><th>סוג מבצע</th><th>סטטוס מרצה</th><th>סך שעות</th><th>2 מ׳</th><th>1 מ׳</th><th>תקציב</th><th>פעולות</th></tr></thead><tbody>
                 ${mentors.map(m => `<tr>
-                    <td><strong>${escAttr(m.fullName)}</strong></td>
+                    <td><strong>${escAttr(getMentorName(m))}</strong></td>
                     <td style="direction:ltr;font-size:11px;">${m.idNumber || '—'}</td>
                     <td>${getLookupLabel(DataStore.KEYS.LOOKUP_PERFORMER_TYPES, m.performerType) || '—'}</td>
                     <td>${getLookupLabel(DataStore.KEYS.LOOKUP_LECTURER_STATUS, m.lecturerStatus) || '—'}</td>
@@ -3097,14 +3115,14 @@ const App = (() => {
         const editInst = editInstId ? DataStore.getById(DataStore.KEYS.SOLUTION_INSTRUCTORS, editInstId) : null;
         editingItem = editInst;
         const mentors = DataStore.getAll(DataStore.KEYS.MENTORS) || [];
-        const mentorOpts = mentors.filter(m => m.isActive !== false).map(m => `<option value="${m.id}">${m.fullName} (${m.idNumber})</option>`).join('');
+        const mentorOpts = mentors.filter(m => m.isActive !== false).map(m => `<option value="${m.id}">${escAttr(getMentorName(m))} (${m.idNumber})</option>`).join('');
         // מבצעים פדגוגיים מתוך הטבלה החדשה
         const pedExecs = DataStore.getAll(DataStore.KEYS.PEDAGOGICAL_EXECUTORS) || [];
         const pedagogicalOpts = pedExecs.map(p => `<option value="${p.id}">${escAttr(p.institutionName || p.fullName || '')}</option>`).join('');
 
         const isEdit = !!editInst;
         const selMentorId = isEdit ? (editInst.mentorRepoId || '') : '';
-        const eName = isEdit ? escAttr(editInst.fullName) : '';
+        const eName = isEdit ? escAttr(editInst.fullNameHe || editInst.fullName) : '';
         const eId = isEdit ? (editInst.idNumber || '') : '';
         const ePhone = isEdit ? (editInst.phone || '') : '';
         const eEmail = isEdit ? (editInst.email || '') : '';
@@ -3190,7 +3208,7 @@ const App = (() => {
         if (!mentorId) return;
         const m = DataStore.getById(DataStore.KEYS.MENTORS, mentorId);
         if (!m) return;
-        document.getElementById('fInstName').value = m.fullName || '';
+        document.getElementById('fInstName').value = getMentorName(m) || '';
         document.getElementById('fInstId').value = m.idNumber || '';
         document.getElementById('fInstPhone').value = m.phone || '';
         document.getElementById('fInstEmail').value = m.email || '';
