@@ -4991,7 +4991,7 @@ function _saveCompleteData(solutionId) {
     function filterMentors() {
         const search = document.getElementById('mentorSearch').value.toLowerCase();
         let items = DataStore.getAll(DataStore.KEYS.MENTORS) || [];
-        if (search) items = items.filter(m => (m.fullName||'').toLowerCase().includes(search) || (m.idNumber||'').includes(search) || (m.email||'').toLowerCase().includes(search));
+        if (search) items = items.filter(m => (m.fullNameHe||m.fullName||'').toLowerCase().includes(search) || (m.fullNameAr||'').toLowerCase().includes(search) || (m.idNumber||'').includes(search) || (m.email||'').toLowerCase().includes(search));
         // Apply KPI filter
         if (_mentorKpiFilter) {
             var f = _mentorKpiFilter;
@@ -5009,9 +5009,9 @@ function _saveCompleteData(solutionId) {
 
     function _renderMentorsTable(items) {
         if (!items.length) return `<div class="empty-state"><div class="empty-icon">👨‍🏫</div><h3>אין מרצים</h3><button class="btn btn-primary" onclick="App.openMentorModal()">➕ הוסף מרצה</button></div>`;
-        return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th>ת.ז.</th><th>שם מרצה</th><th>טלפון</th><th>דוא"ל</th><th>מרצה מוסמך</th><th>מומחה בתחומו</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>
+        return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th>ת.ז.</th><th>שם מרצה (עברית)</th><th>שם מרצה (ערבית)</th><th>טלפון</th><th>דוא"ל</th><th>מרצה מוסמך</th><th>מומחה בתחומו</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>
         ${items.sort((a,b) => (getMentorName(a)||'').localeCompare(getMentorName(b)||'','he')).map(m => `<tr>
-            <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(getMentorName(m))}</strong></td>
+            <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(getMentorName(m))}</strong></td><td>${m.fullNameAr || '—'}</td>
             <td style="direction:ltr">${m.phone || '—'}</td><td>${m.email || '—'}</td>
             <td>${m.isCertifiedLecturer ? '<span class="badge badge-success">כן</span>' : '<span class="badge badge-gray">—</span>'}</td>
             <td>${m.expertInField ? '<span class="badge badge-success">כן</span>' : '<span class="badge badge-gray">—</span>'}</td>
