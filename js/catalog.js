@@ -140,10 +140,34 @@ const CatalogPage = (() => {
         const links = solutionInstructors.filter(si => si.solutionId === solutionId);
         if (!links.length) return '';
         return links.map(link => {
-            const mentor = mentorsRepo.find(m => m.id === link.mentorId);
-            return mentor ? mentor.fullName : '';
+            // If mentorId exists, use mentorsRepo; otherwise use fullName directly from solution_instructors
+            if (link.mentorId) {
+                const mentor = mentorsRepo.find(m => m.id === link.mentorId);
+                return mentor ? (lang === 'ar' && mentor.fullNameAr ? mentor.fullNameAr : mentor.fullName) : '';
+            } else {
+                // Use fullName from solution_instructors with translation map
+                const fullName = link.fullName || '';
+                if (!fullName) return '';
+                // Translate to Arabic if needed
+                if (lang === 'ar' && MENTOR_NAME_TRANSLATIONS[fullName]) {
+                    return MENTOR_NAME_TRANSLATIONS[fullName];
+                }
+                return fullName;
+            }
         }).filter(Boolean).join(', ');
     }
+
+    // Mentor name translations (Hebrew → Arabic)
+    const MENTOR_NAME_TRANSLATIONS = {
+        'אחלאם חגאזי': 'أحلام حجازي',
+        'אייאד כנאענה': 'إياد كناعنة',
+        "אלח'נסא דיאב": 'الخنساء دياب',
+        'גואד דויק': 'جواد دويك',
+        'מייסון מילחם': 'ميسون ملحهم',
+        'נאיל אבו יוסף': 'نائل أبو يوسف',
+        'נבין סולימאן': 'نبين سليمان',
+        'נזיה אנסארי': 'نزية أنصاري'
+    };
 
     function formatDate(dateStr) {
         if (!dateStr) return '—';
@@ -349,7 +373,8 @@ const CatalogPage = (() => {
                            getLookupLabel(categories, item.topicType) ||
                            '';
         const fieldColor = getFieldColor(item.topic || '');
-        const guideName = getGuideName(item.guideId);
+        // Get mentor names instead of guide name (requirement: display mentors, not guide)
+        const mentorNames = getMentorNames(item.id);
         const meetingLabel = getLookupLabel(lookupMeetingTypes, item.meetingType);
         const dayLabel = getLookupLabel(lookupWeekDays, item.weekDay);
         const hours = item.academicHours || 0;
@@ -366,7 +391,7 @@ const CatalogPage = (() => {
                 <span class="strip-label">${item.name || ''}</span>
             </div>
             <div class="catalog-card-body">
-                ${guideName ? `<div class="catalog-card-guide"><span class="guide-icon">👤</span> ${guideName}</div>` : ''}
+                ${mentorNames ? `<div class="catalog-card-guide"><span class="guide-icon">👥</span> ${mentorNames}</div>` : ''}
                 ${badgesHtml ? `<div class="catalog-card-badges">${badgesHtml}</div>` : ''}
             </div>
             <div class="catalog-card-footer" style="display:flex;gap:8px;justify-content:center;">
@@ -394,14 +419,16 @@ const CatalogPage = (() => {
             html += `<div class="detail-row"><span class="detail-label">${t('descriptionLabel')}</span><span class="detail-value">${item.description}</span></div>`;
         }
 
-        const guideName = getGuideName(item.guideId);
-        if (guideName) {
-            html += `<div class="detail-row"><span class="detail-label">${t('guideLabel')}</span><span class="detail-value">👤 ${guideName}</span></div>`;
-        }
-
+        // Display mentors first (requirement: show mentors, not guide)
         const mentorNames = getMentorNames(item.id);
         if (mentorNames) {
             html += `<div class="detail-row"><span class="detail-label">${t('mentorsLabel')}</span><span class="detail-value">👥 ${mentorNames}</span></div>`;
+        }
+
+        // Guide is secondary - still display but after mentors
+        const guideName = getGuideName(item.guideId);
+        if (guideName) {
+            html += `<div class="detail-row"><span class="detail-label">${t('guideLabel')}</span><span class="detail-value">👤 ${guideName}</span></div>`;
         }
 
         const topicTypeLabel = getLookupLabel(categories, item.topicType);
