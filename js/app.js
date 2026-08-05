@@ -3144,13 +3144,14 @@ const App = (() => {
         showModal(isEdit ? 'עריכת מנחה' : 'הוספת מנחה לפתרון', `
             <div class="form-group"><label>בחר מנחה מהמאגר</label>
                 <div style="position:relative;">
-                    <input type="text" id="fInstSearch" class="form-input" placeholder="🔍 הקלד שם מלא או ת.ז. לחיפוש..." oninput="App._filterMentorSearch('fInst',false)" onfocus="App._filterMentorSearch('fInst',false)" onblur="App._closeMentorSearch('fInst')" autocomplete="off" value="${isEdit && selMentorId ? (editInst.fullName || '') : ''}">
+                    <input type="text" id="fInstSearch" class="form-input" placeholder="🔍 הקלד שם מלא או ת.ז. לחיפוש..." oninput="App._filterMentorSearch('fInst',false)" onfocus="App._filterMentorSearch('fInst',false)" onblur="App._closeMentorSearch('fInst')" autocomplete="off" value="${isEdit && selMentorId ? getMentorName(editInst) : ''}">
                     <div id="fInstSearchResults" style="position:absolute;top:100%;left:0;right:0;z-index:100;background:#fff;border:1px solid var(--gray-200);border-radius:0 0 var(--border-radius) var(--border-radius);max-height:200px;overflow-y:auto;display:none;box-shadow:0 4px 6px rgba(0,0,0,.1);"></div>
                 </div>
                 <input type="hidden" id="fInstSelect" value="${selMentorId}">
             </div>
             <div class="form-grid">
-                <div class="form-group"><label>שם מנחה *</label><input type="text" id="fInstName" class="form-input" value="${eName}" required></div>
+                <div class="form-group"><label>שם מנחה (עברית) *</label><input type="text" id="fInstNameHe" class="form-input" value="${isEdit ? escAttr(editInst.fullNameHe || editInst.fullName) : ''}" required></div>
+                <div class="form-group"><label>שם מנחה (ערבית)</label><input type="text" id="fInstNameAr" class="form-input" value="${isEdit ? escAttr(editInst.fullNameAr || '') : ''}" placeholder="יישאר ריק אם לא קיים תרגום"></div>
                 <div class="form-group"><label>תעודת זהות</label><input type="text" id="fInstId" class="form-input" value="${eId}"></div>
                 <div class="form-group"><label>טלפון</label><input type="text" id="fInstPhone" class="form-input" value="${ePhone}"></div>
                 <div class="form-group"><label>דוא"ל</label><input type="email" id="fInstEmail" class="form-input" value="${eEmail}"></div>
@@ -3208,7 +3209,8 @@ const App = (() => {
         if (!mentorId) return;
         const m = DataStore.getById(DataStore.KEYS.MENTORS, mentorId);
         if (!m) return;
-        document.getElementById('fInstName').value = getMentorName(m) || '';
+        document.getElementById('fInstNameHe').value = m.fullNameHe || m.fullName || '';
+        document.getElementById('fInstNameAr').value = m.fullNameAr || '';
         document.getElementById('fInstId').value = m.idNumber || '';
         document.getElementById('fInstPhone').value = m.phone || '';
         document.getElementById('fInstEmail').value = m.email || '';
@@ -3222,8 +3224,9 @@ const App = (() => {
     }
 
     function saveSolInst() {
-        const name = document.getElementById('fInstName').value.trim();
-        if (!name) { showToast('יש להזין שם מנחה', 'error'); return; }
+        const nameHe = document.getElementById('fInstNameHe').value.trim();
+        const nameAr = document.getElementById('fInstNameAr').value.trim();
+        if (!nameHe) { showToast('יש להזין שם מנחה (עברית)', 'error'); return; }
         const solId = document.getElementById('fInstSolId').value;
         const repoId = document.getElementById('fInstSelect').value || null;
         const performerType = document.getElementById('fInstType').value;
@@ -3232,7 +3235,8 @@ const App = (() => {
 
         const instData = {
             solutionId: solId, mentorRepoId: repoId,
-            fullName: name, idNumber: document.getElementById('fInstId').value.trim(),
+            fullNameHe: nameHe, fullNameAr: nameAr,
+            idNumber: document.getElementById('fInstId').value.trim(),
             phone: document.getElementById('fInstPhone').value.trim(), email: document.getElementById('fInstEmail').value.trim(),
             performerType: performerType,
             pedagogicalExecutorId: pedagogicalId,
@@ -3248,11 +3252,11 @@ const App = (() => {
 
         if (editId) {
             DataStore.update(DataStore.KEYS.SOLUTION_INSTRUCTORS, editId, instData);
-            logActivity('edit_mentor', 'עריכת מנחה: ' + name, 'solution_instructor', editId);
+            logActivity('edit_mentor', 'עריכת מנחה: ' + nameHe, 'solution_instructor', editId);
             showToast('המנחה עודכן', 'success');
         } else {
             DataStore.create(DataStore.KEYS.SOLUTION_INSTRUCTORS, instData);
-            logActivity('add_mentor', 'הוספת מנחה: ' + name, 'solution_instructor', '');
+            logActivity('add_mentor', 'הוספת מנחה: ' + nameHe, 'solution_instructor', '');
             showToast('המנחה נוסף', 'success');
         }
         // בדיקת התאמת שעות
@@ -3266,6 +3270,8 @@ const App = (() => {
     function editSolInst(instId) {
         const inst = DataStore.getById(DataStore.KEYS.SOLUTION_INSTRUCTORS, instId);
         if (!inst) return;
+        // עדכון השמות בטופס העריכה להשתמש ב-getMentorName עבור התצוגה
+        inst.fullNameDisplay = getMentorName(inst);
         closeModal();
         setTimeout(function() { App.openSolInstModal(inst.solutionId, instId); }, 200);
     }
@@ -3730,7 +3736,9 @@ const App = (() => {
                     DataStore.create(DataStore.KEYS.SOLUTION_INSTRUCTORS, {
                         solutionId: editingItem.id,
                         mentorId: mentor.id,
-                        fullName: mentor.fullName,
+                        mentorRepoId: mentor.id,
+                        fullNameHe: mentor.fullNameHe || mentor.fullName,
+                        fullNameAr: mentor.fullNameAr || '',
                         idNumber: mentor.idNumber,
                         phone: mentor.phone,
                         email: mentor.email,
@@ -3798,7 +3806,8 @@ const App = (() => {
             var insts = (DataStore.getAll(DataStore.KEYS.SOLUTION_INSTRUCTORS) || []).filter(function(i) { return i.solutionId === id; });
             for (var ii = 0; ii < insts.length; ii++) {
                 var inst = insts[ii];
-                var fn = (inst.fullName || '').trim();
+                // Use fullNameHe as primary, fallback to legacy fullName
+                var fn = (inst.fullNameHe || inst.fullName || '').trim();
                 if (!fn || fn.indexOf(',') === -1 || _getMentorType(inst) === 'כוח פנים') continue;
                 var names = fn.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
                 if (names.length <= 1) continue;
@@ -3808,7 +3817,8 @@ const App = (() => {
                         solutionId: inst.solutionId,
                         mentorId: inst.mentorId || '',
                         mentorRepoId: inst.mentorRepoId || '',
-                        fullName: names[ni],
+                        fullNameHe: names[ni],
+                        fullNameAr: inst.fullNameAr || '',
                         idNumber: inst.idNumber || '',
                         phone: inst.phone || '',
                         email: inst.email || '',
@@ -3821,7 +3831,7 @@ const App = (() => {
                     });
                 }
                 // Update original record with first name only
-                DataStore.update(DataStore.KEYS.SOLUTION_INSTRUCTORS, inst.id, { fullName: names[0] });
+                DataStore.update(DataStore.KEYS.SOLUTION_INSTRUCTORS, inst.id, { fullNameHe: names[0] });
             }
         })();
 
@@ -3965,7 +3975,8 @@ function _cdRenderFundedStage2() {
             solutionId: solId,
             mentorId: '',
             mentorRepoId: '',
-            fullName: 'כוח פנים',
+            fullNameHe: 'כוח פנים',
+            fullNameAr: '',
             idNumber: '', phone: '', email: '',
             performerType: 'כוח פנים',
             lecturerStatus: '',
@@ -4212,17 +4223,18 @@ function _cdRenderFundedStage2() {
         var typeCellHtml;
         if (isSpecialRow) {
             // Hidden select for recalc/save compatibility
-            typeCellHtml = '<select class="cd-mentor-type" data-inst-id="' + m.id + '" data-orig-name="' + escAttr(m.fullName) + '" data-orig-mentor-id="' + (m.mentorId || '') + '" onchange="App._cdOnTypeChange(this)" style="display:none;"><option value="' + type + '" selected>' + type + '</option></select>' +
+            typeCellHtml = '<select class="cd-mentor-type" data-inst-id="' + m.id + '" data-orig-name="' + escAttr(m.fullNameHe || m.fullName || '') + '" data-orig-mentor-id="' + (m.mentorId || '') + '" onchange="App._cdOnTypeChange(this)" style="display:none;"><option value="' + type + '" selected>' + type + '</option></select>' +
                 '<span style="font-size:13px;color:var(--gray-600);">' + type + '</span>';
         } else {
             var typeOpts = '<option value="רגיל"' + (type === 'רגיל' ? ' selected' : '') + '>רגיל</option>' +
                 '<option value="כוח פנים"' + (type === 'כוח פנים' ? ' selected' : '') + '>כוח פנים</option>' +
                 '<option value="שעות ליווי"' + (type === 'שעות ליווי' ? ' selected' : '') + '>שעות ליווי</option>';
-            typeCellHtml = '<select class="form-select cd-mentor-type" data-inst-id="' + m.id + '" data-orig-name="' + escAttr(m.fullName) + '" data-orig-mentor-id="' + (m.mentorId || '') + '" onchange="App._cdOnTypeChange(this)" style="min-width:110px;font-size:13px;">' + typeOpts + '</select>';
+            typeCellHtml = '<select class="form-select cd-mentor-type" data-inst-id="' + m.id + '" data-orig-name="' + escAttr(m.fullNameHe || m.fullName || '') + '" data-orig-mentor-id="' + (m.mentorId || '') + '" onchange="App._cdOnTypeChange(this)" style="min-width:110px;font-size:13px;">' + typeOpts + '</select>';
         }
 
-        // Name display
+        // Name display - use getMentorName helper for consistent display
         var nameHtml = '';
+        var displayName = getMentorName(m) || m.fullNameHe || m.fullName || '';
         if (type === 'כוח פנים') {
             nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
                 '<span style="width:28px;height:28px;border-radius:50%;background:var(--accent,#f59e0b);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏠</span>' +
@@ -4231,11 +4243,11 @@ function _cdRenderFundedStage2() {
             // Editable name field for שעות ליווי
             nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
                 '<span style="width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1e40af;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🕐</span>' +
-                '<input type="text" class="form-input cd-acc-name" data-inst-id="' + m.id + '" value="' + escAttr(m.fullName || '') + '" placeholder="שם מלווה..." style="min-width:120px;font-size:13px;">' +
+                '<input type="text" class="form-input cd-acc-name" data-inst-id="' + m.id + '" value="' + escAttr(m.fullNameHe || m.fullName || '') + '" placeholder="שם מלווה..." style="min-width:120px;font-size:13px;">' +
                 '</div>';
         } else {
             nameHtml = '<div style="display:flex;align-items:center;gap:8px;">' +
-                '<span style="font-weight:600;">' + escAttr(m.fullName) + '</span>' +
+                '<span style="font-weight:600;">' + escAttr(displayName) + '</span>' +
                 (m.idNumber ? '<span style="font-size:11px;color:var(--gray-400);direction:ltr;">' + escAttr(m.idNumber) + '</span>' : '') +
                 '</div>';
         }
@@ -4566,7 +4578,8 @@ function _cdRecalc() {
             solutionId: window._cdSolutionId,
             mentorId: mentorId,
             mentorRepoId: mentorId,
-            fullName: mentor.fullName,
+            fullNameHe: mentor.fullNameHe || mentor.fullName,
+            fullNameAr: mentor.fullNameAr || '',
             idNumber: mentor.idNumber || '',
             phone: mentor.phone || '',
             email: mentor.email || '',
@@ -4615,7 +4628,8 @@ function _cdRecalc() {
             solutionId: solId,
             mentorId: '',
             mentorRepoId: '',
-            fullName: 'כוח פנים',
+            fullNameHe: 'כוח פנים',
+            fullNameAr: '',
             idNumber: '',
             phone: '',
             email: '',
@@ -4714,7 +4728,8 @@ function _saveCompleteData(solutionId) {
             if (type === 'כוח פנים') {
                 update.performerType = 'כוח פנים';
                 update.isAccompaniment = false;
-                update.fullName = 'כוח פנים';
+                update.fullNameHe = 'כוח פנים';
+                update.fullNameAr = '';
                 update.mentorId = null;
                 internalSum += preservedTotal;
             } else {
