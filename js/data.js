@@ -71,11 +71,12 @@ const DataStore = (() => {
     };
 
     // מיפוי מפתח → שם קובץ JSON
+    // הערה: MENTORS הוסר מהמיפוי כדי למנוע טעינה אוטומטית של קובץ גדול ל-localStorage
     const KEY_TO_FILE = {
         [KEYS.USERS]:                   'users.json',
         [KEYS.CATEGORIES]:              'categories.json',
         [KEYS.SOLUTIONS]:                'solutions.json',
-        [KEYS.MENTORS]:                 'mentors.json',
+        // [KEYS.MENTORS]:                 'mentors.json', // הוסר - יש לייבא ידנית דרך הממשק
         [KEYS.GUIDES_REPO]:             'guides_repo.json',
         [KEYS.BUDGETS]:                 'budgets.json',
         [KEYS.PERIODS]:                 'periods.json',
@@ -248,38 +249,9 @@ const DataStore = (() => {
     DEFAULT_DATA[KEYS.SOLUTIONS] = [];
 
     // --- מאגר מנחים/מרצים (MENTORS) ---
-    DEFAULT_DATA[KEYS.MENTORS] = [
-        {
-            id: 'mentor_001',
-            idNumber: '12345678',
-            fullName: 'פרופ\' יהודה אברהם',
-            phone: '050-1234567',
-            email: 'yehuda.rahamim@mail.com',
-            isConverted: 'no',
-            isExpert: 'yes',
-            performerType: 'external',
-            organization: 'אוניברסיטת תל אביב',
-            status: 'active',
-            isActive: true,
-            createdAt: '2024-09-01T00:00:00.000Z',
-            updatedAt: '2024-09-01T00:00:00.000Z'
-        },
-        {
-            id: 'mentor_002',
-            idNumber: '87654321',
-            fullName: 'ד"ר שרה ישראלי',
-            phone: '052-9876543',
-            email: 'sarah.israeli@mail.com',
-            isConverted: 'yes',
-            isExpert: 'yes',
-            performerType: 'pedagogical',
-            organization: 'מכללת קיי באר שבע',
-            status: 'active',
-            isActive: true,
-            createdAt: '2024-09-01T00:00:00.000Z',
-            updatedAt: '2024-09-01T00:00:00.000Z'
-        }
-    ];
+    // הערה: מאגר המרצים מאותחל כמערך ריק כדי למנוע בעיות אחסון ב-localStorage
+    // נתוני המרצים מיובאים על ידי המשתמש דרך ממשק הייבוא
+    DEFAULT_DATA[KEYS.MENTORS] = [];
 
     // --- מאגר מדריכים – אנשי סגל פסג"ה (GUIDES_REPO) ---
     DEFAULT_DATA[KEYS.GUIDES_REPO] = [
