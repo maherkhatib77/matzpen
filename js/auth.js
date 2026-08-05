@@ -28,12 +28,23 @@ const Auth = (() => {
     };
 
     function _normalizeRole(role) {
-        if (role === 'admin') return 'system_admin';
-        return role || 'guide';
+        if (!role) return 'guide';
+        
+        // Normalize Hebrew roles to English
+        const hebrewToEnglish = {
+            'מנהל מערכת': 'system_admin',
+            'מפעיל מערכת': 'system_operator',
+            'חבר בצוות מוביל': 'team_leader',
+            'מדריך פסג"ה': 'guide',
+            'admin': 'system_admin'
+        };
+        
+        return hebrewToEnglish[role] || role;
     }
 
     function _isAdminRole(role) {
-        return role === 'admin' || role === 'system_admin';
+        const normalized = _normalizeRole(role);
+        return normalized === 'system_admin';
     }
 
     /**
@@ -97,7 +108,7 @@ const Auth = (() => {
 
     function isGuide() {
         const user = getCurrentUser();
-        return user ? (user.role === 'guide') : false;
+        return user ? (_normalizeRole(user.role) === 'guide') : false;
     }
 
     // ===== PERMISSION CHECKING =====
