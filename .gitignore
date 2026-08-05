@@ -1,3 +1,1 @@
-(js/catalog.js is a source file, so no need to add anything to .gitignore)
-
-(empty)
+(data/mentors.json is a source/config file, and there are no build artifacts, dependencies, or temp files in the changes)
