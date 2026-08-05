@@ -1,32 +1,62 @@
 [
   {
+    "value": "",
+    "label": "ערך ריק (אין מידע)",
+    "labelAr": "لا يوجد معلومات",
+    "order": 1,
+    "isActive": true,
+    "id": "ms4ysx0mb2ndmb9ya",
+    "createdAt": "2026-07-28T18:03:56.325Z",
+    "updatedAt": "2026-07-28T18:03:56.325Z"
+  },
+  {
     "value": "אושר",
     "label": "אושר",
     "labelAr": "تمت الموافقة",
-    "order": 1,
+    "order": 2,
     "isActive": true,
     "id": "ms4ysx0mb2ndmb9yc",
     "createdAt": "2026-07-28T18:03:56.326Z",
     "updatedAt": "2026-07-28T18:03:56.326Z"
   },
   {
-    "value": "ממתין לאישור",
-    "label": "ממתין לאישור",
-    "labelAr": "بانتظار الموافقة",
-    "order": 2,
+    "value": "אושר פדגוגית",
+    "label": "אושר פדגוגית",
+    "labelAr": "تمت الموافقة تربوياً",
+    "order": 3,
     "isActive": true,
-    "id": "ms4ysx0nqvo0xf27h",
+    "id": "ms4ysx0mb2ndmb9yd",
     "createdAt": "2026-07-28T18:03:56.327Z",
     "updatedAt": "2026-07-28T18:03:56.327Z"
+  },
+  {
+    "value": "השלמת פרטים",
+    "label": "השלמת פרטים",
+    "labelAr": "استكمال التفاصيل",
+    "order": 4,
+    "isActive": true,
+    "id": "ms4ysx0mb2ndmb9ye",
+    "createdAt": "2026-07-28T18:03:56.328Z",
+    "updatedAt": "2026-07-28T18:03:56.328Z"
   },
   {
     "value": "נדחה",
     "label": "נדחה",
     "labelAr": "مرفوض",
-    "order": 3,
+    "order": 5,
     "isActive": true,
     "id": "ms4ysx0ox55rqv943",
-    "createdAt": "2026-07-28T18:03:56.328Z",
-    "updatedAt": "2026-07-28T18:03:56.328Z"
+    "createdAt": "2026-07-28T18:03:56.329Z",
+    "updatedAt": "2026-07-28T18:03:56.329Z"
+  },
+  {
+    "value": "עודכן מרצה",
+    "label": "עודכן מרצה",
+    "labelAr": "تم تحديث المحاضر",
+    "order": 6,
+    "isActive": true,
+    "id": "ms4ysx0mb2ndmb9yf",
+    "createdAt": "2026-07-28T18:03:56.330Z",
+    "updatedAt": "2026-07-28T18:03:56.330Z"
   }
 ]
