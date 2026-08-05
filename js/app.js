@@ -85,7 +85,7 @@ const App = (() => {
             { key: 'fullNameAr', label: 'שם מרצה (ערבית)', hints: ['ערבית', 'arabic', 'שם ערבית'] },
             { key: 'phone', label: 'טלפון נייד', hints: ['טלפון', 'phone', 'נייד', 'פלאפון'] },
             { key: 'email', label: 'דוא"ל', hints: ['דואל', 'email', 'מייל', 'אימייל'] },
-            { key: 'isCertifiedLecturer', label: 'מרצה מוסמך', hints: ['מוסמך', 'certified', 'מרצה מוסמך'] },
+            { key: 'isCertifiedLecturer', label: 'מרצה מוסב', hints: ['מוסב', 'certified', 'מרצה מוסב', 'מרצה מוסמך'] },
             { key: 'expertInField', label: 'מומחה בתחומו', hints: ['מומחה', 'expert', 'מומחה בתחומו'] },
             { key: 'lecturerStatus', label: 'סטטוס', hints: ['סטטוס', 'status', 'אושר', 'נדחה'] }
         ],
@@ -212,7 +212,7 @@ const App = (() => {
                 { index: 2, key: 'fullNameAr', label: 'שם מרצה (ערבית)' },
                 { index: 3, key: 'phone', label: 'טלפון' },
                 { index: 4, key: 'email', label: 'דוא"ל' },
-                { index: 5, key: 'isCertifiedLecturer', label: 'מרצה מוסמך' },
+                { index: 5, key: 'isCertifiedLecturer', label: 'מרצה מוסב' },
                 { index: 6, key: 'expertInField', label: 'מומחה בתחומו' },
                 { index: 7, key: 'lecturerStatus', label: 'סטטוס' }
             ]
@@ -1172,7 +1172,7 @@ const App = (() => {
                 showToast('יוצא בהצלחה', 'success');
                 return;
             } else if (type === 'mentors') {
-                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה (עברית)': m.fullNameHe || '', 'שם מרצה (ערבית)': m.fullNameAr || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסמך': m.isCertifiedLecturer || '', 'מומחה בתחומו': m.expertInField || '', 'סטטוס': m.lecturerStatus || '' }));
+                data = items.map(m => ({ 'ת.ז. מרצה': m.idNumber || '', 'שם מרצה (עברית)': m.fullNameHe || '', 'שם מרצה (ערבית)': m.fullNameAr || '', 'טלפון נייד': m.phone || '', 'דוא"ל': m.email || '', 'מרצה מוסב': m.isCertifiedLecturer !== null ? (m.isCertifiedLecturer ? 'כן' : 'לא') : '', 'מומחה בתחומו': m.expertInField !== null ? (m.expertInField ? 'כן' : 'לא') : '', 'סטטוס': m.lecturerStatus || '' }));
                 sheetName = 'מרצים';
             } else if (type === 'guides_repo') {
                 data = items.map(g => ({ 'ת.ז.': g.idNumber || '', 'שם מלא (עברית)': g.fullNameHe || g.fullName || '', 'שם מלא (ערבית)': g.fullNameAr || '', 'תפקיד': g.position || '', 'טלפון': g.phone || '', 'דוא"ל': g.email || '', 'תחומי התמחות': g.specializations || '' }));
@@ -5009,7 +5009,7 @@ function _saveCompleteData(solutionId) {
 
     function _renderMentorsTable(items) {
         if (!items.length) return `<div class="empty-state"><div class="empty-icon">👨‍🏫</div><h3>אין מרצים</h3><button class="btn btn-primary" onclick="App.openMentorModal()">➕ הוסף מרצה</button></div>`;
-        return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th>ת.ז.</th><th>שם מרצה (עברית)</th><th>שם מרצה (ערבית)</th><th>טלפון</th><th>דוא"ל</th><th>מרצה מוסמך</th><th>מומחה בתחומו</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>
+        return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th>ת.ז.</th><th>שם מרצה (עברית)</th><th>שם מרצה (ערבית)</th><th>טלפון</th><th>דוא"ל</th><th>מרצה מוסב</th><th>מומחה בתחומו</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>
         ${items.sort((a,b) => (getMentorName(a)||'').localeCompare(getMentorName(b)||'','he')).map(m => `<tr>
             <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(getMentorName(m))}</strong></td><td>${m.fullNameAr || '—'}</td>
             <td style="direction:ltr">${m.phone || '—'}</td><td>${m.email || '—'}</td>
@@ -5044,7 +5044,7 @@ function _saveCompleteData(solutionId) {
                 <div class="form-group"><label>שם מרצה (ערבית)</label><input type="text" id="fMNameAr" class="form-input" value="${m ? (m.fullNameAr || '') : ''}" placeholder="יישאר ריק אם לא קיים תרגום"></div>
                 <div class="form-group"><label>טלפון נייד</label><input type="tel" id="fMPhone" class="form-input" value="${m ? m.phone || '' : ''}" placeholder="050-0000000" style="direction:ltr;text-align:right;" oninput="App._formatPhoneInput(this)"></div>
                 <div class="form-group"><label>דוא"ל</label><input type="email" id="fMEmail" class="form-input" value="${m ? m.email || '' : ''}" placeholder="example@mail.com"></div>
-                <div class="form-group"><label>מרצה מוסמך</label><select id="fMCertified" class="form-select"><option value="">לא צוין</option><option value="true" ${m && m.isCertifiedLecturer === true ? 'selected' : ''}>כן</option><option value="false" ${m && m.isCertifiedLecturer === false ? 'selected' : ''}>לא</option></select></div>
+                <div class="form-group"><label>מרצה מוסב</label><select id="fMCertified" class="form-select"><option value="">לא צוין</option><option value="true" ${m && m.isCertifiedLecturer === true ? 'selected' : ''}>כן</option><option value="false" ${m && m.isCertifiedLecturer === false ? 'selected' : ''}>לא</option></select></div>
                 <div class="form-group"><label>מומחה בתחומו</label><select id="fMExpert" class="form-select"><option value="">לא צוין</option><option value="true" ${m && m.expertInField === true ? 'selected' : ''}>כן</option><option value="false" ${m && m.expertInField === false ? 'selected' : ''}>לא</option></select></div>
                 <div class="form-group"><label>סטטוס</label><select id="fMStatus" class="form-select">${_lecturerStatusOpts(m ? m.lecturerStatus : '')}</select></div>
             </div>`,
@@ -6884,7 +6884,7 @@ function _saveCompleteData(solutionId) {
                 });
             });
         } else if (type === 'mentors') {
-            csv += 'ת.ז. מרצה,שם מרצה (עברית),שם מרצה (ערבית),טלפון נייד,דוא"ל,מרצה מוסמך,מומחה בתחומו,סטטוס\n';
+            csv += 'ת.ז. מרצה,שם מרצה (עברית),שם מרצה (ערבית),טלפון נייד,דוא"ל,מרצה מוסב,מומחה בתחומו,סטטוס\n';
             items.forEach(m => { csv += `"${m.idNumber||''}","${m.fullNameHe||m.fullName||''}","${m.fullNameAr||''}","${m.phone||''}","${m.email||''}","${m.isCertifiedLecturer!==null?(m.isCertifiedLecturer?'כן':'לא'):''}","${m.expertInField!==null?(m.expertInField?'כן':'לא'):''}","${m.lecturerStatus||''}"\n`; });
         } else if (type === 'guides_repo') {
             csv += 'ת.ז.,שם מלא (עברית),שם מלא (ערבית),תפקיד,טלפון,דוא"ל,תחומי התמחות\n';
@@ -6919,7 +6919,7 @@ function _saveCompleteData(solutionId) {
     var _batchImportErrors = null;
     var _batchImportUpdateDetails = null; // Array of {rowNum, idNumber, fullName, changedFields: [{field, label, oldVal, newVal}]}
     var _MENTOR_UPSERT_FIELDS = ['fullNameHe', 'fullNameAr', 'phone', 'email', 'isCertifiedLecturer', 'expertInField', 'lecturerStatus'];
-    var _MENTOR_FIELD_LABELS = { fullNameHe: 'שם מרצה (עברית)', fullNameAr: 'שם מרצה (ערבית)', phone: 'טלפון נייד', email: 'דוא"ל', isCertifiedLecturer: 'מרצה מוסמך', expertInField: 'מומחה בתחומו', lecturerStatus: 'סטטוס' };
+    var _MENTOR_FIELD_LABELS = { fullNameHe: 'שם מרצה (עברית)', fullNameAr: 'שם מרצה (ערבית)', phone: 'טלפון נייד', email: 'דוא"ל', isCertifiedLecturer: 'מרצה מוסב', expertInField: 'מומחה בתחומו', lecturerStatus: 'סטטוס' };
 
     function _showMentorsImportSummary(newRows, updateRows, errors, fieldMappings) {
         var totalDataRows = newRows.length + updateRows.length;
