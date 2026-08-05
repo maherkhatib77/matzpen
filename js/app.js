@@ -81,12 +81,13 @@ const App = (() => {
         ],
         mentors: [
             { key: 'idNumber', label: 'ת.ז. מרצה', hints: ['ת.ז', 'תעודת זהות', 'id', 'tz', 'מספר זהות', 'ת.ז. מרצה'] },
-            { key: 'fullName', label: 'שם מרצה', hints: ['שם', 'name', 'מלא', 'שם מרצה'] },
+            { key: 'fullNameHe', label: 'שם מרצה (עברית)', hints: ['שם', 'name', 'מלא', 'שם מרצה', 'עברית', 'hebrew'] },
+            { key: 'fullNameAr', label: 'שם מרצה (ערבית)', hints: ['ערבית', 'arabic', 'שם ערבית'] },
             { key: 'phone', label: 'טלפון נייד', hints: ['טלפון', 'phone', 'נייד', 'פלאפון'] },
             { key: 'email', label: 'דוא"ל', hints: ['דואל', 'email', 'מייל', 'אימייל'] },
-            { key: 'isConverted', label: 'מרצה מוסב', hints: ['מוסב', 'converted', 'מרצה מוסב'] },
-            { key: 'isExpert', label: 'מומחה בתחומו', hints: ['מומחה', 'expert', 'מומחה בתחומו'] },
-            { key: 'status', label: 'סטטוס', hints: ['סטטוס', 'status', 'אושר', 'נדחה'] }
+            { key: 'isCertifiedLecturer', label: 'מרצה מוסמך', hints: ['מוסמך', 'certified', 'מרצה מוסמך'] },
+            { key: 'expertInField', label: 'מומחה בתחומו', hints: ['מומחה', 'expert', 'מומחה בתחומו'] },
+            { key: 'lecturerStatus', label: 'סטטוס', hints: ['סטטוס', 'status', 'אושר', 'נדחה'] }
         ],
         guides_repo: [
             { key: 'idNumber', label: 'ת.ז.', hints: ['ת.ז', 'תעודת זהות', 'id', 'tz'] },
@@ -207,12 +208,13 @@ const App = (() => {
             label: 'מאגר מרצים',
             columns: [
                 { index: 0, key: 'idNumber', label: 'ת.ז.' },
-                { index: 1, key: 'fullName', label: 'שם מרצה' },
-                { index: 2, key: 'phone', label: 'טלפון' },
-                { index: 3, key: 'email', label: 'דוא"ל' },
-                { index: 4, key: 'isConverted', label: 'מרצה מוסב' },
-                { index: 5, key: 'isExpert', label: 'מומחה בתחומו' },
-                { index: 6, key: 'status', label: 'סטטוס' }
+                { index: 1, key: 'fullNameHe', label: 'שם מרצה (עברית)' },
+                { index: 2, key: 'fullNameAr', label: 'שם מרצה (ערבית)' },
+                { index: 3, key: 'phone', label: 'טלפון' },
+                { index: 4, key: 'email', label: 'דוא"ל' },
+                { index: 5, key: 'isCertifiedLecturer', label: 'מרצה מוסמך' },
+                { index: 6, key: 'expertInField', label: 'מומחה בתחומו' },
+                { index: 7, key: 'lecturerStatus', label: 'סטטוס' }
             ]
         },
         users: {
