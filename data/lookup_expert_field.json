@@ -1,0 +1,32 @@
+[
+  {
+    "value": "הוגשה בקשה",
+    "label": "הוגשה בקשה",
+    "labelAr": "تم تقديم الطلب",
+    "order": 1,
+    "isActive": true,
+    "id": "lef_001",
+    "createdAt": "2026-07-28T18:03:56.325Z",
+    "updatedAt": "2026-07-28T18:03:56.325Z"
+  },
+  {
+    "value": "מומחה בתחומו",
+    "label": "מומחה בתחומו",
+    "labelAr": "خبير في مجاله",
+    "order": 2,
+    "isActive": true,
+    "id": "lef_002",
+    "createdAt": "2026-07-28T18:03:56.326Z",
+    "updatedAt": "2026-07-28T18:03:56.326Z"
+  },
+  {
+    "value": "נדחתה הבקשה",
+    "label": "נדחתה הבקשה",
+    "labelAr": "تم رفض الطلب",
+    "order": 3,
+    "isActive": true,
+    "id": "lef_003",
+    "createdAt": "2026-07-28T18:03:56.327Z",
+    "updatedAt": "2026-07-28T18:03:56.327Z"
+  }
+]

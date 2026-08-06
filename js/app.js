@@ -5013,8 +5013,8 @@ function _saveCompleteData(solutionId) {
         ${items.sort((a,b) => (getMentorName(a)||'').localeCompare(getMentorName(b)||'','he')).map(m => `<tr>
             <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(getMentorName(m))}</strong></td><td>${m.fullNameAr || '—'}</td>
             <td style="direction:ltr">${m.phone || '—'}</td><td>${m.email || '—'}</td>
-            <td>${m.isCertifiedLecturer ? '<span class="badge badge-success">כן</span>' : '<span class="badge badge-gray">—</span>'}</td>
-            <td>${m.expertInField ? '<span class="badge badge-success">כן</span>' : '<span class="badge badge-gray">—</span>'}</td>
+            <td>${getLookupLabel(DataStore.KEYS.LOOKUP_CERTIFIED_LECTURER, m.isCertifiedLecturer)}</td>
+            <td>${getLookupLabel(DataStore.KEYS.LOOKUP_EXPERT_FIELD, m.expertInField)}</td>
             <td>${m.lecturerStatus ? getStatusBadge(m.lecturerStatus) : '<span class="badge badge-gray">—</span>'}</td>
             <td><div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm" onclick="App.openMentorModal('${m.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="App.deleteMentor('${m.id}')">🗑️</button></div></td>
         </tr>`).join('')}</tbody></table></div>`;
@@ -5044,8 +5044,8 @@ function _saveCompleteData(solutionId) {
                 <div class="form-group"><label>שם מרצה (ערבית)</label><input type="text" id="fMNameAr" class="form-input" value="${m ? (m.fullNameAr || '') : ''}" placeholder="יישאר ריק אם לא קיים תרגום"></div>
                 <div class="form-group"><label>טלפון נייד</label><input type="tel" id="fMPhone" class="form-input" value="${m ? m.phone || '' : ''}" placeholder="050-0000000" style="direction:ltr;text-align:right;" oninput="App._formatPhoneInput(this)"></div>
                 <div class="form-group"><label>דוא"ל</label><input type="email" id="fMEmail" class="form-input" value="${m ? m.email || '' : ''}" placeholder="example@mail.com"></div>
-                <div class="form-group"><label>מרצה מוסב</label><select id="fMCertified" class="form-select"><option value="">לא צוין</option><option value="true" ${m && m.isCertifiedLecturer === true ? 'selected' : ''}>כן</option><option value="false" ${m && m.isCertifiedLecturer === false ? 'selected' : ''}>לא</option></select></div>
-                <div class="form-group"><label>מומחה בתחומו</label><select id="fMExpert" class="form-select"><option value="">לא צוין</option><option value="true" ${m && m.expertInField === true ? 'selected' : ''}>כן</option><option value="false" ${m && m.expertInField === false ? 'selected' : ''}>לא</option></select></div>
+                <div class="form-group"><label>מרצה מוסב</label><select id="fMCertified" class="form-select"><option value="">לא צוין</option>${getLookupOptions(DataStore.KEYS.LOOKUP_CERTIFIED_LECTURER, m ? m.isCertifiedLecturer : '')}</select></div>
+                <div class="form-group"><label>מומחה בתחומו</label><select id="fMExpert" class="form-select"><option value="">לא צוין</option>${getLookupOptions(DataStore.KEYS.LOOKUP_EXPERT_FIELD, m ? m.expertInField : '')}</select></div>
                 <div class="form-group"><label>סטטוס</label><select id="fMStatus" class="form-select">${_lecturerStatusOpts(m ? m.lecturerStatus : '')}</select></div>
             </div>`,
         `<button class="btn btn-primary" onclick="App.saveMentor()">${m ? '💾 שמור' : '➕ הוסף'}</button><button class="btn btn-outline" onclick="App.closeModal()">ביטול</button>`);
@@ -5078,9 +5078,9 @@ function _saveCompleteData(solutionId) {
             fullNameAr: nameAr || '',
             phone: phone,
             email: email,
-            isCertifiedLecturer: isCertifiedVal === '' ? null : (isCertifiedVal === 'true'),
-            expertInField: isExpertVal === '' ? null : (isExpertVal === 'true'),
-            lecturerStatus: lecturerStatus
+            isCertifiedLecturer: isCertifiedVal || null,
+            expertInField: isExpertVal || null,
+            lecturerStatus: lecturerStatus || null
         };
         
         // Preserve removed fields from existing data
