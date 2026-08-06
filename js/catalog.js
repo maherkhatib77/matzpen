@@ -140,10 +140,21 @@ const CatalogPage = (() => {
         const links = solutionInstructors.filter(si => si.solutionId === solutionId);
         if (!links.length) return '';
         return links.map(link => {
+            // Skip "כוח פנים" entries entirely - do not display them
+            if (link.fullName === 'כוח פנים' || link.performerType === 'כוח פנים') {
+                return '';
+            }
             // If mentorId exists, use mentorsRepo; otherwise use fullName directly from solution_instructors
             if (link.mentorId) {
                 const mentor = mentorsRepo.find(m => m.id === link.mentorId);
-                return mentor ? (lang === 'ar' && mentor.fullNameAr ? mentor.fullNameAr : mentor.fullName) : '';
+                // Priority: fullNameAr (if exists and non-empty) > fullNameHe > fallback
+                if (mentor) {
+                    if (lang === 'ar' && mentor.fullNameAr && mentor.fullNameAr.trim()) {
+                        return mentor.fullNameAr;
+                    }
+                    return lang === 'ar' ? (mentor.fullNameHe || '') : (mentor.fullNameHe || '');
+                }
+                return '';
             } else {
                 // Use fullName from solution_instructors with translation map
                 const fullName = link.fullName || '';
