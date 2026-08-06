@@ -668,18 +668,12 @@ const App = (() => {
                         var s = localStorage.getItem(_LANG_KEY);
                         if (s === 'ar' || s === 'he') return s;
                 } catch (e) {}
-                return 'he'; // Default to Hebrew for Back End
-        }
-
-        function t(key) {
-                var row = UI_STRINGS[key];
-                if (!row) return key;
-                return row[getUiLang()] || row.he || key;
+                return 'he'; // Default to Hebrew for Back End / Dashboard
         }
 
         function _locLabel(item) {
                 if (!item) return '';
-                if (getUiLang() === 'ar') return item.labelAr || item.label || item.value || '';
+                // Always return Hebrew label for dashboard display
                 return item.label || item.labelAr || item.value || '';
         }
 
@@ -754,7 +748,7 @@ const App = (() => {
     function getLookupOptions(key, selectedValue) {
         const items = DataStore.getAll(key) || [];
         return items.filter(i => i.isActive !== false).map(i =>
-            `<option value="${escAttr(i.value)}" ${selectedValue === i.value ? 'selected' : ''}>${escAttr(_locLabel(i))}</option>`
+            `<option value="${escAttr(i.value)}" ${selectedValue === i.value ? 'selected' : ''}>${escAttr(i.label || i.labelAr || i.value)}</option>`
         ).join('');
     }
 
@@ -775,7 +769,8 @@ const App = (() => {
         const items = DataStore.getAll(key) || [];
         const item = items.find(i => i.value === topicValue);
         if (!item) return topicValue;
-        return _locLabel(item) || topicValue;
+        // Always return Hebrew label for dashboard display
+        return item.label || item.labelAr || topicValue;
     }
 
     function _onTopicTypeChange(preSelectValue) {
@@ -813,7 +808,17 @@ const App = (() => {
         const items = DataStore.getAll(key) || [];
         const item = items.find(i => i.value === value);
         if (!item) return value;
-        return _locLabel(item) || value;
+        // Always return Hebrew label for dashboard display
+        return item.label || item.labelAr || item.value || value;
+    }
+
+    /** Get lookup label in Hebrew (for dashboard use) */
+    function getLookupLabelHe(key, value) {
+        if (!value) return '—';
+        const items = DataStore.getAll(key) || [];
+        const item = items.find(i => i.value === value);
+        if (!item) return value;
+        return item.label || item.labelAr || item.value || value;
     }
     
     /** Generate select options for lecturer status lookup table */
@@ -822,7 +827,8 @@ const App = (() => {
         const items = DataStore.getAll(DataStore.KEYS.LOOKUP_LECTURER_STATUS) || [];
         items.forEach(function(o) {
             var sel = (o.value === selected) ? ' selected' : '';
-            html += '<option value="' + escAttr(o.value) + '"' + sel + '>' + escAttr(_locLabel(o) || o.label || o.value) + '</option>';
+            // Always use Hebrew label for dropdown options in dashboard
+            html += '<option value="' + escAttr(o.value) + '"' + sel + '>' + escAttr((o.label || o.labelAr || o.value) || '') + '</option>';
         });
         if (selected && !items.some(i => i.value === selected)) {
             html += '<option value="' + escAttr(selected) + '" selected>' + escAttr(selected) + '</option>';
