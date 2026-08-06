@@ -5010,8 +5010,8 @@ function _saveCompleteData(solutionId) {
     function _renderMentorsTable(items) {
         if (!items.length) return `<div class="empty-state"><div class="empty-icon">👨‍🏫</div><h3>אין מרצים</h3><button class="btn btn-primary" onclick="App.openMentorModal()">➕ הוסף מרצה</button></div>`;
         return `<div class="table-wrapper" style="box-shadow:none;"><table class="data-table"><thead><tr><th>ת.ז.</th><th>שם מרצה (עברית)</th><th>שם מרצה (ערבית)</th><th>טלפון</th><th>דוא"ל</th><th>מרצה מוסב</th><th>מומחה בתחומו</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>
-        ${items.sort((a,b) => (getMentorName(a)||'').localeCompare(getMentorName(b)||'','he')).map(m => `<tr>
-            <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(getMentorName(m))}</strong></td><td>${m.fullNameAr || '—'}</td>
+        ${items.sort((a,b) => (a.fullNameHe||a.fullName||'').localeCompare(b.fullNameHe||b.fullName||'','he')).map(m => `<tr>
+            <td style="direction:ltr">${m.idNumber || '—'}</td><td><strong>${escAttr(m.fullNameHe || m.fullName || '—')}</strong></td><td>${m.fullNameAr || '—'}</td>
             <td style="direction:ltr">${m.phone || '—'}</td><td>${m.email || '—'}</td>
             <td>${getLookupLabel(DataStore.KEYS.LOOKUP_CERTIFIED_LECTURER, m.isCertifiedLecturer)}</td>
             <td>${getLookupLabel(DataStore.KEYS.LOOKUP_EXPERT_FIELD, m.expertInField)}</td>
