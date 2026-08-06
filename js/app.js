@@ -4938,8 +4938,8 @@ function _saveCompleteData(solutionId) {
         var statusColors = { 'אושר': 'var(--success, #16a34a)', 'אושר פדגוגית': 'var(--primary, #2563eb)', 'השלמת פרטים': 'var(--warning, #d97706)', 'נדחה': 'var(--danger, #dc2626)', 'עודכן מרצה': 'var(--info, #0891b2)' };
         var statusOrder = ['אושר', 'אושר פדגוגית', 'השלמת פרטים', 'נדחה', 'עודכן מרצה'];
         statusOrder.forEach(function(s) {
-            var cnt = c.status[s] || 0;
-            html += kpiCard(s, cnt, 'status', s, statusColors[s] || 'var(--gray-500)');
+            var cnt = c.lecturerStatus[s] || 0;
+            html += kpiCard(s, cnt, 'lecturerStatus', s, statusColors[s] || 'var(--gray-500)');
         });
         // Separator
         html += '<div style="width:1px;background:var(--gray-200);margin:0 4px;"></div>';
