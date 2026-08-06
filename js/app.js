@@ -6338,6 +6338,8 @@ function _saveCompleteData(solutionId) {
             { key: DataStore.KEYS.LOOKUP_SOLUTION_STATUS, label: 'סטטוס פתרון למידה' },
             { key: DataStore.KEYS.LOOKUP_PERFORMER_TYPES, label: 'סוג מבצע' },
             { key: DataStore.KEYS.LOOKUP_LECTURER_STATUS, label: 'סטטוס מרצה' },
+            { key: DataStore.KEYS.LOOKUP_CERTIFIED_LECTURER, label: 'מרצה מוסב' },
+            { key: DataStore.KEYS.LOOKUP_EXPERT_FIELD, label: 'מומחה בתחומו' },
             { key: DataStore.KEYS.LOOKUP_FIELD_KNOWLEDGE, label: 'תחום דעת' },
             { key: DataStore.KEYS.LOOKUP_ROLE_HOLDERS, label: 'בעלי תפקידים' },
             { key: DataStore.KEYS.LOOKUP_BROAD_TOPICS, label: 'נושא רוחב' },
