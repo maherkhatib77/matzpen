@@ -3006,7 +3006,7 @@ const App = (() => {
                         phone: mentor.phone,
                         email: mentor.email,
                         performerType: '',
-                        lecturerStatus: mentor.status || '',
+                        lecturerStatus: mentor.lecturerStatus || '',
                         totalAcademicHours: 0,
                         period1Hours: 0,
                         period2Hours: 0
@@ -3768,7 +3768,7 @@ const App = (() => {
                         phone: mentor.phone,
                         email: mentor.email,
                         performerType: '',
-                        lecturerStatus: mentor.status || '',
+                        lecturerStatus: mentor.lecturerStatus || '',
                         totalAcademicHours: 0,
                         period1Hours: 0,
                         period2Hours: 0
@@ -4902,18 +4902,18 @@ function _saveCompleteData(solutionId) {
     // ================================================================
     //  MENTORS (מאגר מרצים)
     // ================================================================
-    var _mentorKpiFilter = null; // { field: 'status'|'isExpert'|'isConverted', value: string|null }
+    var _mentorKpiFilter = null; // { field: 'lecturerStatus'|'expertInField'|'isCertifiedLecturer', value: string|null }
 
     function _mentorKpiCounts(items) {
         var total = items.length;
-        var counts = { total: total, status: {}, isExpert: {}, isConverted: {} };
+        var counts = { total: total, lecturerStatus: {}, expertInField: {}, isCertifiedLecturer: {} };
         items.forEach(function(m) {
-            var s = m.status || '';
-            if (s) counts.status[s] = (counts.status[s] || 0) + 1;
-            var e = m.isExpert || '';
-            if (e) counts.isExpert[e] = (counts.isExpert[e] || 0) + 1;
-            var c = m.isConverted || '';
-            if (c) counts.isConverted[c] = (counts.isConverted[c] || 0) + 1;
+            var s = m.lecturerStatus || '';
+            if (s) counts.lecturerStatus[s] = (counts.lecturerStatus[s] || 0) + 1;
+            var e = m.expertInField || '';
+            if (e) counts.expertInField[e] = (counts.expertInField[e] || 0) + 1;
+            var c = m.isCertifiedLecturer || '';
+            if (c) counts.isCertifiedLecturer[c] = (counts.isCertifiedLecturer[c] || 0) + 1;
         });
         return counts;
     }
@@ -4946,14 +4946,14 @@ function _saveCompleteData(solutionId) {
         // Expert KPIs
         var expColors = { 'הוגשה בקשה': 'var(--warning, #d97706)', 'מומחה בתחומו': 'var(--success, #16a34a)', 'נדחתה הבקשה': 'var(--danger, #dc2626)' };
         ['הוגשה בקשה', 'מומחה בתחומו', 'נדחתה הבקשה'].forEach(function(e) {
-            var cnt = c.isExpert[e] || 0;
-            html += kpiCard(e, cnt, 'isExpert', e, expColors[e] || 'var(--gray-500)');
+            var cnt = c.expertInField[e] || 0;
+            html += kpiCard(e, cnt, 'expertInField', e, expColors[e] || 'var(--gray-500)');
         });
         // Separator
         html += '<div style="width:1px;background:var(--gray-200);margin:0 4px;"></div>';
-        // Converted KPI
-        var convCnt = c.isConverted['מוסב'] || 0;
-        html += kpiCard('מוסב', convCnt, 'isConverted', 'מוסב', 'var(--info, #0891b2)');
+        // Certified Lecturer KPI
+        var certCnt = c.isCertifiedLecturer['מוסב'] || 0;
+        html += kpiCard('מוסב', certCnt, 'isCertifiedLecturer', 'מוסב', 'var(--info, #0891b2)');
         html += '</div>';
         // Active filter indicator
         if (active) {
@@ -4996,9 +4996,9 @@ function _saveCompleteData(solutionId) {
         if (_mentorKpiFilter) {
             var f = _mentorKpiFilter;
             items = items.filter(function(m) {
-                if (f.field === 'status') return (m.status || '') === f.value;
-                if (f.field === 'isExpert') return (m.isExpert || '') === f.value;
-                if (f.field === 'isConverted') return (m.isConverted || '') === f.value;
+                if (f.field === 'lecturerStatus') return (m.lecturerStatus || '') === f.value;
+                if (f.field === 'expertInField') return (m.expertInField || '') === f.value;
+                if (f.field === 'isCertifiedLecturer') return (m.isCertifiedLecturer || '') === f.value;
                 return true;
             });
         }
@@ -7076,19 +7076,20 @@ function _saveCompleteData(solutionId) {
                         existing.updatedAt = nowTs;
                         updatedCount++;
                         if (changedFields.length > 0) {
-                            updateDetails.push({ rowNum: rec._rowNum, idNumber: rec.idNumber, fullName: existing.fullName, changedFields: changedFields });
+                            updateDetails.push({ rowNum: rec._rowNum, idNumber: rec.idNumber, fullName: existing.fullNameHe || existing.fullName, changedFields: changedFields });
                         }
                     } else {
                         // INSERT new record
                         var newMentor = {
                             id: Date.now().toString(36) + Math.random().toString(36).substr(2, 9),
                             idNumber: rec.idNumber || '',
-                            fullName: rec.fullName || '',
+                            fullNameHe: rec.fullNameHe || '',
+                            fullNameAr: rec.fullNameAr || '',
                             phone: rec.phone || '',
                             email: rec.email || '',
-                            isConverted: rec.isConverted || '',
-                            isExpert: rec.isExpert || '',
-                            status: rec.status || '',
+                            isCertifiedLecturer: rec.isCertifiedLecturer || '',
+                            expertInField: rec.expertInField || '',
+                            lecturerStatus: rec.lecturerStatus || '',
                             createdAt: nowTs,
                             updatedAt: nowTs
                         };
@@ -7478,7 +7479,7 @@ function _saveCompleteData(solutionId) {
                             changedFields.push({ field: f, label: _MENTOR_FIELD_LABELS[f] || f, oldVal: oldVal, newVal: newVal });
                         }
                     });
-                    updateMentorRows.push({ rowNum: rowNum, idNumber: rec.idNumber, fullName: existing.fullName || rec.fullName, record: rec, changedFields: changedFields });
+                    updateMentorRows.push({ rowNum: rowNum, idNumber: rec.idNumber, fullName: existing.fullNameHe || existing.fullName || rec.fullNameHe, record: rec, changedFields: changedFields });
                 } else {
                     newMentorRows.push(rec);
                 }
@@ -7749,10 +7750,12 @@ function _saveCompleteData(solutionId) {
 
             if (type === 'mentors') {
                 DataStore.create(DataStore.KEYS.MENTORS, {
-                    idNumber: record.idNumber || '', fullName: record.fullName || '',
+                    idNumber: record.idNumber || '', fullNameHe: record.fullNameHe || record.fullName || '',
+                    fullNameAr: record.fullNameAr || '',
                     phone: record.phone || '', email: record.email || '',
-                    isConverted: record.isConverted || '', isExpert: record.isExpert || '',
-                    status: record.status || ''
+                    isCertifiedLecturer: record.isCertifiedLecturer || '',
+                    expertInField: record.expertInField || '',
+                    lecturerStatus: record.lecturerStatus || ''
                 });
             } else if (type === 'guides_repo') {
                 // Upsert by idNumber
