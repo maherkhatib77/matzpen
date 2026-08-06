@@ -48,6 +48,8 @@ const DataStore = (() => {
         LOOKUP_SOLUTION_STATUS:  'lookup_solution_status',
         LOOKUP_PERFORMER_TYPES:  'lookup_performer_types',
         LOOKUP_LECTURER_STATUS:  'lookup_lecturer_status',
+        LOOKUP_CERTIFIED_LECTURER: 'lookup_certified_lecturer',
+        LOOKUP_EXPERT_FIELD:     'lookup_expert_field',
         LOOKUP_FIELD_KNOWLEDGE:  'lookup_field_knowledge',
         LOOKUP_ROLE_HOLDERS:     'lookup_role_holders',
         LOOKUP_BROAD_TOPICS:     'lookup_broad_topics',
@@ -89,6 +91,8 @@ const DataStore = (() => {
         [KEYS.LOOKUP_SOLUTION_STATUS]:  'lookup_solution_status.json',
         [KEYS.LOOKUP_PERFORMER_TYPES]:  'lookup_performer_types.json',
         [KEYS.LOOKUP_LECTURER_STATUS]:  'lookup_lecturer_status.json',
+        [KEYS.LOOKUP_CERTIFIED_LECTURER]: 'lookup_certified_lecturer.json',
+        [KEYS.LOOKUP_EXPERT_FIELD]:     'lookup_expert_field.json',
         [KEYS.LOOKUP_FIELD_KNOWLEDGE]:  'lookup_field_knowledge.json',
         [KEYS.LOOKUP_ROLE_HOLDERS]:     'lookup_role_holders.json',
         [KEYS.LOOKUP_BROAD_TOPICS]:     'lookup_broad_topics.json',
@@ -372,6 +376,18 @@ const DataStore = (() => {
         { id: 'lls_001', value: 'אושר',           label: 'אושר',           order: 1, isActive: true },
         { id: 'lls_002', value: 'ממתין לאישור',    label: 'ממתין לאישור',    order: 2, isActive: true },
         { id: 'lls_003', value: 'נדחה',           label: 'נדחה',           order: 3, isActive: true }
+    ];
+
+    // --- מרצה מוסב (LOOKUP_CERTIFIED_LECTURER) ---
+    DEFAULT_DATA[KEYS.LOOKUP_CERTIFIED_LECTURER] = [
+        { id: 'lcl_001', value: 'מוסב', label: 'מוסב', order: 1, isActive: true }
+    ];
+
+    // --- מומחה בתחומו (LOOKUP_EXPERT_FIELD) ---
+    DEFAULT_DATA[KEYS.LOOKUP_EXPERT_FIELD] = [
+        { id: 'lef_001', value: 'הוגשה בקשה', label: 'הוגשה בקשה', order: 1, isActive: true },
+        { id: 'lef_002', value: 'מומחה בתחומו', label: 'מומחה בתחומו', order: 2, isActive: true },
+        { id: 'lef_003', value: 'נדחתה הבקשה', label: 'נדחתה הבקשה', order: 3, isActive: true }
     ];
 
     // --- תחום דעת (LOOKUP_FIELD_KNOWLEDGE) ---
