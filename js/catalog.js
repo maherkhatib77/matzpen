@@ -144,41 +144,29 @@ const CatalogPage = (() => {
             if (link.fullName === 'כוח פנים' || link.performerType === 'כוח פנים') {
                 return '';
             }
-            // If mentorId exists, use mentorsRepo; otherwise use fullName directly from solution_instructors
-            if (link.mentorId) {
-                const mentor = mentorsRepo.find(m => m.id === link.mentorId);
-                // Priority: fullNameAr (if exists and non-empty) > fullNameHe > fallback
-                if (mentor) {
-                    if (lang === 'ar' && mentor.fullNameAr && mentor.fullNameAr.trim()) {
-                        return mentor.fullNameAr;
-                    }
-                    return lang === 'ar' ? (mentor.fullNameHe || '') : (mentor.fullNameHe || '');
+            // Must have mentorId to fetch from mentorsRepo
+            if (!link.mentorId) {
+                return '';
+            }
+            const mentor = mentorsRepo.find(m => m.id === link.mentorId);
+            if (!mentor) {
+                return '';
+            }
+            // Priority: fullNameAr (if exists and non-empty) > fullNameHe
+            if (lang === 'ar') {
+                if (mentor.fullNameAr && mentor.fullNameAr.trim()) {
+                    return mentor.fullNameAr;
+                }
+                // Fallback to fullNameHe only if fullNameAr is empty
+                if (mentor.fullNameHe && mentor.fullNameHe.trim()) {
+                    return mentor.fullNameHe;
                 }
                 return '';
-            } else {
-                // Use fullName from solution_instructors with translation map
-                const fullName = link.fullName || '';
-                if (!fullName) return '';
-                // Translate to Arabic if needed
-                if (lang === 'ar' && MENTOR_NAME_TRANSLATIONS[fullName]) {
-                    return MENTOR_NAME_TRANSLATIONS[fullName];
-                }
-                return fullName;
             }
+            // For Hebrew, return fullNameHe
+            return mentor.fullNameHe || '';
         }).filter(Boolean).join(', ');
     }
-
-    // Mentor name translations (Hebrew → Arabic)
-    const MENTOR_NAME_TRANSLATIONS = {
-        'אחלאם חגאזי': 'أحلام حجازي',
-        'אייאד כנאענה': 'إياد كناعنة',
-        "אלח'נסא דיאב": 'الخنساء دياب',
-        'גואד דויק': 'جواد دويك',
-        'מייסון מילחם': 'ميسون ملحهم',
-        'נאיל אבו יוסף': 'نائل أبو يوسف',
-        'נבין סולימאן': 'نبين سليمان',
-        'נזיה אנסארי': 'نزية أنصاري'
-    };
 
     function formatDate(dateStr) {
         if (!dateStr) return '—';
