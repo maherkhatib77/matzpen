@@ -1,3 +1,3 @@
-(js/catalog.js is a source file, so no additional ignores are needed)
+(js/catalog.js is a source file, so no need to ignore it)
 
-# No additional ignores required for source file modifications only
+Nothing to add to .gitignore.
