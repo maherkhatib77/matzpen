@@ -736,6 +736,13 @@ const App = (() => {
         }
         // פונקציית toggleUiLang הוסרה - Back End עברי בלבד ללא החלפת שפה
         function __ms_translateHeader() { _translateTextNodes(document.getElementById('headerTitle')); }
+        
+        // פונקציית תרגום - מחזירה את התווית בשפה הנוכחית (ברירת מחדל: עברית ל-Back End)
+        function t(key) {
+            if (!UI_STRINGS[key]) return key;
+            var lang = getUiLang();
+            return lang === 'ar' ? UI_STRINGS[key].ar : UI_STRINGS[key].he;
+        }
 
         // חשיפה גלובלית
         window.getUiLang = getUiLang;
