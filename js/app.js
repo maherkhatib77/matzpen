@@ -10417,21 +10417,44 @@ function _saveCompleteData(solutionId) {
         }
         closeModal();
         confirmDialog('⚠️ למחוק את כל הנתונים לצמיתות? פעולה זו בלתי הפיכה!', function() {
+            // רשימה מלאה של כל הטבלאות למחיקה (למעט users - מטופל בנפרד)
             const TABLES_TO_CLEAR = [
-                'inspectors', 'pedagogical_executors', 'schools',
+                // טבלאות ערכים
+                'inspectors', 'pedagogical_executors', 'schools', 
                 'lookup_solution_status', 'lookup_education_stages', 'lookup_education_types',
                 'lookup_week_days', 'lookup_meeting_types', 'lookup_budgeted',
                 'lookup_allocation_status', 'lookup_performer_types', 'lookup_lecturer_status',
                 'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
                 'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
-                'lookup_responsibility_types',
-                'solutions', 'solution_instructors', 'solution_comments', 'catalog_items',
-                'mentors', 'guides_repo', 'faq_data', 'custom_pages',
-                'users', 'budgets', 'periods', 'registrations',
-                'activity_log', 'recycle_bin'
+                'lookup_responsibility_types', 'lookup_user_roles', 'lookup_schools',
+                // קטלוג פתרונות למידה
+                'solutions', 'solution_instructors', 'solution_comments', 'catalog_items', 'catalog_entries',
+                // מאגר מרצים
+                'mentors',
+                // מאגר מדריכים
+                'guides_repo',
+                // שאלות נפוצות
+                'faq_data',
+                // יצירת דף חדש
+                'custom_pages',
+                // קטגוריות
+                'categories',
+                // תקציבים ותקופות
+                'budgets', 'periods',
+                // נרשמים לפתרונות למידה
+                'registrations',
+                // מעקב והיסטוריה
+                'activity_log',
+                // סל מחזור
+                'recycle_bin',
+                // הגדרות ודף שער
+                'settings', 'homepage',
+                // מוסדות
+                'institutions', 'institutions_east_jerusalem'
             ];
             
             let totalDeleted = 0;
+            
             // שלב 1: ניקוי מיידי של localStorage - זה חייב להצליח
             TABLES_TO_CLEAR.forEach(function(key) {
                 var storeKey = 'matspanet_' + key;
@@ -10448,17 +10471,60 @@ function _saveCompleteData(solutionId) {
                 }
             });
             
-            // שלב 2: שמירת מערכים ריקים בשרת (fire-and-forget - לא קריטי אם נכשל)
+            // שלב 2: שמירת מערכים ריקים בשרת לכל הטבלאות (fire-and-forget)
             TABLES_TO_CLEAR.forEach(function(key) {
                 try {
                     DataStore.saveAll(key, []);
                 } catch(e) {
-                    // מתעטלים שגיאות שמירה לשרת - הנתונים כבר נמחקו מ-localStorage
+                    // מתעלמים משגיאות שמירה לשרת - הנתונים כבר נמחקו מ-localStorage
                 }
             });
             
-            logActivity('clear_all', 'נקה הכל - נמחקו ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות', 'settings');
-            showToast('הכל נמחק! ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות. מרענן...', 'success');
+            // שלב 3: טיפול מיוחד ב-users.json - שמירה על משתמש admin בלבד
+            try {
+                var usersData = localStorage.getItem('matspanet_users');
+                if (usersData) {
+                    try {
+                        var users = JSON.parse(usersData);
+                        var adminUser = users.find(function(u) { return u.username === 'admin'; });
+                        // אם אין admin, ניצור אחד ברירת מחדל
+                        if (!adminUser) {
+                            adminUser = {
+                                id: 'usr_admin_001',
+                                username: 'admin',
+                                password: 'admin123',
+                                fullName: 'מנהל מערכת',
+                                email: 'admin@matspanet.co.il',
+                                role: 'system_admin',
+                                isActive: true,
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            };
+                        }
+                        // נשמור רק את ה-admin
+                        DataStore.saveAll('users', [adminUser]);
+                        totalDeleted += (users.length - 1); // נחסיר את ה-admin מהספירה
+                    } catch(e) {
+                        // אם יש שגיאה, נשמור admin ברירת מחדל
+                        DataStore.saveAll('users', [{
+                            id: 'usr_admin_001',
+                            username: 'admin',
+                            password: 'admin123',
+                            fullName: 'מנהל מערכת',
+                            email: 'admin@matspanet.co.il',
+                            role: 'system_admin',
+                            isActive: true,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        }]);
+                    }
+                }
+            } catch(e) {
+                // מתעלמים משגיאות בטיפול ב-users
+            }
+            
+            logActivity('clear_all', 'נקה הכל - נמחקו ' + totalDeleted + ' רשומות מ-' + (TABLES_TO_CLEAR.length + 1) + ' טבלאות', 'settings');
+            showToast('הכל נמחק! ' + totalDeleted + ' רשומות נמחקו. משתמש admin נשמר. מרענן...', 'success');
             setTimeout(function() { window.location.reload(); }, 1500);
         });
     }
