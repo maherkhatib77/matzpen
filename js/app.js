@@ -10354,7 +10354,7 @@ function _saveCompleteData(solutionId) {
             // טבלאות ערכים
             'inspectors', 'pedagogical_executors', 'schools', 
             'lookup_solution_status', 'lookup_education_stages', 'lookup_education_types',
-            'lookup_week_days', 'lookup_meeting_types', 'lookup_budgeted',
+            'lookup_week_days', 'lookup_meeting_types', 'lookup_budget_types', 'lookup_field_knowledge',
             'lookup_allocation_status', 'lookup_performer_types', 'lookup_lecturer_status',
             'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
             'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
@@ -10390,7 +10390,7 @@ function _saveCompleteData(solutionId) {
             '<p style="color:var(--gray-500);margin-bottom:16px;font-size:13px;">פעולה זו תמחק את כל הנתונים מהמערכת לצמיתות, כולל:</p>' +
             '<div style="text-align:right;background:var(--gray-50);padding:12px;border-radius:8px;font-size:12px;color:var(--gray-600);max-height:200px;overflow-y:auto;">' +
             '<strong>📋 רשימת הטבלאות שימחקו (' + TABLES_TO_CLEAR.length + '):</strong><br>' +
-            '• טבלאות ערכים (מפקחים, מבצעים, בתי ספר, שלבים, סוגים, ימים, מפגשים, תקצוב, סטטוסים, מרצים, מומחים, תחומי דעת, בעלי תפקידים, נושאי רוחב, תוכניות ייעודיות, סוגי אחריות)<br>' +
+            '• טבלאות ערכים (מפקחים, מבצעים, בתי ספר, שלבים, סוגים, ימים, מפגשים, סוגי תקציב, תחומי דעת, תקצוב, סטטוסים, מרצים, מומחים, תחומי דעת, בעלי תפקידים, נושאי רוחב, תוכניות ייעודיות, סוגי אחריות)<br>' +
             '• קטלוג פתרונות למידה (כולל מדריכים ו הערות)<br>' +
             '• מאגר מרצים<br>' +
             '• מאגר מדריכים<br>' +
@@ -10422,7 +10422,7 @@ function _saveCompleteData(solutionId) {
                 // טבלאות ערכים
                 'inspectors', 'pedagogical_executors', 'schools', 
                 'lookup_solution_status', 'lookup_education_stages', 'lookup_education_types',
-                'lookup_week_days', 'lookup_meeting_types', 'lookup_budgeted',
+                'lookup_week_days', 'lookup_meeting_types', 'lookup_budget_types', 'lookup_field_knowledge',
                 'lookup_allocation_status', 'lookup_performer_types', 'lookup_lecturer_status',
                 'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
                 'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
