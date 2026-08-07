@@ -10432,15 +10432,28 @@ function _saveCompleteData(solutionId) {
             ];
             
             let totalDeleted = 0;
+            // שלב 1: ניקוי מיידי של localStorage - זה חייב להצליח
             TABLES_TO_CLEAR.forEach(function(key) {
-                var data = DataStore.getAll(key);
+                var storeKey = 'matspanet_' + key;
+                var data = localStorage.getItem(storeKey);
                 if (data) {
-                    var count = Array.isArray(data) ? data.length : (typeof data === 'object' && data !== null ? Object.keys(data).length : 0);
-                    totalDeleted += count;
-                    var storeKey = 'matspanet_' + key;
+                    try {
+                        var parsed = JSON.parse(data);
+                        var count = Array.isArray(parsed) ? parsed.length : (typeof parsed === 'object' && parsed !== null ? Object.keys(parsed).length : 0);
+                        totalDeleted += count;
+                    } catch(e) {
+                        totalDeleted += 0;
+                    }
                     localStorage.removeItem(storeKey);
-                    // שמירה גם בשרת - כתיבת מערך ריק לקובץ JSON
+                }
+            });
+            
+            // שלב 2: שמירת מערכים ריקים בשרת (fire-and-forget - לא קריטי אם נכשל)
+            TABLES_TO_CLEAR.forEach(function(key) {
+                try {
                     DataStore.saveAll(key, []);
+                } catch(e) {
+                    // מתעטלים שגיאות שמירה לשרת - הנתונים כבר נמחקו מ-localStorage
                 }
             });
             
