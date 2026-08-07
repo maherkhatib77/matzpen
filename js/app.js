@@ -10442,7 +10442,6 @@ function _saveCompleteData(solutionId) {
                 }
             });
             
-            DataStore.init();
             logActivity('clear_all', 'נקה הכל - נמחקו ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות', 'settings');
             showToast('הכל נמחק! ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות. מרענן...', 'success');
             setTimeout(function() { window.location.reload(); }, 1500);
