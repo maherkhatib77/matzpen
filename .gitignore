@@ -1,1 +1,4 @@
-(js/app.js and js/data.js are source files, no build artifacts, dependencies, or temp files in the changes)
+```
+# Data files
+data/*.json
+```
