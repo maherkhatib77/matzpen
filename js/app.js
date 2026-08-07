@@ -10439,6 +10439,8 @@ function _saveCompleteData(solutionId) {
                     totalDeleted += count;
                     var storeKey = 'matspanet_' + key;
                     localStorage.removeItem(storeKey);
+                    // שמירה גם בשרת - כתיבת מערך ריק לקובץ JSON
+                    DataStore.saveAll(key, []);
                 }
             });
             
