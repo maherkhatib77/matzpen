@@ -10067,7 +10067,7 @@ function _saveCompleteData(solutionId) {
         lookup_broad_topics: 'נושאים רחבים', lookup_designated_programs: 'תוכניות ייעוד',
         lookup_week_days: 'ימים בשבוע', lookup_meeting_types: 'סוגי מפגש',
         solution_comments: 'הערות פתרונות',
-        catalog_entries: 'רשומות קטלוג', registrations: 'נרשמים לפתרונות למידה',
+        catalog_entries: 'רשומות קטלוג', catalog_items: 'פריטי קטלוג', registrations: 'נרשמים לפתרונות למידה',
         settings: 'הגדרות אתר',
         recycle_bin: 'סל מחזור', inspectors: 'מפקחים',
         pedagogical_executors: 'מבצעים פדגוגיים',
@@ -10360,7 +10360,7 @@ function _saveCompleteData(solutionId) {
             'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
             'lookup_responsibility_types',
             // קטלוג פתרונות למידה
-            'solutions', 'solution_instructors', 'solution_comments',
+            'solutions', 'solution_instructors', 'solution_comments', 'catalog_items',
             // מאגר מרצים
             'mentors',
             // מאגר מדריכים
@@ -10425,7 +10425,7 @@ function _saveCompleteData(solutionId) {
                 'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
                 'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
                 'lookup_responsibility_types',
-                'solutions', 'solution_instructors', 'solution_comments',
+                'solutions', 'solution_instructors', 'solution_comments', 'catalog_items',
                 'mentors', 'guides_repo', 'faq_data', 'custom_pages',
                 'users', 'budgets', 'periods', 'registrations',
                 'activity_log', 'recycle_bin'

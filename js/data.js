@@ -59,6 +59,7 @@ const DataStore = (() => {
         LOOKUP_SCHOOLS:          'lookup_schools',
         SOLUTION_COMMENTS:      'solution_comments',
         CATALOG_ENTRIES:         'catalog_entries',
+        CATALOG_ITEMS:           'catalog_items',
         REGISTRATIONS:           'registrations',
         SETTINGS:                'settings',
         SESSION:                 'session',
@@ -102,6 +103,7 @@ const DataStore = (() => {
         [KEYS.INSTITUTIONS]:            'institutions.json',
         [KEYS.SOLUTION_COMMENTS]:      'solution_comments.json',
         [KEYS.CATALOG_ENTRIES]:         'catalog_entries.json',
+        [KEYS.CATALOG_ITEMS]:           'catalog_items.json',
         [KEYS.REGISTRATIONS]:           'registrations.json',
         [KEYS.SETTINGS]:                'settings.json',
         [KEYS.ACTIVITY_LOG]:            'activity_log.json',
@@ -313,6 +315,9 @@ const DataStore = (() => {
 
     // --- דפים מותאמים אישית (CUSTOM_PAGES) – רשימה ריקה ---
     DEFAULT_DATA[KEYS.CUSTOM_PAGES] = [];
+
+    // --- פריטי קטלוג פתרונות למידה (CATALOG_ITEMS) – רשימה ריקה ---
+    DEFAULT_DATA[KEYS.CATALOG_ITEMS] = [];
 
     // --- תחום פתרון למידה (LOOKUP_DOMAINS) ---
     DEFAULT_DATA[KEYS.LOOKUP_DOMAINS] = [
