@@ -73,12 +73,11 @@ const DataStore = (() => {
     };
 
     // מיפוי מפתח → שם קובץ JSON
-    // הערה: MENTORS הוסר מהמיפוי כדי למנוע טעינה אוטומטית של קובץ גדול ל-localStorage
     const KEY_TO_FILE = {
         [KEYS.USERS]:                   'users.json',
         [KEYS.CATEGORIES]:              'categories.json',
         [KEYS.SOLUTIONS]:                'solutions.json',
-        // [KEYS.MENTORS]:                 'mentors.json', // הוסר - יש לייבא ידנית דרך הממשק
+        // [KEYS.MENTORS]:                 'mentors.json', // הוסר - הקובץ גדול מדי ל-localStorage (5.6MB)
         [KEYS.GUIDES_REPO]:             'guides_repo.json',
         [KEYS.BUDGETS]:                 'budgets.json',
         [KEYS.PERIODS]:                 'periods.json',
@@ -931,12 +930,6 @@ const DataStore = (() => {
             if (stored !== null) continue;
             const filename = KEY_TO_FILE[key];
             if (!filename) continue;
-            
-            // דילוג על מאגר מרצים - הקובץ גדול מדי ל-localStorage (חורג מ-5MB)
-            if (key === KEYS.MENTORS) {
-                console.log('[DataStore] ⚠️ דילוג על טעינת מאגר המרצים מקובץ JSON - יש לייבא ידנית דרך הממשק');
-                continue;
-            }
             
             const data = await fetchJsonFile(filename);
             if (data !== null) {
