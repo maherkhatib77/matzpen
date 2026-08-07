@@ -1,3 +1,5 @@
-(js/catalog.js is a source file, so no need to ignore it)
+(js/app.js is a source file, and there are no build artifacts, dependencies, or temp files in the changes)
 
-Nothing to add to .gitignore.
+```javascript
+
+```

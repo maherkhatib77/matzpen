@@ -6849,7 +6849,7 @@ function _saveCompleteData(solutionId) {
                         <button class="btn btn-outline btn-block" onclick="App.exportCSV('schools')">📤 רשימת בתי ספר (CSV)</button>
                     </div>
                     <hr style="margin:16px 0;border:none;border-top:1px solid var(--gray-200);">
-                    <button class="btn btn-success btn-block" onclick="App.exportJSON()">💾 גיבוי מלא (JSON)</button>
+                    <button class="btn btn-success btn-block" onclick="App.backupFull()">💾 גיבוי מלא (JSON)</button>
                 </div></div>
                 <div class="card"><div class="card-header"><span class="card-title">📥 ייבוא נתונים</span></div><div class="card-body">
                     <p style="color:var(--gray-500);margin-bottom:16px;">ייבוא Excel/CSV עם אשף מיפוי עמודות</p>
@@ -6923,6 +6923,7 @@ function _saveCompleteData(solutionId) {
 
     function exportJSON() {
         const data = DataStore.exportAllData();
+        data.__backup_meta = { type: 'full', timestamp: new Date().toISOString(), version: '2.0', tableCount: Object.keys(data).length - 1 };
         downloadFile(JSON.stringify(data, null, 2), `matspanet_backup_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
         showToast('גיבוי יוצא בהצלחה', 'success');
     }
@@ -7970,8 +7971,30 @@ function _saveCompleteData(solutionId) {
         const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            try { DataStore.importData(JSON.parse(e.target.result), true); showToast('הנתונים יובאו! מרענן...', 'success'); setTimeout(() => window.location.reload(), 1500); }
-            catch(err) { showToast('שגיאה בקריאת JSON', 'error'); }
+            try {
+                var data = JSON.parse(e.target.result);
+                // תמיכה בייבוא קבצי גיבוי עם __backup_meta (שחזור מלא) או ללא (ייבוא רגיל)
+                if (data.__backup_meta) {
+                    // שחזור מלא מקובץ גיבוי - משתמש בפונקציה הקיימת
+                    App._pendingRestoreData = data;
+                    confirmDialog('⚠️ נמצא קובץ גיבוי עם ' + Object.keys(data).filter(function(k){return k!=='__backup_meta';}).length + ' טבלאות\nהאם לבצע שחזור מלא של כל הטבלאות?', function() {
+                        var tablesInFile = Object.keys(data).filter(function(k) { return k !== '__backup_meta'; });
+                        var applied = 0;
+                        tablesInFile.forEach(function(k) {
+                            try { DataStore.saveAll(k, data[k]); applied++; } catch(e) { console.error('[Import] Error restoring', k, e); }
+                        });
+                        logActivity('restore_full', 'ייבוא גיבוי (' + applied + ' טבלאות)', 'settings');
+                        showToast('✅ ייבוא הושלם — ' + applied + ' טבלאות שוחזרו בהצלחה. מרענן...', 'success');
+                        setTimeout(function() { window.location.reload(); }, 1500);
+                    });
+                } else {
+                    // ייבוא רגיל ללא מטא-נתונים
+                    DataStore.importData(data, true);
+                    showToast('הנתונים יובאו! מרענן...', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            }
+            catch(err) { showToast('שגיאה בקריאת JSON: ' + err.message, 'error'); }
         };
         reader.readAsText(file); input.value = '';
     }
@@ -9635,37 +9658,27 @@ function _saveCompleteData(solutionId) {
                 '</div>' +
             '</div>' +
 
-            // ===== Card 3: Data Management (Gray) =====
+            // ===== Card 3: Data Management & Backup/Restore (Combined) =====
             '<div class="card" style="border-top:4px solid #6b7280;margin-bottom:24px;">' +
-                '<div class="card-header"><span class="card-title">⚙️ ניהול נתונים</span></div>' +
-                '<div class="card-body">' +
-                    '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">' +
-                        '<button class="btn btn-outline" onclick="App.exportJSON()" style="font-size:13px;">📤 ייצא נתונים</button>' +
-                        '<button class="btn btn-outline" onclick="App._triggerDataImport()" style="font-size:13px;">📥 ייבא נתונים</button>' +
-                        '<button class="btn btn-outline" onclick="App._checkDataIntegrity()" style="font-size:13px;">✅ בדיקת תקינות</button>' +
-                        '<button class="btn btn-warning" onclick="App.resetData()" style="font-size:13px;">🔄 אתחול נתוני הדגמה</button>' +
-                        '<button class="btn btn-danger" onclick="App.clearData()" style="font-size:13px;">🗑️ נקה הכל</button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-
-            // ===== Card 4: Backup & Restore (Burgundy) =====
-            '<div class="card" style="border-top:4px solid #7f1d1d;margin-bottom:24px;">' +
-                '<div class="card-header"><span class="card-title">💾 גיבוי ושחזור</span></div>' +
+                '<div class="card-header"><span class="card-title">💾 ניהול נתונים, גיבוי ושחזור</span></div>' +
                 '<div class="card-body">' +
                     // Description
                     '<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 16px;margin-bottom:20px;direction:rtl;text-align:right;">' +
                         '<p style="margin:0 0 6px 0;font-size:13px;color:var(--gray-600);line-height:1.6;">' +
-                            '💾 <strong>גיבוי</strong> — יוצר עותק מלא של כל קבצי ה-JSON ומוריד למחשב. הנתונים כוללים את כל ' + tableKeys.length + ' הטבלאות במערכת.' +
+                            '💾 <strong>גיבוי מלא</strong> — יוצר עותק מלא של כל ' + tableKeys.length + ' הטבלאות במערכת ומוריד למחשב כקובץ JSON.' +
                         '</p>' +
                         '<p style="margin:0;font-size:13px;color:var(--gray-600);line-height:1.6;">' +
-                            '🔄 <strong>שחזור</strong> — טוען קובץ גיבוי ומאפשר לבחור אילו טבלאות לשחזר (ברירת מחדל: הכל). <span style="color:#991b1b;font-weight:500;">⚠️ הנתונים הקיימים יוחלפו.</span>' +
+                            '🔄 <strong>שחזור מלא</strong> — טוען קובץ גיבוי ומשחזר את כל הטבלאות שנכללו בו. <span style="color:#991b1b;font-weight:500;">⚠️ הנתונים הקיימים יוחלפו לחלוטין.</span>' +
                         '</p>' +
                     '</div>' +
-                    // Full backup/restore buttons
-                    '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--gray-200);">' +
+                    // Main action buttons
+                    '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--gray-200);">' +
                         '<button class="btn btn-primary" id="btnBackupFull" onclick="App._backupFullCard()" style="font-size:14px;padding:10px 20px;" title="יצירת גיבוי מלא של כל הטבלאות והורדה למחשב">💾 גיבוי מלא – כל הנתונים</button>' +
-                        '<button class="btn btn-outline" onclick="App._triggerFullRestore()" style="font-size:14px;padding:10px 20px;" title="טעינת קובץ גיבוי ובחירת טבלאות לשחזור">🔄 שחזור מקובץ גיבוי</button>' +
+                        '<button class="btn btn-outline" onclick="App._triggerFullRestore()" style="font-size:14px;padding:10px 20px;" title="טעינת קובץ גיבוי ושחזור מלא של כל הטבלאות">🔄 שחזור מלא מקובץ גיבוי</button>' +
+                        '<button class="btn btn-outline" onclick="App.exportJSON()" style="font-size:13px;">📤 ייצוא נתונים</button>' +
+                        '<button class="btn btn-outline" onclick="App._triggerDataImport()" style="font-size:13px;">📥 ייבוא נתונים</button>' +
+                        '<button class="btn btn-outline" onclick="App._checkDataIntegrity()" style="font-size:13px;">✅ בדיקת תקינות</button>' +
+                        '<button class="btn btn-danger" onclick="App.clearData()" style="font-size:13px;">🗑️ נקה הכל</button>' +
                     '</div>' +
                     // Status legend
                     '<div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;">' +
@@ -10246,7 +10259,17 @@ function _saveCompleteData(solutionId) {
         try {
             var data = await _readBackupFile(fileInput);
             if (!data.__backup_meta) { showToast('❌ קובץ הגיבוי אינו תקין – חסר metadata', 'error'); return; }
-            _showSelectiveRestoreModal(data);
+            // שחזור מלא - משחזר את כל הטבלאות ללא בחירה
+            var tablesInFile = Object.keys(data).filter(function(k) { return k !== '__backup_meta'; });
+            confirmDialog('⚠️ שחזור מלא של ' + tablesInFile.length + ' טבלאות\\nהנתונים הקיימים יוחלפו לחלוטין. להמשיך?', function() {
+                var applied = 0;
+                tablesInFile.forEach(function(k) {
+                    try { DataStore.saveAll(k, data[k]); applied++; } catch(e) { console.error('[Restore] Error restoring', k, e); }
+                });
+                logActivity('restore_full', 'שחזור מלא (' + applied + ' טבלאות)', 'settings');
+                showToast('✅ שחזור מלא הושלם — ' + applied + ' טבלאות שוחזרו בהצלחה. מרענן...', 'success');
+                setTimeout(function() { window.location.reload(); }, 1500);
+            });
             fileInput.value = '';
         } catch (err) {
             showToast('❌ ' + err, 'error');
@@ -10276,14 +10299,8 @@ function _saveCompleteData(solutionId) {
     }
 
     function resetData() {
-        confirmDialog('לאתחל את כל הנתונים?', () => {
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('matspanet_')) keysToRemove.push(k); }
-            keysToRemove.forEach(k => localStorage.removeItem(k));
-            DataStore.init();
-            showToast('הנתונים אותחלו! מרענן...', 'success');
-            setTimeout(() => window.location.reload(), 1500);
-        });
+        // פונקציה זו הוסרה - אין יותר נתוני הדגמה במערכת
+        console.warn('resetData() deprecated - demo data removed');
     }
 
     function clearData() {
