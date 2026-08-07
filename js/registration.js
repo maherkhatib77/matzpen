@@ -34,7 +34,7 @@ const RegistrationPage = (() => {
                 console.warn('[Registration] DataStore.init timed out, starting setup anyway.');
                 setup();
             }, 6000);
-            DataStore.init().then(function() {
+            DataStore.init(true).then(function() {
                 clearTimeout(_initTimeout);
                 setup();
             }).catch(function(err) {
