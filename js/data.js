@@ -894,12 +894,22 @@ const DataStore = (() => {
      *
      * @returns {Promise<void>}
      */
-    async function init() {
+    async function init(forceReloadFromServer = false) {
         // בדיקת גרסה – מעבר גרסאות חכם (ללא מחיקת נתוני משתמש)
         const storedVersion = localStorage.getItem(VERSION_KEY);
         if (storedVersion && storedVersion !== DATA_VERSION) {
             // גרסה השתנתה – אין מחיקת נתונים! רק מילוי מפתחות חסרים להלן.
             console.log(`[DataStore] 🔄 Version changed: ${storedVersion} → ${DATA_VERSION}. Preserving existing data, filling missing keys.`);
+        }
+
+        // אם forceReloadFromServer=true, ננקה את כל ה-localStorage ונטען הכל מחדש מהשרת
+        if (forceReloadFromServer) {
+            console.log('[DataStore] 🔄 Force reloading all data from server...');
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith(STORAGE_PREFIX)) {
+                    localStorage.removeItem(key);
+                }
+            });
         }
 
         // טעינת טבלאות ערכים תמיד מ-JSON (כדי לקבל labelAr עדכני) - רק אם לא קיים ב-localStorage

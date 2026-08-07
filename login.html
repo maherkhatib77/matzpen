@@ -549,7 +549,8 @@ button{font-family:inherit}
         release();
       };
       try {
-        var p = DataStore.init();
+        // אתחול עם טעינה מחדש מהשרת כדי לוודא שהנתונים עדכניים
+        var p = DataStore.init(true);
         if (p && typeof p.then === 'function') p.then(finishInit, finishInit);
         else finishInit();
       } catch (e) { finishInit(); }
