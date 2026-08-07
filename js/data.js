@@ -897,7 +897,7 @@ const DataStore = (() => {
             console.log(`[DataStore] 🔄 Version changed: ${storedVersion} → ${DATA_VERSION}. Preserving existing data, filling missing keys.`);
         }
 
-        // טעינת טבלאות ערכים תמיד מ-JSON (כדי לקבל labelAr עדכני)
+        // טעינת טבלאות ערכים תמיד מ-JSON (כדי לקבל labelAr עדכני) - רק אם לא קיים ב-localStorage
         const lookupKeys = [
             KEYS.LOOKUP_DOMAINS, KEYS.LOOKUP_EDUCATION_STAGES, KEYS.LOOKUP_EDUCATION_TYPES,
             KEYS.LOOKUP_BUDGET_TYPES, KEYS.LOOKUP_ALLOCATION_STATUS, KEYS.LOOKUP_SOLUTION_STATUS,
@@ -908,8 +908,11 @@ const DataStore = (() => {
         ];
         const loadedFromFiles = new Set();
 
-        // Load lookup files sequentially to avoid overwhelming the server
+        // Load lookup files sequentially to avoid overwhelming the server - ONLY if not in localStorage
         for (const key of lookupKeys) {
+            const stored = localStorage.getItem(getKey(key));
+            if (stored !== null) continue; // Skip if already in localStorage
+            
             const filename = KEY_TO_FILE[key];
             if (!filename) continue;
             const data = await fetchJsonFile(filename);
@@ -927,7 +930,8 @@ const DataStore = (() => {
         // Load non-lookup files sequentially (only if not in localStorage)
         for (const key of nonLookupKeys) {
             const stored = localStorage.getItem(getKey(key));
-            if (stored !== null) continue;
+            if (stored !== null) continue; // Skip if already in localStorage
+            
             const filename = KEY_TO_FILE[key];
             if (!filename) continue;
             
