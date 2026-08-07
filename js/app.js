@@ -9543,13 +9543,48 @@ function _saveCompleteData(solutionId) {
 
     function _updateBackupStatusUI() {
         var tableKeys = Object.keys(BACKUP_TABLE_META);
+        var freshCount = 0, oldCount = 0, staleCount = 0, noneCount = 0;
+        
         tableKeys.forEach(function(k) {
             var st = _getBackupStatus(k);
             var dot = document.getElementById('backup-dot-' + k);
             var dateEl = document.getElementById('backup-date-' + k);
             if (dot) { dot.style.background = st.color; dot.title = st.label; }
             if (dateEl) dateEl.textContent = st.date || '—';
+            
+            // Count status types
+            if (st.status === 'fresh') freshCount++;
+            else if (st.status === 'old') oldCount++;
+            else if (st.status === 'stale') staleCount++;
+            else noneCount++;
         });
+        
+        // Update summary badge
+        var badge = document.getElementById('backupSummaryBadge');
+        var summaryText = document.getElementById('backupSummaryText');
+        if (badge && summaryText) {
+            if (noneCount > 0) {
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#991b1b';
+                badge.textContent = 'דרוש גיבוי';
+                summaryText.textContent = noneCount + ' טבלאות ללא גיבוי';
+            } else if (staleCount > 0) {
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.textContent = 'גיבוי ישן';
+                summaryText.textContent = staleCount + ' טבלאות עם גיבוי ישן (>30 יום)';
+            } else if (oldCount > 0) {
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.textContent = 'שים לב';
+                summaryText.textContent = oldCount + ' טבלאות עם גיבוי עד 30 יום';
+            } else {
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#166534';
+                badge.textContent = 'תקין';
+                summaryText.textContent = 'כל הטבלאות מעודכנות (עד 7 ימים)';
+            }
+        }
     }
 
     function _triggerFullRestore() {
@@ -9680,16 +9715,27 @@ function _saveCompleteData(solutionId) {
                         '<button class="btn btn-outline" onclick="App._checkDataIntegrity()" style="font-size:13px;">✅ בדיקת תקינות</button>' +
                         '<button class="btn btn-danger" onclick="App.clearData()" style="font-size:13px;">🗑️ נקה הכל</button>' +
                     '</div>' +
-                    // Status legend
-                    '<div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;">' +
-                        '<span style="font-size:12px;font-weight:600;color:var(--gray-500);">מצב גיבוי:</span>' +
-                        '<span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-500);"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;"></span> עדכני (עד 7 ימים)</span>' +
-                        '<span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-500);"><span style="width:10px;height:10px;border-radius:50%;background:#eab308;display:inline-block;"></span> ישן (עד 30 יום)</span>' +
-                        '<span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-500);"><span style="width:10px;height:10px;border-radius:50%;background:var(--gray-400);display:inline-block;"></span> מאוד ישן</span>' +
-                        '<span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-500);"><span style="width:10px;height:10px;border-radius:50%;background:var(--gray-300);display:inline-block;"></span> ללא גיבוי</span>' +
+                    // Enhanced description with export/import clarification
+                    '<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-bottom:16px;direction:rtl;text-align:right;">' +
+                        '<p style="margin:0;font-size:12px;color:#0369a1;line-height:1.6;">' +
+                            '📤 <strong>ייצוא נתונים</strong> — מייצא את כל הנתונים לקובץ CSV/Excel לצורך ניתוח או דיווח חיצוני. לא מתאים לשחזור!<br>' +
+                            '📥 <strong>ייבוא נתונים</strong> — מיזוג נתונים מקובץ חיצוני לתוך הטבלאות הקיימות. לא מחליף נתונים קיימים!' +
+                        '</p>' +
                     '</div>' +
-                    '<p style="font-size:12px;color:var(--gray-400);margin-bottom:14px;">גיבוי ושחזור לפי טבלה בודדת. לחצו על "גיבוי" להורדת הטבלה, או "שחזור" לטעינת קובץ.</p>' +
-                    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;max-height:480px;overflow-y:auto;padding:2px;">' +
+                    // Compact status summary
+                    '<div style="background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:1px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:16px;">' +
+                        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">' +
+                            '<div style="display:flex;align-items:center;gap:10px;">' +
+                                '<span style="font-size:13px;font-weight:600;color:var(--gray-600);">📊 מצב גיבוי כללי:</span>' +
+                                '<span id="backupSummaryBadge" style="font-size:12px;padding:4px 10px;border-radius:12px;background:#dcfce7;color:#166534;font-weight:600;">תקין</span>' +
+                            '</div>' +
+                            '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray-500);">' +
+                                '<span id="backupSummaryText">כל הטבלאות מעודכנות</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<p style="font-size:12px;color:var(--gray-400);margin-bottom:10px;">מצב גיבוי לכל טבלה (לחצו על "גיבוי" להורדה או "שחזור" לטעינה):</p>' +
+                    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;max-height:360px;overflow-y:auto;padding:2px;">' +
                         tableCardsHtml +
                     '</div>' +
                 '</div>' +
@@ -10304,12 +10350,59 @@ function _saveCompleteData(solutionId) {
     }
 
     function clearData() {
+        const TABLES_TO_CLEAR = [
+            // טבלאות ערכים
+            'inspectors', 'pedagogical_executors', 'schools', 
+            'lookup_solution_status', 'lookup_education_stages', 'lookup_education_types',
+            'lookup_week_days', 'lookup_meeting_types', 'lookup_budgeted',
+            'lookup_allocation_status', 'lookup_performer_types', 'lookup_lecturer_status',
+            'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
+            'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
+            'lookup_responsibility_types',
+            // קטלוג פתרונות למידה
+            'solutions', 'solution_instructors', 'solution_comments',
+            // מאגר מרצים
+            'mentors',
+            // מאגר מדריכים
+            'guides_repo',
+            // שאלות נפוצות
+            'faq_data',
+            // יצירת דף חדש
+            'custom_pages',
+            // ניהול משתמשים
+            'users',
+            // תקציבים
+            'budgets',
+            // תקופות
+            'periods',
+            // נרשמים לפתרונות למידה
+            'registrations',
+            // מעקב והיסטוריה
+            'activity_log',
+            // סל מחזור
+            'recycle_bin'
+        ];
+        
         showModal('⚠️ מחיקת כל הנתונים', 
             '<div style="text-align:center;padding:12px 0;">' +
             '<div style="font-size:48px;margin-bottom:12px;">⚠️</div>' +
             '<p style="color:var(--danger);font-weight:600;font-size:15px;margin-bottom:8px;">פעולה בלתי הפיכה!</p>' +
-            '<p style="color:var(--gray-500);margin-bottom:16px;">פעולה זו תמחק את כל הנתונים מהמערכת לצמיתות.</p>' +
-            '<div class="form-group"><label>הזן סיסמת אישור</label><input type="password" id="fClearPass" class="form-input" placeholder="סיסמת אישור" style="text-align:center;font-size:16px;"></div>' +
+            '<p style="color:var(--gray-500);margin-bottom:16px;font-size:13px;">פעולה זו תמחק את כל הנתונים מהמערכת לצמיתות, כולל:</p>' +
+            '<div style="text-align:right;background:var(--gray-50);padding:12px;border-radius:8px;font-size:12px;color:var(--gray-600);max-height:200px;overflow-y:auto;">' +
+            '<strong>📋 רשימת הטבלאות שימחקו (' + TABLES_TO_CLEAR.length + '):</strong><br>' +
+            '• טבלאות ערכים (מפקחים, מבצעים, בתי ספר, שלבים, סוגים, ימים, מפגשים, תקצוב, סטטוסים, מרצים, מומחים, תחומי דעת, בעלי תפקידים, נושאי רוחב, תוכניות ייעודיות, סוגי אחריות)<br>' +
+            '• קטלוג פתרונות למידה (כולל מדריכים ו הערות)<br>' +
+            '• מאגר מרצים<br>' +
+            '• מאגר מדריכים<br>' +
+            '• שאלות נפוצות ותשובות<br>' +
+            '• דפים מותאמים אישית<br>' +
+            '• משתמשים רשומים<br>' +
+            '• תקציבים ותקופות<br>' +
+            '• נרשמים לפתרונות<br>' +
+            '• יומן פעילות והיסטוריה<br>' +
+            '• סל מחזור' +
+            '</div>' +
+            '<div class="form-group" style="margin-top:16px;"><label>הזן סיסמת אישור</label><input type="password" id="fClearPass" class="form-input" placeholder="סיסמת אישור" style="text-align:center;font-size:16px;"></div>' +
             '</div>',
             '<button class="btn btn-danger" onclick="App._doClearAll()">🗑️ אישור מחיקה</button><button class="btn btn-outline" onclick="App.closeModal()">ביטול</button>'
         );
@@ -10324,11 +10417,34 @@ function _saveCompleteData(solutionId) {
         }
         closeModal();
         confirmDialog('⚠️ למחוק את כל הנתונים לצמיתות? פעולה זו בלתי הפיכה!', function() {
-            var keysToRemove = [];
-            for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.startsWith('matspanet_')) keysToRemove.push(k); }
-            keysToRemove.forEach(function(k) { localStorage.removeItem(k); });
+            const TABLES_TO_CLEAR = [
+                'inspectors', 'pedagogical_executors', 'schools',
+                'lookup_solution_status', 'lookup_education_stages', 'lookup_education_types',
+                'lookup_week_days', 'lookup_meeting_types', 'lookup_budgeted',
+                'lookup_allocation_status', 'lookup_performer_types', 'lookup_lecturer_status',
+                'lookup_certified_lecturer', 'lookup_expert_field', 'lookup_domains',
+                'lookup_role_holders', 'lookup_broad_topics', 'lookup_designated_programs',
+                'lookup_responsibility_types',
+                'solutions', 'solution_instructors', 'solution_comments',
+                'mentors', 'guides_repo', 'faq_data', 'custom_pages',
+                'users', 'budgets', 'periods', 'registrations',
+                'activity_log', 'recycle_bin'
+            ];
+            
+            let totalDeleted = 0;
+            TABLES_TO_CLEAR.forEach(function(key) {
+                var data = DataStore.getAll(key);
+                if (data) {
+                    var count = Array.isArray(data) ? data.length : (typeof data === 'object' && data !== null ? Object.keys(data).length : 0);
+                    totalDeleted += count;
+                    var storeKey = 'matspanet_' + key;
+                    localStorage.removeItem(storeKey);
+                }
+            });
+            
             DataStore.init();
-            showToast('הכל נמחק! מרענן...', 'success');
+            logActivity('clear_all', 'נקה הכל - נמחקו ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות', 'settings');
+            showToast('הכל נמחק! ' + totalDeleted + ' רשומות מ-' + TABLES_TO_CLEAR.length + ' טבלאות. מרענן...', 'success');
             setTimeout(function() { window.location.reload(); }, 1500);
         });
     }
