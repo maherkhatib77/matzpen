@@ -262,7 +262,12 @@ class CustomHandler(SimpleHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 response = json.dumps({'success': True, 'message': 'Data saved successfully'})
-                self.wfile.write(response.encode('utf-8'))
+                try:
+                    self.wfile.write(response.encode('utf-8'))
+                except (ConnectionAbortedError, BrokenPipeError, ConnectionResetError) as e:
+                    # הלקוח ניתק את החיבור - זה תקין במקרים מסוימים
+                    print(f"⚠️  Client disconnected before response could be sent: {e}")
+                    return  # יציאה ללא שליחת שגיאה
                 
                 print(f"✅  Saved {filename} ({len(post_data)} bytes)")
                 

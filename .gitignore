@@ -1,5 +1,63 @@
-(js/app.js is a source file, and there are no build artifacts, dependencies, or temporary files in the changes - only a modified JavaScript source file)
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.class
+*.out
 
-```javascript
+# Dependencies
+.venv/
+venv/
+node_modules/
+pip-wheel-metadata/
+*.egg-info/
 
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing and coverage
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Distribution / packaging
+dist/
+build/
+*.tar.gz
+*.whl
+*.zip
+
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+.Python
 ```
