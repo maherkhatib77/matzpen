@@ -434,24 +434,13 @@ button{font-family:inherit}
     // מסלול ראשי: דרך מודול האימות
     if (typeof Auth !== 'undefined' && typeof Auth.login === 'function') {
       try {
-        // Auth.login הוא עכשיו async - מחזיר Promise
-        var loginPromise = Auth.login(u, pw);
-        if (loginPromise && typeof loginPromise.then === 'function') {
-          // זהו Promise - נמתין לתוצאה
-          loginPromise.then(function(r) {
-            if (r && r.success) { done(true); }
-            else { done(false, r && r.message); }
-          }).catch(function(err) {
-            done(false, 'שגיאת התחברות: ' + err.message);
-          });
-          return false; // יציאה מיידית, ה-callback יטופל אסינכרונית
-        } else {
-          // תוצאה סינכרונית (לתאימות לאחור)
-          if (loginPromise && loginPromise.success) { done(true); return false; }
-          done(false, loginPromise && loginPromise.message);
-          return false;
-        }
-      } catch (err) { done(false, 'שגיאת התחברות: ' + err.message); return false; }
+        var result = Auth.login(u, pw);
+        if (result && result.success) { done(true); }
+        else { done(false, result && result.message); }
+      } catch (err) {
+        done(false, 'שגיאת התחברות: ' + err.message);
+      }
+      return false;
     }
 
     // מסלול גיבוי: בדיקה ישירה מול חנות המשתמשים
