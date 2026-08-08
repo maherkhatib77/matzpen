@@ -368,7 +368,7 @@
         // Initialize
         if (DataStore.init && typeof DataStore.init === 'function') {
             var _t = setTimeout(function() { renderFAQ(); if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar'); }, 5000);
-            DataStore.init().then(function() { clearTimeout(_t); renderFAQ(); if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar'); }).catch(function() { clearTimeout(_t); renderFAQ(); if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar'); });
+            DataStore.init(false).then(function() { clearTimeout(_t); renderFAQ(); if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar'); }).catch(function() { clearTimeout(_t); renderFAQ(); if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar'); });
         } else {
             renderFAQ();
             if (typeof GlobalUI !== 'undefined') GlobalUI.apply('ar');

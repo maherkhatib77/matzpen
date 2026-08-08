@@ -130,7 +130,7 @@
 
         if (typeof DataStore !== 'undefined') {
             console.log('[Dashboard] 🔄 מאתחל DataStore...');
-            DataStore.init().then(() => {
+            DataStore.init(false).then(() => {
                 console.log('[Dashboard] ✅ DataStore מוכן.');
                 _startApp();
             }).catch(err => {
