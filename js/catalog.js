@@ -204,31 +204,58 @@ const CatalogPage = (() => {
             if (link.fullName === 'כוח פנים' || link.performerType === 'כוח פנים') {
                 continue;
             }
-            // Must have mentorId to fetch from mentorsRepo
-            if (!link.mentorId) {
-                continue;
-            }
-            const mentor = mentorsRepo.find(m => m.id === link.mentorId);
-            if (!mentor) {
-                continue;
-            }
-            // Priority: fullNameAr (if exists and non-empty) > fullNameHe
-            let nameToShow = '';
-            if (lang === 'ar') {
-                if (mentor.fullNameAr && mentor.fullNameAr.trim()) {
-                    nameToShow = mentor.fullNameAr;
-                } else if (mentor.fullNameHe && mentor.fullNameHe.trim()) {
-                    nameToShow = mentor.fullNameHe;
+            
+            // If mentorId exists, try to fetch from mentorsRepo
+            if (link.mentorId) {
+                const mentor = mentorsRepo.find(m => m.id === link.mentorId);
+                if (mentor) {
+                    // Priority: fullNameAr (if exists and non-empty) > fullNameHe
+                    let nameToShow = '';
+                    if (lang === 'ar') {
+                        if (mentor.fullNameAr && mentor.fullNameAr.trim()) {
+                            nameToShow = mentor.fullNameAr;
+                        } else if (mentor.fullNameHe && mentor.fullNameHe.trim()) {
+                            nameToShow = mentor.fullNameHe;
+                        }
+                    } else {
+                        // For Hebrew, return fullNameHe
+                        nameToShow = mentor.fullNameHe || '';
+                    }
+                    
+                    if (nameToShow) {
+                        mentorNames.push({
+                            name: nameToShow,
+                            mentorId: mentor.mentorId || mentor.id
+                        });
+                    }
+                    continue;
                 }
-            } else {
-                // For Hebrew, return fullNameHe
-                nameToShow = mentor.fullNameHe || '';
             }
             
-            if (nameToShow) {
+            // Fallback: use direct name from solution_instructors if no mentorId or mentor not found
+            let directName = '';
+            if (lang === 'ar') {
+                // For Arabic: prefer fullNameAr if exists, otherwise fullNameHe, otherwise fullName
+                if (link.fullNameAr && link.fullNameAr.trim()) {
+                    directName = link.fullNameAr;
+                } else if (link.fullNameHe && link.fullNameHe.trim()) {
+                    directName = link.fullNameHe;
+                } else if (link.fullName && link.fullName.trim()) {
+                    directName = link.fullName;
+                }
+            } else {
+                // For Hebrew: prefer fullNameHe, otherwise fullName
+                if (link.fullNameHe && link.fullNameHe.trim()) {
+                    directName = link.fullNameHe;
+                } else if (link.fullName && link.fullName.trim()) {
+                    directName = link.fullName;
+                }
+            }
+            
+            if (directName) {
                 mentorNames.push({
-                    name: nameToShow,
-                    mentorId: mentor.mentorId || mentor.id
+                    name: directName,
+                    mentorId: null
                 });
             }
         }
