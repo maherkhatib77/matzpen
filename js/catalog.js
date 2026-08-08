@@ -115,10 +115,68 @@ const CatalogPage = (() => {
 
     // ======================== Lookup Helpers ========================
 
+    /**
+     * Get label from lookup list with language priority (Arabic first, then Hebrew fallback)
+     */
     function getLookupLabel(lookupList, value) {
         if (!value || !lookupList) return '';
         const item = lookupList.find(l => l.value === value);
         if (!item) return value;
+        return lang === 'ar' ? (item.labelAr || item.label || item.value) : (item.label || item.value);
+    }
+
+    /**
+     * Get topic label based on topicType mapping to correct lookup table
+     * TopicType determines which lookup table to use for the topic field
+     */
+    function getTopicLabel(topicType, topicValue) {
+        if (!topicValue) return '';
+        
+        // Map topicType to the correct lookup table
+        let lookupTable = null;
+        
+        if (topicType === 'תחום דעת') {
+            // Use lookup_field_knowledge for knowledge fields
+            lookupTable = lookupFieldKnowledge;
+        } else if (topicType === 'בעלי תפקידים') {
+            // Use lookup_role_holders for role holders
+            lookupTable = DataStore.getAll(DataStore.KEYS.LOOKUP_ROLE_HOLDERS) || [];
+        } else if (topicType === 'נושא רוחב') {
+            // Could use another lookup table if defined
+            lookupTable = lookupFieldKnowledge;
+        } else if (topicType === 'תוכניות ייעודיות') {
+            // Use designated programs lookup
+            lookupTable = DataStore.getAll(DataStore.KEYS.LOOKUP_DESIGNATED_PROGRAMS) || [];
+        } else {
+            // Default fallback: try field knowledge first, then domains
+            lookupTable = lookupFieldKnowledge;
+        }
+        
+        // Get the label with Arabic priority
+        if (lookupTable && lookupTable.length > 0) {
+            const item = lookupTable.find(l => l.value === topicValue);
+            if (item) {
+                return lang === 'ar' ? (item.labelAr || item.label || item.value) : (item.label || item.value);
+            }
+        }
+        
+        // Fallback: try field knowledge then domains
+        const fieldItem = lookupFieldKnowledge.find(l => l.value === topicValue);
+        if (fieldItem) {
+            return lang === 'ar' ? (fieldItem.labelAr || fieldItem.label || fieldItem.value) : (fieldItem.label || fieldItem.value);
+        }
+        
+        // Last resort: return the raw value
+        return topicValue;
+    }
+
+    /**
+     * Get domain/topicType label with Arabic priority
+     */
+    function getDomainLabel(domainValue) {
+        if (!domainValue) return '';
+        const item = categories.find(d => d.value === domainValue);
+        if (!item) return domainValue;
         return lang === 'ar' ? (item.labelAr || item.label || item.value) : (item.label || item.value);
     }
 
@@ -136,36 +194,57 @@ const CatalogPage = (() => {
     }
 
     function getMentorNames(solutionId) {
-        if (!solutionId || !solutionInstructors) return '';
+        if (!solutionId || !solutionInstructors) return [];
         const links = solutionInstructors.filter(si => si.solutionId === solutionId);
-        if (!links.length) return '';
-        return links.map(link => {
+        if (!links.length) return [];
+        
+        const mentorNames = [];
+        for (const link of links) {
             // Skip "כוח פנים" entries entirely - do not display them
             if (link.fullName === 'כוח פנים' || link.performerType === 'כוח פנים') {
-                return '';
+                continue;
             }
             // Must have mentorId to fetch from mentorsRepo
             if (!link.mentorId) {
-                return '';
+                continue;
             }
             const mentor = mentorsRepo.find(m => m.id === link.mentorId);
             if (!mentor) {
-                return '';
+                continue;
             }
             // Priority: fullNameAr (if exists and non-empty) > fullNameHe
+            let nameToShow = '';
             if (lang === 'ar') {
                 if (mentor.fullNameAr && mentor.fullNameAr.trim()) {
-                    return mentor.fullNameAr;
+                    nameToShow = mentor.fullNameAr;
+                } else if (mentor.fullNameHe && mentor.fullNameHe.trim()) {
+                    nameToShow = mentor.fullNameHe;
                 }
-                // Fallback to fullNameHe only if fullNameAr is empty
-                if (mentor.fullNameHe && mentor.fullNameHe.trim()) {
-                    return mentor.fullNameHe;
-                }
-                return '';
+            } else {
+                // For Hebrew, return fullNameHe
+                nameToShow = mentor.fullNameHe || '';
             }
-            // For Hebrew, return fullNameHe
-            return mentor.fullNameHe || '';
-        }).filter(Boolean).join(', ');
+            
+            if (nameToShow) {
+                mentorNames.push({
+                    name: nameToShow,
+                    mentorId: mentor.mentorId || mentor.id
+                });
+            }
+        }
+        return mentorNames;
+    }
+    
+    /**
+     * Get mentor names as tag HTML for card display
+     */
+    function getMentorTagsHtml(solutionId) {
+        const mentorNames = getMentorNames(solutionId);
+        if (!mentorNames || mentorNames.length === 0) return '';
+        
+        return mentorNames.map(m => 
+            `<span class="mentor-tag">${m.name}</span>`
+        ).join('');
     }
 
     function formatDate(dateStr) {
@@ -368,20 +447,23 @@ const CatalogPage = (() => {
         card.setAttribute('aria-label', item.name || '');
         card._catalogItem = item; // reference for event delegation
 
-        const topicLabel = getLookupLabel(lookupFieldKnowledge, item.topic) ||
-                           getLookupLabel(categories, item.topicType) ||
-                           '';
+        // Get domain (topicType) label with Arabic priority
+        const domainLabel = getDomainLabel(item.topicType);
+        // Get topic (subject) label based on topicType mapping
+        const subjectLabel = getTopicLabel(item.topicType, item.topic);
+        
         const fieldColor = getFieldColor(item.topic || '');
-        // Get mentor names instead of guide name (requirement: display mentors, not guide)
-        const mentorNames = getMentorNames(item.id);
+        // Get mentor tags HTML (requirement: display mentors as tags, filter out "כוח פנים")
+        const mentorTagsHtml = getMentorTagsHtml(item.id);
         const meetingLabel = getLookupLabel(lookupMeetingTypes, item.meetingType);
         const dayLabel = getLookupLabel(lookupWeekDays, item.weekDay);
         const hours = item.academicHours || 0;
         const regUrl = './registration.html?solution=' + encodeURIComponent(item.id) + '&name=' + encodeURIComponent(item.name);
 
         let badgesHtml = '';
-        if (topicLabel) badgesHtml += `<span class="badge badge-primary">${topicLabel}</span>`;
-        if (meetingLabel) badgesHtml += `<span class="badge badge-info">${meetingLabel}</span>`;
+        if (domainLabel) badgesHtml += `<span class="badge badge-primary">${domainLabel}</span>`;
+        if (subjectLabel) badgesHtml += `<span class="badge badge-info">${subjectLabel}</span>`;
+        if (meetingLabel) badgesHtml += `<span class="badge badge-gray">${meetingLabel}</span>`;
         if (dayLabel) badgesHtml += `<span class="badge badge-gray">${dayLabel}</span>`;
         if (hours > 0) badgesHtml += `<span class="badge badge-gray">🕐 ${hours} ${t('hoursUnit')}</span>`;
 
@@ -390,7 +472,7 @@ const CatalogPage = (() => {
                 <span class="strip-label">${item.name || ''}</span>
             </div>
             <div class="catalog-card-body">
-                ${mentorNames ? `<div class="catalog-card-guide"><span class="guide-icon">👥</span> ${mentorNames}</div>` : ''}
+                ${mentorTagsHtml ? `<div class="catalog-card-mentors">${mentorTagsHtml}</div>` : ''}
                 ${badgesHtml ? `<div class="catalog-card-badges">${badgesHtml}</div>` : ''}
             </div>
             <div class="catalog-card-footer" style="display:flex;gap:8px;justify-content:center;">
@@ -418,10 +500,11 @@ const CatalogPage = (() => {
             html += `<div class="detail-row"><span class="detail-label">${t('descriptionLabel')}</span><span class="detail-value">${item.description}</span></div>`;
         }
 
-        // Display mentors first (requirement: show mentors, not guide)
+        // Display mentors first as tags (requirement: show mentors, filter out "כוח פנים")
         const mentorNames = getMentorNames(item.id);
-        if (mentorNames) {
-            html += `<div class="detail-row"><span class="detail-label">${t('mentorsLabel')}</span><span class="detail-value">👥 ${mentorNames}</span></div>`;
+        if (mentorNames && mentorNames.length > 0) {
+            const mentorTagsHtml = mentorNames.map(m => `<span class="badge badge-primary">${m.name}</span>`).join('');
+            html += `<div class="detail-row"><span class="detail-label">${t('mentorsLabel')}</span><span class="detail-value"><span class="detail-badges">${mentorTagsHtml}</span></span></div>`;
         }
 
         // Guide is secondary - still display but after mentors
@@ -430,10 +513,11 @@ const CatalogPage = (() => {
             html += `<div class="detail-row"><span class="detail-label">${t('guideLabel')}</span><span class="detail-value">👤 ${guideName}</span></div>`;
         }
 
-        const topicTypeLabel = getLookupLabel(categories, item.topicType);
-        const topicLabel = getLookupLabel(lookupFieldKnowledge, item.topic);
-        if (topicTypeLabel || topicLabel) {
-            html += `<div class="detail-row"><span class="detail-label">${t('topicTypeLabel')}</span><span class="detail-value"><span class="detail-badges">${topicTypeLabel ? '<span class="badge badge-primary">' + topicTypeLabel + '</span>' : ''}${topicLabel ? '<span class="badge badge-info">' + topicLabel + '</span>' : ''}</span></span></div>`;
+        // Display domain (topicType) and subject (topic) with Arabic priority using proper lookup tables
+        const domainLabel = getDomainLabel(item.topicType);
+        const subjectLabel = getTopicLabel(item.topicType, item.topic);
+        if (domainLabel || subjectLabel) {
+            html += `<div class="detail-row"><span class="detail-label">${t('topicTypeLabel')}</span><span class="detail-value"><span class="detail-badges">${domainLabel ? '<span class="badge badge-primary">' + domainLabel + '</span>' : ''}${subjectLabel ? '<span class="badge badge-info">' + subjectLabel + '</span>' : ''}</span></span></div>`;
         }
 
         if (item.educationStage && item.educationStage.length > 0) {
@@ -562,6 +646,20 @@ const CatalogPage = (() => {
 
         applyLanguage();
         bindEvents();
+        render();
+    }
+    
+    // Expose onYearChange for the year select dropdown in HTML
+    function onYearChange(year) {
+        selectedPeriodId = year;
+        // Reload data filtered by selected period
+        let solutions = (DataStore.getAll(DataStore.KEYS.SOLUTIONS) || []).filter(s => s.showInCatalog === true || s.showInPublicCatalog === true);
+        
+        if (selectedPeriodId) {
+            solutions = solutions.filter(function(s) { return s.periodId === selectedPeriodId; });
+        }
+        
+        allItems = solutions.map(normalizeItem);
         render();
     }
 
