@@ -67,7 +67,8 @@ const App = (() => {
             { key: 'baseBudgetedHours', label: 'סה"כ שעות מתוקצבות', hints: ['שעות מתוקצבות', 'budgeted hours'] },
             { key: 'baseBudgetType', label: 'סוג תקצוב', hints: ['סוג תקצוב', 'budget type'] },
             { key: 'mentorType', label: 'סוג המנחה', hints: ['סוג מנחה', 'mentor type', 'רגיל', 'כוח פנים', 'שעות ליווי'] },
-            { key: 'mentorName', label: 'שם המנחה', hints: ['שם מנחה', 'mentor name', 'מנחה'] },
+            { key: 'mentorName', label: 'שם המנחה (עברית)', hints: ['שם מנחה', 'mentor name', 'מנחה', 'עברית'] },
+            { key: 'mentorNameAr', label: 'שם המנחה (ערבית)', hints: ['שם מנחה ערבית', 'mentor name arabic', 'ערבית', 'arabic'] },
             { key: 'mentorP2', label: 'שעות תקופה ב׳ (09-12)', hints: ['תקופה ב', 'period 2', '09-12'] },
             { key: 'mentorP1', label: 'שעות תקופה א׳ (01-08)', hints: ['תקופה א', 'period 1', '01-08'] },
             { key: 'mentorTotal', label: 'סה"כ שעות', hints: ['סהכ', 'total hours'] },
@@ -7637,7 +7638,8 @@ function _saveCompleteData(solutionId) {
                 var _createdInstTypes = {}; // track which special types were created
                 group.mentorRows.forEach(function(mRec) {
                     var mType = String(mRec.mentorType || 'רגיל').trim();
-                    var mName = String(mRec.mentorName || '').trim();
+                    var mNameHe = String(mRec.mentorName || '').trim();
+                    var mNameAr = String(mRec.mentorNameAr || '').trim();
                     var mP2Raw = String(mRec.mentorP2 || '').trim();
                     var mP1Raw = String(mRec.mentorP1 || '').trim();
                     var mP2 = mP2Raw !== '' ? parseFloat(mP2Raw) : 0;
@@ -7645,7 +7647,7 @@ function _saveCompleteData(solutionId) {
                     var hasHours = (mP2Raw !== '' || mP1Raw !== '');
 
                     // Skip empty mentor names (but track special types for auto-creation below)
-                    if (!mName) {
+                    if (!mNameHe && !mNameAr) {
                         if (mType === 'כוח פנים' || mType === 'שעות ליווי') {
                             _createdInstTypes[mType] = { p2: mP2, p1: mP1, total: mP2 + mP1 };
                         }
@@ -7657,20 +7659,21 @@ function _saveCompleteData(solutionId) {
 
                     if (isAcc) {
                         // שעות ליווי row: name may be empty, total from hours or solution-level accBudgetedHours
-                        _createdInstTypes['שעות ליווי'] = { p2: mP2, p1: mP1, total: mP2 + mP1, name: mName };
+                        _createdInstTypes['שעות ליווי'] = { p2: mP2, p1: mP1, total: mP2 + mP1, name: mNameHe || mNameAr };
                     } else if (isInternal) {
                         // כוח פנים row
                         _createdInstTypes['כוח פנים'] = { p2: mP2, p1: mP1, total: mP2 + mP1 };
-                    } else if (mName.indexOf(',') !== -1) {
+                    } else if ((mNameHe || mNameAr).indexOf(',') !== -1) {
                         // Comma-separated mentor names: split into individual rows (hours not assigned per-mentor)
-                        var names = mName.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
+                        var combinedName = mNameHe || mNameAr;
+                        var names = combinedName.split(',').map(function(n) { return n.trim(); }).filter(Boolean);
                         names.forEach(function(singleName) {
                             DataStore.create(DataStore.KEYS.SOLUTION_INSTRUCTORS, {
                                 solutionId: newSol.id,
                                 mentorId: null,
                                 fullName: singleName,
                                 fullNameHe: singleName,  // Store name in Hebrew field for catalog display
-                                fullNameAr: '',          // Arabic name empty by default
+                                fullNameAr: '',          // Arabic name empty by default for comma-split
                                 idNumber: '', phone: '', email: '',
                                 performerType: '',
                                 lecturerStatus: '',
@@ -7682,12 +7685,14 @@ function _saveCompleteData(solutionId) {
                         });
                     } else {
                         // Single mentor row (with or without hours)
+                        // Use Arabic name as primary if exists, otherwise use Hebrew name
+                        var displayName = mNameAr || mNameHe || '';
                         DataStore.create(DataStore.KEYS.SOLUTION_INSTRUCTORS, {
                             solutionId: newSol.id,
                             mentorId: null,
-                            fullName: mName,
-                            fullNameHe: mName,  // Store name in Hebrew field for catalog display
-                            fullNameAr: '',     // Arabic name empty by default
+                            fullName: displayName,
+                            fullNameHe: mNameHe || displayName,  // Store Hebrew name (or fallback) for catalog display
+                            fullNameAr: mNameAr || '',           // Store Arabic name if provided
                             idNumber: '', phone: '', email: '',
                             performerType: '',
                             lecturerStatus: '',

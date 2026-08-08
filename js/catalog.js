@@ -233,18 +233,22 @@ const CatalogPage = (() => {
             }
             
             // Fallback: use direct name from solution_instructors if no mentorId or mentor not found
+            // For imported mentors without mentorId, the name is stored in fullNameHe
+            // In Arabic mode: prefer fullNameAr if exists, otherwise use fullNameHe as fallback
+            // In Hebrew mode: use fullNameHe
             let directName = '';
             if (lang === 'ar') {
-                // For Arabic: prefer fullNameAr if exists, otherwise fullNameHe, otherwise fullName
+                // Arabic priority: fullNameAr > fullNameHe > fullName
                 if (link.fullNameAr && link.fullNameAr.trim()) {
                     directName = link.fullNameAr;
                 } else if (link.fullNameHe && link.fullNameHe.trim()) {
+                    // Use Hebrew name as fallback when Arabic name is missing
                     directName = link.fullNameHe;
                 } else if (link.fullName && link.fullName.trim()) {
                     directName = link.fullName;
                 }
             } else {
-                // For Hebrew: prefer fullNameHe, otherwise fullName
+                // Hebrew: prefer fullNameHe, otherwise fullName
                 if (link.fullNameHe && link.fullNameHe.trim()) {
                     directName = link.fullNameHe;
                 } else if (link.fullName && link.fullName.trim()) {
