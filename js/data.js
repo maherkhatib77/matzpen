@@ -100,7 +100,7 @@ const DataStore = (() => {
         [KEYS.LOOKUP_WEEK_DAYS]:       'lookup_week_days.json',
         [KEYS.LOOKUP_MEETING_TYPES]:   'lookup_meeting_types.json',
         [KEYS.LOOKUP_SCHOOLS]:          'lookup_schools.json',
-        [KEYS.INSTITUTIONS]:            'institutions.json',
+        // [KEYS.INSTITUTIONS]:            'institutions.json', // הוסר - קובץ לא קיים, גורם לשגיאת 404
         [KEYS.SOLUTION_COMMENTS]:      'solution_comments.json',
         [KEYS.CATALOG_ENTRIES]:         'catalog_entries.json',
         [KEYS.CATALOG_ITEMS]:           'catalog_items.json',
