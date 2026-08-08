@@ -555,19 +555,25 @@ const App = (() => {
     }
     
     /**
-     * Returns the mentor/guide name according to the new logic:
-     * - If fullNameAr (Arabic name) exists and is not empty, return it
-     * - Otherwise, return fullNameHe (Hebrew name) as fallback
-     * This ensures professional Arabic names are displayed when available,
-     * with Hebrew names as backup when translation is not yet provided.
+     * Returns the mentor/guide name according to language context:
+     * - For Hebrew (default): prefer fullNameHe, then fullName, then fullNameAr
+     * - For Arabic (lang === 'ar'): prefer fullNameAr, then fullNameHe
+     * This ensures proper display in both languages.
      */
     function getMentorName(m) {
         if (!m) return '';
-        // Priority: Arabic name if exists and not empty, otherwise Hebrew name
-        if (m.fullNameAr && m.fullNameAr.trim() !== '') {
-            return m.fullNameAr;
+        // For Arabic language context
+        if (lang === 'ar') {
+            if (m.fullNameAr && m.fullNameAr.trim() !== '') {
+                return m.fullNameAr;
+            }
+            return m.fullNameHe || m.fullName || '';
         }
-        return m.fullNameHe || m.fullName || '';
+        // For Hebrew language context (default): prefer fullNameHe
+        if (m.fullNameHe && m.fullNameHe.trim() !== '') {
+            return m.fullNameHe;
+        }
+        return m.fullName || m.fullNameAr || '';
     }
 
     /**
@@ -1159,7 +1165,8 @@ const App = (() => {
                     var sRows = _buildSolutionFlatRows(s, insts);
                     var startIdx = _aoa.length; // row index in aoa (0 = header)
                     for (var r = 0; r < sRows.length; r++) { _aoa.push(sRows[r]); }
-                    if (sRows.length > 2) {
+                    // Apply color to ALL solutions with multiple rows (not just >2)
+                    if (sRows.length > 1) {
                         // Use sequential pastel color instead of random
                         var pastel = pastelColors[colorIndex % pastelColors.length];
                         colorIndex++;
