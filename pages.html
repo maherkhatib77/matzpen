@@ -948,7 +948,7 @@
 
         // ==================== Init ====================
         document.addEventListener('DOMContentLoaded', function() {
-            DataStore.init().then(function() {
+            DataStore.init(false).then(function() {
                 applyLanguage();
                 loadPages();
                 renderList();

@@ -549,8 +549,8 @@ button{font-family:inherit}
         release();
       };
       try {
-        // אתחול עם טעינה מחדש מהשרת כדי לוודא שהנתונים עדכניים
-        var p = DataStore.init(true);
+        // אתחול רגיל (ללא טעינה מחדש מהשרת) כדי לשמור על הנתונים ב-localStorage
+        var p = DataStore.init(false);
         if (p && typeof p.then === 'function') p.then(finishInit, finishInit);
         else finishInit();
       } catch (e) { finishInit(); }

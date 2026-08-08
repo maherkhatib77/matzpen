@@ -568,7 +568,7 @@ const CatalogPage = (() => {
     // ======================== Boot ========================
 
     if (DataStore.init && typeof DataStore.init === 'function') {
-        DataStore.init(true).then(() => init()).catch(() => init());
+        DataStore.init(false).then(() => init()).catch(() => init());
     } else {
         init();
     }

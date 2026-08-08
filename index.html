@@ -381,7 +381,7 @@
         // Initialize
         if (DataStore.init && typeof DataStore.init === 'function') {
             var _t = setTimeout(function() { renderPage(); }, 5000);
-            DataStore.init().then(function() { clearTimeout(_t); renderPage(); }).catch(function() { clearTimeout(_t); renderPage(); });
+            DataStore.init(false).then(function() { clearTimeout(_t); renderPage(); }).catch(function() { clearTimeout(_t); renderPage(); });
         } else {
             renderPage();
         }
