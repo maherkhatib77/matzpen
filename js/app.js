@@ -562,8 +562,21 @@ const App = (() => {
      */
     function getMentorName(m) {
         if (!m) return '';
+        // Determine current UI language
+        var currentLang = 'he';
+        try {
+            if (typeof DataStore !== 'undefined' && DataStore.getSettings) {
+                var d = (DataStore.getSettings() || {}).language;
+                if (d === 'ar' || d === 'he') currentLang = d;
+            }
+        } catch (e) {}
+        try {
+            var s = localStorage.getItem('matspanet_ui_lang');
+            if (s === 'ar' || s === 'he') currentLang = s;
+        } catch (e) {}
+        
         // For Arabic language context
-        if (lang === 'ar') {
+        if (currentLang === 'ar') {
             if (m.fullNameAr && m.fullNameAr.trim() !== '') {
                 return m.fullNameAr;
             }
