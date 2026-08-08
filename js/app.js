@@ -1143,19 +1143,29 @@ const App = (() => {
                 _aoa.push(_SOLUTION_EXPORT_HEADERS);
 
                 var _solColorGroups = []; // track solutions with >2 rows for background coloring
+                var pastelColors = [
+                    { r: 255, g: 230, b: 230 }, // ורוד חיוור
+                    { r: 220, g: 245, b: 255 }, // תכלת
+                    { r: 220, g: 255, b: 230 }, // ירוק מנטה
+                    { r: 255, g: 250, b: 210 }, // צהוב עדין
+                    { r: 235, g: 225, b: 255 }, // לבנדר
+                    { r: 255, g: 235, b: 245 }, // ורוד בהיר
+                    { r: 230, g: 245, b: 240 }, // ירוק-כחול
+                    { r: 255, g: 240, b: 220 }  // אפרסק
+                ];
+                var colorIndex = 0;
                 items.forEach(function(s) {
                     var insts = _instBySol[s.id] || [];
                     var sRows = _buildSolutionFlatRows(s, insts);
                     var startIdx = _aoa.length; // row index in aoa (0 = header)
                     for (var r = 0; r < sRows.length; r++) { _aoa.push(sRows[r]); }
                     if (sRows.length > 2) {
-                        // Generate a random pastel color (light, readable)
-                        var cr = Math.floor(Math.random() * 80 + 175);
-                        var cg = Math.floor(Math.random() * 80 + 175);
-                        var cb = Math.floor(Math.random() * 80 + 175);
-                        var hexR = cr.toString(16).toUpperCase();
-                        var hexG = cg.toString(16).toUpperCase();
-                        var hexB = cb.toString(16).toUpperCase();
+                        // Use sequential pastel color instead of random
+                        var pastel = pastelColors[colorIndex % pastelColors.length];
+                        colorIndex++;
+                        var hexR = pastel.r.toString(16).toUpperCase();
+                        var hexG = pastel.g.toString(16).toUpperCase();
+                        var hexB = pastel.b.toString(16).toUpperCase();
                         _solColorGroups.push({ startRow: startIdx, count: sRows.length, rgb: 'FF' + (hexR.length < 2 ? '0' + hexR : hexR) + (hexG.length < 2 ? '0' + hexG : hexG) + (hexB.length < 2 ? '0' + hexB : hexB) });
                     }
                 });
