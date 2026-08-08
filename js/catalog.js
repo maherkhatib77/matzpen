@@ -14,7 +14,7 @@
 const CatalogPage = (() => {
 
     // ======================== State ========================
-    let lang = 'he'; // default Hebrew for public catalog
+    let lang = 'ar'; // default Arabic for public catalog
     let allItems = []; // combined list from both sources
     let guidesRepo = [];
     let categories = [];
