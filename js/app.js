@@ -9773,6 +9773,49 @@ function _saveCompleteData(solutionId) {
         _restoreCpanelUrl();
     }
 
+    // ===== Settings Sub-Section Navigation =====
+    function _switchSettingsSub(subSection) {
+        App._settingsSubSection = subSection;
+        
+        // Hide all sub-sections
+        document.querySelectorAll('.settings-sub-section').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        
+        // Show active sub-section
+        var activeEl = document.getElementById('settings-sub-' + subSection);
+        if (activeEl) activeEl.style.display = 'block';
+        
+        // Update tab buttons styling
+        var buttons = document.querySelectorAll('#section-settings .btn');
+        buttons.forEach(function(btn) {
+            var isTarget = btn.textContent.includes(_getSubSectionLabel(subSection));
+            if (isTarget) {
+                btn.classList.remove('btn-ghost');
+                btn.classList.add('btn-primary');
+            } else {
+                // Only update buttons that are sub-section navigators
+                if (btn.onclick && btn.onclick.toString().includes('_switchSettingsSub')) {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-ghost');
+                }
+            }
+        });
+        
+        // Scroll to top of settings
+        document.querySelector('.main-content').scrollTop = 0;
+    }
+    
+    function _getSubSectionLabel(sub) {
+        var labels = {
+            'general': 'הגדרות כלליות',
+            'whatsapp': 'תבניות WhatsApp',
+            'backup': 'גיבוי ושחזור',
+            'health': 'אבחון שרת'
+        };
+        return labels[sub] || '';
+    }
+
     // ======================== אבחון תקינות שרת ========================
     var _lastHealthData = null;
 
@@ -10945,7 +10988,9 @@ function _saveCompleteData(solutionId) {
         // Custom Pages
         openCustomPageModal, saveCustomPage, editCustomPage, deleteCustomPage, previewCustomPage, _openPageLink, _copyPageLink, _cpOnMenuLocChange,
         // Internal
-        _doConfirm, _confirmCb: null
+        _doConfirm, _confirmCb: null,
+        // Settings Sub-Section Navigation
+        _switchSettingsSub, _getSubSectionLabel
     };
 })();
 
