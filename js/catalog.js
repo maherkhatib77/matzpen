@@ -219,7 +219,7 @@ const CatalogPage = (() => {
                         }
                     } else {
                         // For Hebrew, return fullNameHe
-                        nameToShow = mentor.fullNameHe || '';
+                        nameToShow = mentor.fullNameHe || mentor.fullName || '';
                     }
                     
                     if (nameToShow) {
