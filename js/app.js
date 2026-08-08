@@ -7659,6 +7659,8 @@ function _saveCompleteData(solutionId) {
                                 solutionId: newSol.id,
                                 mentorId: null,
                                 fullName: singleName,
+                                fullNameHe: singleName,  // Store name in Hebrew field for catalog display
+                                fullNameAr: '',          // Arabic name empty by default
                                 idNumber: '', phone: '', email: '',
                                 performerType: '',
                                 lecturerStatus: '',
@@ -7674,6 +7676,8 @@ function _saveCompleteData(solutionId) {
                             solutionId: newSol.id,
                             mentorId: null,
                             fullName: mName,
+                            fullNameHe: mName,  // Store name in Hebrew field for catalog display
+                            fullNameAr: '',     // Arabic name empty by default
                             idNumber: '', phone: '', email: '',
                             performerType: '',
                             lecturerStatus: '',
